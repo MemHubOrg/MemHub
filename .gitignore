@@ -1,0 +1,24 @@
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtual environment
+venv/
+.venv/
+
+# Docker-related
+*.log
+*.pid
+*.sock
+
+# Database files
+*.sqlite3
+
+# IDEs
+.idea/
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
