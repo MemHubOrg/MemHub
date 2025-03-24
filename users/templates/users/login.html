@@ -5,20 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
     <title>Memhub – Вход</title>
-    <link rel="stylesheet" href="styles.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/styles.css' %}">
 </head>
 <body>
-    <img src="img/memhub_logo.svg" alt="Логотип" class="logo">
+    <img src="../../static/users/memhub_logo.svg" alt="Логотип" class="logo">
 
     <div class="login-box">
         <h2>Вход</h2>
-        <input type="text" placeholder="Введите логин Telegram">
-        <input type="password" placeholder="Введите пароль">
-        <button>Войти</button>
-        <button class="register">Зарегистрироваться</button>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>
+                {{ form.username }}  <!-- Django будет рендерить поле с классом и другими аттрибутами -->
+            </label>
+            <label>
+                {{ form.password }}
+            </label>
+            <button type="submit">Войти</button>
+            <button class="register" onclick="window.location.href='/register/'">Зарегистрироваться</button>
+            {% if form.errors %}
+                <div class="error" style="color: red;
+                     font-size: 16px;
+                     padding: 0px;
+                     text-align: center;
+                     border: 1px solid black;">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </form>
     </div>
 
-    <img src="img/cat_lupa.png" alt="" class="bottom-left">
-    <img src="img/tapaem_homyaka.png" alt="" class="top-right">
+    <img src="../../static/users/cat_lupa.png" alt="" class="bottom-left">
+    <img src="../../static/users/tapaem_homyaka.png" alt="" class="top-right">
 </body>
 </html>
