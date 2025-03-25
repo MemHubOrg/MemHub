@@ -51,6 +51,14 @@ class RegisterForm(forms.Form):
         required=True,
         label='Подтверждение пароля'
     )
+    telegram_code = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control',
+                                          'placeholder': 'Введите код подтверждения Telegram'}),
+        min_length=4,
+        max_length=4,
+        required=True,
+        label='Телеграм код'
+    )
 
     def clean_username(self):
         username = self.cleaned_data['username']
@@ -75,3 +83,8 @@ class RegisterForm(forms.Form):
         if password != confirm_password:
             raise forms.ValidationError('Введённые пароли не совпадают!')
         return password
+
+    def clean_telegram_code(self):
+        telegram_code = self.cleaned_data['telegram_code']
+        if not telegram_code.isdigit():
+            raise forms.ValidationError('Код может содержать только цифры!')

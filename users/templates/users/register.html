@@ -25,6 +25,15 @@
             <label>
                 {{ form.confirm_password }}
             </label>
+            <div class="telegram-code-container">
+                {{ form.telegram_code }}
+                <button type="button" id="sendCodeBtn">Отправить код</button>
+                <p id="codeError" style="display: none;
+                     color: grey;
+                     font-size: 16px;
+                     padding: 0px;
+                     text-align: center;">Если вам не приходит код, проверьте, инициализирован ли диалог с ботом *ссылка*</p>
+            </div>
             <button class="register">Зарегистрироваться</button>
             {% if form.errors %}
                 <div class="error" style="color: red;
@@ -45,5 +54,44 @@
 
     <img src="../../static/users/cat_lupa.png" alt="" class="bottom-left">
     <img src="../../static/users/tapaem_homyaka.png" alt="" class="top-right">
+
+    <script>
+        document.getElementById("sendCodeBtn").addEventListener("click", function() {
+            let username = document.querySelector("input[name='username']").value;
+
+            if (!username) {
+                alert("Введите логин перед отправкой кода!");
+                return;
+            }
+
+            fetch(`/check-telegram-user/?username=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        return fetch("/send-telegram-code/", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": "{{ csrf_token }}"
+                            },
+                            body: JSON.stringify({ username: username })
+                        });
+                    } else {
+                        throw new Error("Пользователь с таким ником не найден!");
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("sendCodeBtn").style.display = "none";
+                        document.getElementById("codeError").style.display = "block";
+                    }
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        });
+        </script>
+
 </body>
 </html>

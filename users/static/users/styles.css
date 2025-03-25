@@ -85,3 +85,23 @@ button.register {
     right: 0px;
     transform: none;
 }
+
+.telegram-code-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.telegram-code-container input {
+    flex: 1;
+}
+
+.telegram-code-container button {
+    margin-left: 10px;
+    padding: 10px;
+    background-color: #ED9E1D;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
