@@ -44,10 +44,6 @@ def register(request):
                 {'username': username, "form": TelegramCodeForm(request.POST)}
             )
 
-
-            # return redirect(f'/login/?username={username}')
-            # else:
-            #   return render(request, "users/register.html", {"form": form, "error": "Неверный логин или пароль!"})
         else:
             return render(request, "users/register.html", {"form": form})
 
@@ -96,9 +92,6 @@ def verify_telegram_code(request):
     return JsonResponse({"success": False}, status=400)
 
 def login(request):
-    username = request.GET.get("username", "")
-    form = LoginForm(initial={'username': username})
-
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -128,7 +121,6 @@ def login(request):
     else:
         form = LoginForm()
         return render(request, "users/login.html", {"form": form})
-
 
 
 @csrf_exempt

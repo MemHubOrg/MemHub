@@ -13,6 +13,8 @@ class LoginForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control',
                                           'placeholder': 'Введите пароль'}),
+        max_length=12,
+        min_length=8,
         required=True,
         label='Пароль'
     )
