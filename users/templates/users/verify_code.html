@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <title>Memhub – Проверка кода</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/styles.css' %}">
+</head>
+<body>
+    <img src="../../static/users/memhub_logo.svg" alt="Логотип" class="logo">
+
+    <div class="verify-code-box">
+        <form method="POST" id="codeForm">
+            {% csrf_token %}
+            <div class="telegram-code-container">
+                <div class="code-input-container">
+                    {{ form.telegram_code }}
+                </div>
+                
+                <button type="button" id="sendCodeBtn" class="action-btn send-code-btn">Отправить код повторно</button>
+                <button type="button" id="verifyCodeBtn" class="action-btn verify-code-btn">Проверить код</button>
+                <p id="codeError" style="
+                    color: grey; 
+                    font-size: 16px;
+                    padding: 0px; 
+                    text-align: center;">
+                    Если вам не приходит код, проверьте, инициализирован ли диалог с ботом 
+                    <a href="https://t.me/LFS_Auth_Bot" 
+                        target="_blank" 
+                        style="color: blue; text-decoration: underline;">здесь
+                    </a>.
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <img src="../../static/users/cat_lupa.png" alt="" class="bottom-left">
+    <img src="../../static/users/tapaem_homyaka.png" alt="" class="top-right">
+
+    <script>
+        document.getElementById("sendCodeBtn").addEventListener("click", function() {
+            const username = sessionStorage.getItem('username');
+            
+            fetch("/send-telegram-code/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ username: username })
+            });
+        });
+
+        document.getElementById("verifyCodeBtn").addEventListener("click", async function() {
+            const code = document.querySelector("input[name='telegram_code']").value;
+            const statusElement = document.getElementById("statusMessage");
+            const username = sessionStorage.getItem('username');
+            
+            if (!code || code.length !== 6) {
+                statusElement.textContent = "Введите 6-значный код";
+                statusElement.style.color = "red";
+                return;
+            }
+
+            try {
+                const response = await fetch("/verify-telegram-code/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({ telegram_code: code, username: username })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const modal = document.createElement('div');
+                    modal.className = 'modal-overlay';
+                    
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <h3 class="modal-title">✓ Код верный</h3>
+                            <p>Поздравляем! Вы успешно подтвердили код.</p>
+                            <button class="modal-close-btn" id="modalCloseBtn">
+                                Закрыть
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    document.getElementById('modalCloseBtn').addEventListener('click', function() {
+                        document.body.removeChild(modal);
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        }
+                    });
+
+                    // TODO: надо сделать здесь редирект на главную страницу
+
+                    console.error("Info:", "пароль правильный");
+                } 
+                else {
+                    console.error("Info:", "пароль неправильный");
+                }
+            } 
+            catch (error) {
+                console.error("Ошибка:", error);
+            }
+        });
+    </script>
+</body>
+</html>

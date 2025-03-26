@@ -25,15 +25,21 @@
             <label>
                 {{ form.confirm_password }}
             </label>
-            <div class="telegram-code-container">
+            <!-- <div class="telegram-code-container">
                 {{ form.telegram_code }}
                 <button type="button" id="sendCodeBtn">Отправить код</button>
-                <p id="codeError" style="display: none;
-                     color: grey;
-                     font-size: 16px;
-                     padding: 0px;
-                     text-align: center;">Если вам не приходит код, проверьте, инициализирован ли диалог с ботом *ссылка*</p>
-            </div>
+                <p id="codeError" style="display: none; 
+                    color: grey; 
+                    font-size: 16px;
+                    padding: 0px; 
+                    text-align: center;">
+                    Если вам не приходит код, проверьте, инициализирован ли диалог с ботом 
+                    <a href="https://t.me/LFS_Auth_Bot" 
+                        target="_blank" 
+                        style="color: blue; text-decoration: underline;">здесь
+                    </a>.
+                </p>
+            </div> -->
             <button class="register">Зарегистрироваться</button>
             {% if form.errors %}
                 <div class="error" style="color: red;
@@ -54,6 +60,13 @@
 
     <img src="../../static/users/cat_lupa.png" alt="" class="bottom-left">
     <img src="../../static/users/tapaem_homyaka.png" alt="" class="top-right">
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function() {
+            const username = document.querySelector("[name='username']").value;
+            sessionStorage.setItem('username', username);
+        });
+    </script>
 
     <script>
         document.getElementById("sendCodeBtn").addEventListener("click", function() {
