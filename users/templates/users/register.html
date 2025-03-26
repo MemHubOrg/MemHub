@@ -14,6 +14,17 @@
     <div class="login-box">
         <h2>Регистрация</h2>
 
+        {% if error %}
+            <div class="error" style="color: red;
+                 font-size: 16px;
+                 padding: 0px;
+                 text-align: center;
+                 border: 1px solid black;
+                 margin-bottom: 10px;">
+                {{ error }}
+            </div>
+        {% endif %}
+
         <form method="POST">
             {% csrf_token %}
             <label>
@@ -25,21 +36,7 @@
             <label>
                 {{ form.confirm_password }}
             </label>
-            <!-- <div class="telegram-code-container">
-                {{ form.telegram_code }}
-                <button type="button" id="sendCodeBtn">Отправить код</button>
-                <p id="codeError" style="display: none; 
-                    color: grey; 
-                    font-size: 16px;
-                    padding: 0px; 
-                    text-align: center;">
-                    Если вам не приходит код, проверьте, инициализирован ли диалог с ботом 
-                    <a href="https://t.me/LFS_Auth_Bot" 
-                        target="_blank" 
-                        style="color: blue; text-decoration: underline;">здесь
-                    </a>.
-                </p>
-            </div> -->
+
             <button class="register">Зарегистрироваться</button>
             {% if form.errors %}
                 <div class="error" style="color: red;

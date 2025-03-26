@@ -86,7 +86,6 @@ class RegisterForm(forms.Form):
 
     def clean_password(self):
         password = self.cleaned_data['password']
-        return password
         if not re.match(r'^[a-zA-Z0-9!@#$%^&*()_+={}[\]|:;<>,.?/`~"-]+$', password):
             raise forms.ValidationError('Пароль содержит недопустимые символы!')
         elif not re.search(r'\d', password):
@@ -97,7 +96,6 @@ class RegisterForm(forms.Form):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
-        return password
         if password != confirm_password:
             raise forms.ValidationError('Введённые пароли не совпадают!')
         return password

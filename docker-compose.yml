@@ -43,5 +43,42 @@ services:
       - POSTGRES_USER=django_user
       - POSTGRES_PASSWORD=django_password
 
+  api:
+    build: .
+    container_name: telegram_bot_api
+    command: python /app/TelegramBot/api.py
+    volumes:
+      - .:/app
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      POSTGRES_DB: django_db
+      POSTGRES_USER: django_user
+      POSTGRES_PASSWORD: django_password
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      - db
+      - web
+
+  bot:
+    build: .
+    container_name: telegram_bot
+    command: python /app/TelegramBot/main.py
+    volumes:
+      - .:/app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      POSTGRES_DB: django_db
+      POSTGRES_USER: django_user
+      POSTGRES_PASSWORD: django_password
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      - db
+      - web
+      - api
+
 volumes:
   postgres_data:

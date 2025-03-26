@@ -33,6 +33,7 @@
                     </a>.
                 </p>
             </div>
+            <p id="statusMessage" style="text-align: center; font-size: 16px; color: red;"></p>
         </form>
     </div>
 
@@ -40,6 +41,9 @@
     <img src="../../static/users/tapaem_homyaka.png" alt="" class="top-right">
 
     <script>
+        {% if username %}
+            sessionStorage.setItem("username", "{{ username }}");
+        {% endif %}
         document.getElementById("sendCodeBtn").addEventListener("click", function() {
             const username = sessionStorage.getItem('username');
             
@@ -57,7 +61,7 @@
             const code = document.querySelector("input[name='telegram_code']").value;
             const statusElement = document.getElementById("statusMessage");
             const username = sessionStorage.getItem('username');
-            
+
             if (!code || code.length !== 6) {
                 statusElement.textContent = "Введите 6-значный код";
                 statusElement.style.color = "red";
@@ -73,41 +77,23 @@
                     },
                     body: JSON.stringify({ telegram_code: code, username: username })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    const modal = document.createElement('div');
-                    modal.className = 'modal-overlay';
-                    
-                    modal.innerHTML = `
-                        <div class="modal-content">
-                            <h3 class="modal-title">✓ Код верный</h3>
-                            <p>Поздравляем! Вы успешно подтвердили код.</p>
-                            <button class="modal-close-btn" id="modalCloseBtn">
-                                Закрыть
-                            </button>
-                        </div>
-                    `;
-                    
-                    document.body.appendChild(modal);
-                    
-                    document.getElementById('modalCloseBtn').addEventListener('click', function() {
-                        document.body.removeChild(modal);
-                        if (data.redirect_url) {
-                            window.location.href = data.redirect_url;
-                        }
-                    });
-
-                    // TODO: надо сделать здесь редирект на главную страницу
-
-                    console.error("Info:", "пароль правильный");
-                } 
-                else {
-                    console.error("Info:", "пароль неправильный");
+                    window.location.href = data.redirect_url;
                 }
-            } 
-            catch (error) {
+
+                else {
+                    const errorMsg =
+                        data.errors?.telegram_code?.[0] ||
+                        data.error || "Код должен состоять только из цифр";
+                    statusElement.textContent = errorMsg;
+                    statusElement.style.color = "red";
+                }
+            } catch (error) {
+                statusElement.textContent = "Ошибка соединения с сервером";
+                statusElement.style.color = "red";
                 console.error("Ошибка:", error);
             }
         });
