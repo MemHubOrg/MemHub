@@ -1,4 +1,5 @@
 from django import forms
+from captcha.fields import CaptchaField
 import re
 
 class LoginForm(forms.Form):
@@ -77,6 +78,7 @@ class RegisterForm(forms.Form):
         required=True,
         label='Подтверждение пароля'
     )
+    captcha = CaptchaField()
 
     def clean_username(self):
         username = self.cleaned_data['username']
