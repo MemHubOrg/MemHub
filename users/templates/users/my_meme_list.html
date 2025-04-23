@@ -21,7 +21,7 @@
 
     for (let i = start; i < end; i++) {
         const link = document.createElement('a');
-        link.href = '#';
+        link.href = `/selected_meme/${i + 1}/`;
         link.className = 'mem-item';
 
         const img = document.createElement('img');
@@ -47,6 +47,7 @@
         rightArrow.classList.add('disabled');
     }
 }
+
 
 
     function nextPage() {
