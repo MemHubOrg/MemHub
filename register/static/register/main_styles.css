@@ -183,7 +183,14 @@ body {
 }
 
 /* мое */
+.upload-frame {
+    background-color: transparent;
+}
 
+.hide-ui .rotate-btn,
+.hide-ui .remove-btn {
+    display: none !important;
+}
 
 /* Как сделать мем */
 .howto-section {

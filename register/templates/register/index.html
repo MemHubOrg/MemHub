@@ -62,7 +62,8 @@
                         <div id="preview"></div>
                         <button type="button" class="upload-btn" id="customBtn">Выбрать файл</button>
                         <p class="upload-note">Максимальный размер файла 25MB</p>
-                        <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки" class="upload-icon">
+                        <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки" 
+                            class="upload-icon">
                     </div>
                     <div class="upload-icons">
                         <div class="upload-icons-left">
@@ -72,7 +73,8 @@
                         </div>
                         <div class="upload-icons-right">
                             <img src="{% static 'register/telegram_icon.svg' %}" alt="">
-                            <img src="{% static 'register/download_icon.svg' %}" alt="">
+                            <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" 
+                                id="downloadBtn">
                         </div>
                     </div>
                 </div>
@@ -82,9 +84,88 @@
     </div>
 
     <script>
+        html2canvas(document.querySelector('#memeWrapper'), {
+            useCORS: true,
+            backgroundColor: null,
+            scale: 2,
+            logging: true
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'meme.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    </script>
+
+    <script 
+        src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
+    </script>
+
+    <script>
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        downloadBtn.addEventListener('click', () => {
+            const target = document.querySelector('.upload-inner');
+            if (!target) {
+                console.error('Элемент .upload-inner не найден');
+                return;
+            }
+
+            // Соберем все элементы, которые надо временно скрыть
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div'); // все вложенные кнопки управления
+
+            // Сохраняем оригинальные стили
+            const hiddenElements = [];
+            toHide.forEach(el => {
+                hiddenElements.push({
+                    element: el,
+                    display: el.style.display
+                });
+                el.style.display = 'none';
+            });
+
+            // Убираем возможные рамки у контейнеров
+            const containers = target.querySelectorAll('div[style*="position: absolute"]');
+            const containerStyles = [];
+            containers.forEach(el => {
+                containerStyles.push({
+                    element: el,
+                    border: el.style.border,
+                    boxShadow: el.style.boxShadow,
+                    transform: el.style.transform
+                });
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+            });
+
+            setTimeout(() => {
+                html2canvas(target, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 2
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'meme.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                    // Возвращаем стили
+                    hiddenElements.forEach(({ element, display }) => {
+                        element.style.display = display;
+                    });
+                    containerStyles.forEach(({ element, border, boxShadow }) => {
+                        element.style.border = border;
+                        element.style.boxShadow = boxShadow;
+                    });
+                });
+            }, 50); // подождать, чтобы DOM успел применить изменения
+        });
+    </script>
+
+    <script>
         const addImageBtn = document.getElementById('addImageBtn');
         const addTextBtn = document.getElementById('addTextBtn');
-        const uploadFrame = document.querySelector('.upload-frame');
+        const uploadFrame = document.querySelector('.upload-inner');
     
         function makeDraggable(el) {
             let offsetX = 0, offsetY = 0, isDragging = false;
