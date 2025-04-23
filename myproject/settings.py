@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',  # добавь сюда свое приложение
+    'captcha',
 ]
 
 MIDDLEWARE = [
