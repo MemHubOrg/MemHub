@@ -3,45 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            position: relative;
-        }
-        .container {
-            text-align: center;
-        }
-        .login-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 16px;
-        }
-        .login-btn:hover {
-            background: #0056b3;
-        }
-    </style>
+    <title>Memhub – Главная</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/main_styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<a href="{% url 'login' %}" class="login-btn">Вход</a>
+    <!-- Шапка -->
+    <header class="header">
+        <img src="{% static 'users/header_bg.png' %}" alt="Фон шапки" class="header-bg">
+        <div class="header-content">
+            <a href="{% url 'index' %}">
+                <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип" class="header-logo">
+            </a>
+            <span class="header-title">– сервис для поиска и генерации мемов</span>
+        </div>
 
-<div class="container">
-    <h1>Главная страница!!!</h1>
-</div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="profile-icon">
+                <img src="{% static 'users/profile_icon.svg' %}" alt="Профиль">
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="header-login-btn">Вход</a>
+        {% endif %}
+    </header>
+
+    <!-- Серая линия-разделитель -->
+    <div class="divider"></div>
+
+    <!-- Основной контент -->
+    <div class="main-content-wrapper">
+        <main class="main-content">
+
+            <!-- Кнопки -->
+            <div class="button-row">
+                <button class="main-btn">Создание мема</button>
+                <button class="main-btn">Шаблоны</button>
+            </div>
+
+            <!-- Раздел "Как сделать мем" -->
+            <div class="howto-section">
+                <p class="howto-title">Как сделать мем</p>
+                <div class="howto-gallery">
+                    <div class="howto-item"><img src="{% static 'users/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'users/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'users/placeholder_pic.png' %}" alt=""></div>
+                </div>
+            </div>
+
+            <!-- Зона загрузки -->
+            <div class="upload-wrapper">
+                <div class="upload-frame">
+                    <div class="upload-inner">
+                        <p class="upload-title">Перетащите изображение сюда</p>
+                        <p class="upload-subtitle">Или нажмите, чтобы выбрать изображение</p>
+                        <button class="upload-btn">Выбрать файл</button>
+                        <p class="upload-note">Максимальный размер файла 25MB</p>
+                        <img src="{% static 'users/upload_icon.svg' %}" alt="Иконка загрузки" class="upload-icon">
+                    </div>
+                    <div class="upload-icons">
+                        <div class="upload-icons-left">
+                            <img src="{% static 'users/add_pic_icon.svg' %}" alt="">
+                            <img src="{% static 'users/add_text_icon.svg' %}" alt="">
+                        </div>
+                        <div class="upload-icons-right">
+                            <img src="{% static 'users/telegram_icon.svg' %}" alt="">
+                            <img src="{% static 'users/download_icon.svg' %}" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
 
 </body>
 </html>

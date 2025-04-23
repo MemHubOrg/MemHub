@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-33oz0vhql=z2bytl=*twl^)zrg$hu!-)#=b&xxv(()4y!oh0@2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.0.3", "127.0.0.1"]
+ALLOWED_HOSTS = ["192.168.0.3", '127.0.0.1', 'localhost', '109.68.215.67', 'memhubpoly.ru', 'www.memhubpoly.ru']
 
 LOGGING = {
     'version': 1,
@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',  # добавь сюда свое приложение
-    'captcha',
 ]
 
 MIDDLEWARE = [

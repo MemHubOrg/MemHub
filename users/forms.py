@@ -2,6 +2,9 @@ from django import forms
 from captcha.fields import CaptchaField
 import re
 
+from django.shortcuts import render
+
+
 class LoginForm(forms.Form):
     username = forms.CharField(
         max_length=32,
@@ -27,6 +30,53 @@ class LoginForm(forms.Form):
         elif not re.match(r'^[a-zA-Z0-9_]+$', username):
             raise forms.ValidationError("Неверный формат никнейма: допустимы символы a-z, 0-9 и подчёркивание!")
         return username
+
+class PasswordChangeForm(forms.Form):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Введите старый пароль',
+            'id': 'id_old_password'
+        }),
+        max_length=12,
+        min_length=8,
+        required=True,
+        label='Старый пароль'
+    )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Введите новый пароль',
+            'id': 'id_new_password1'
+        }),
+        max_length=12,
+        min_length=8,
+        required=True,
+        label='Новый пароль'
+    )
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Подтвердите новый пароль',
+            'id': 'id_new_password2'
+        }),
+        max_length=12,
+        min_length=8,
+        required=True,
+        label='Подтвердите новый пароль'
+    )
+
+
+    def change_password(request):
+        if request.method == 'POST':
+            form = PasswordChangeForm(user=request.user, data=request.POST)
+            if form.is_valid():
+                form.save()
+                #TODO логика редиректа и сообщения
+        else:
+            form = PasswordChangeForm(user=request.user)
+
+        return render(request, 'users/change_password.html', {'form': form})
 
 class TelegramCodeForm(forms.Form):
     telegram_code = forms.CharField(

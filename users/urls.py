@@ -1,3 +1,4 @@
+from django.contrib.auth.views import LogoutView
 from django.urls import path
 from . import views
 
@@ -8,4 +9,9 @@ urlpatterns = [
     path('verify-telegram-code/', views.verify_telegram_code, name="verify_telegram_code"),
     #path("check-telegram-user/", views.check_telegram_user, name="check_telegram_user"),
     path("send-telegram-code/", views.send_telegram_code, name="send_telegram_code"),
+    path('profile/', views.profile, name='profile'),
+    path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
+    path('change-password/', views.change_password_view, name='change_password'),
+    path('my_memes/', views.my_memes_view, name='my_memes'),
+    path('selected_meme/<int:image_id>/', views.selected_meme_view, name='selected_meme')
 ]
