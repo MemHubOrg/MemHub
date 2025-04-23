@@ -72,7 +72,9 @@
                             <input type="file" id="image-input" accept="image/*" style="display: none;" />
                         </div>
                         <div class="upload-icons-right">
-                            <img src="{% static 'register/telegram_icon.svg' %}" alt="">
+                            {% if user.is_authenticated %}
+                                <img src="{% static 'users/telegram_icon.svg' %}" alt="">
+                            {% endif %}
                             <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" 
                                 id="downloadBtn">
                         </div>
@@ -101,6 +103,7 @@
         src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
     </script>
 
+    <!-- Скачивание мема -->
     <script>
         const downloadBtn = document.getElementById('downloadBtn');
 
@@ -162,6 +165,7 @@
         });
     </script>
 
+    <!-- Добавление текста/картинок + возможность менять размер/вращать их -->
     <script>
         const addImageBtn = document.getElementById('addImageBtn');
         const addTextBtn = document.getElementById('addTextBtn');
