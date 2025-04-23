@@ -17,7 +17,10 @@
         <button onclick="window.location.href='/change-password/'">Изменить пароль</button>
         <button class="register" onclick="window.location.href='/saved-memes/'">Мои сохранённые мемы</button>
 
-        <button class="exit" onclick="">Выход</button>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="exit">Выход</button>
+        </form>
     </div>
 
     <img src="{% static 'users/cat_lupa.png' %}" alt="" class="bottom-left">
