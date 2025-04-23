@@ -163,3 +163,14 @@ def change_password_view(request):
     else:
         form = PasswordChangeForm()
     return render(request, 'users/change_password.html', {'form': form})
+
+def my_memes_view(request):
+    return render(request, 'users/my_meme_list.html')
+
+def selected_meme_view(request, image_id):
+    # TODO логика забора реального айди реальной картинки
+
+    # А пока заглушка.
+    meme_image_url = f"users/placeholder_pic.png"
+
+    return render(request, 'users/selected_meme.html', {'meme_image_url': meme_image_url})

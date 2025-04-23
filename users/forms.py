@@ -22,7 +22,7 @@ class LoginForm(forms.Form):
         required=True,
         label='Пароль'
     )
-    
+
     def clean_username(self):
         username = self.cleaned_data['username']
         if len(username) < 5 or len(username) > 31:
@@ -128,9 +128,8 @@ class RegisterForm(forms.Form):
         required=True,
         label='Подтверждение пароля'
     )
-    
     captcha = CaptchaField()
-        
+
     def clean_username(self):
         username = self.cleaned_data['username']
         if len(username) < 5 or len(username) > 31:
