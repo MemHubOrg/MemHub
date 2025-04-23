@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memhub – Главная</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'users/main_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'register/main_styles.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <!-- Шапка -->
     <header class="header">
-        <img src="{% static 'users/header_bg.png' %}" alt="Фон шапки" class="header-bg">
+        <img src="{% static 'register/header_bg.png' %}" alt="Фон шапки" class="header-bg">
         <div class="header-content">
             <a href="{% url 'index' %}">
-                <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип" class="header-logo">
+                <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип" class="header-logo">
             </a>
             <span class="header-title">– сервис для поиска и генерации мемов</span>
         </div>
 
         {% if user.is_authenticated %}
             <a href="{% url 'users:profile' %}" class="profile-icon">
-                <img src="{% static 'users/profile_icon.svg' %}" alt="Профиль">
+                <img src="{% static 'register/profile_icon.svg' %}" alt="Профиль">
             </a>
         {% else %}
             <a href="{% url 'login' %}" class="header-login-btn">Вход</a>
@@ -46,9 +46,9 @@
             <div class="howto-section">
                 <p class="howto-title">Как сделать мем</p>
                 <div class="howto-gallery">
-                    <div class="howto-item"><img src="{% static 'users/placeholder_pic.png' %}" alt=""></div>
-                    <div class="howto-item"><img src="{% static 'users/placeholder_pic.png' %}" alt=""></div>
-                    <div class="howto-item"><img src="{% static 'users/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
                 </div>
             </div>
 
@@ -62,16 +62,16 @@
                         <div id="preview"></div>
                         <button type="button" class="upload-btn" id="customBtn">Выбрать файл</button>
                         <p class="upload-note">Максимальный размер файла 25MB</p>
-                        <img src="{% static 'users/upload_icon.svg' %}" alt="Иконка загрузки" class="upload-icon">
+                        <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки" class="upload-icon">
                     </div>
                     <div class="upload-icons">
                         <div class="upload-icons-left">
-                            <img src="{% static 'users/add_pic_icon.svg' %}" alt="" id="addImageBtn">
-                            <img src="{% static 'users/add_text_icon.svg' %}" alt="" id="addTextBtn">
+                            <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn">
+                            <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn">
                         </div>
                         <div class="upload-icons-right">
-                            <img src="{% static 'users/telegram_icon.svg' %}" alt="">
-                            <img src="{% static 'users/download_icon.svg' %}" alt="">
+                            <img src="{% static 'register/telegram_icon.svg' %}" alt="">
+                            <img src="{% static 'register/download_icon.svg' %}" alt="">
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
     <script>
         const addImageBtn = document.getElementById('addImageBtn');
         const addTextBtn = document.getElementById('addTextBtn');
-        const uploadFrame = document.querySelector('.upload-inner');
+        const uploadFrame = document.querySelector('.upload-frame');
     
         function makeDraggable(el) {
             let offsetX = 0, offsetY = 0, isDragging = false;
@@ -140,16 +140,30 @@
 
             resizer.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                e.stopPropagation(); // Чтобы не начиналось перетаскивание
+                e.stopPropagation(); // Чтобы не мешал drag
 
                 const startX = e.clientX;
                 const startY = e.clientY;
-                const startWidth = parseInt(document.defaultView.getComputedStyle(el).width, 10);
-                const startHeight = parseInt(document.defaultView.getComputedStyle(el).height, 10);
+                const startWidth = parseInt(window.getComputedStyle(el).width, 10);
+                const startHeight = parseInt(window.getComputedStyle(el).height, 10);
+                const startLeft = el.offsetLeft;
+                const startTop = el.offsetTop;
 
                 function doDrag(e) {
-                    el.style.width = startWidth + e.clientX - startX + 'px';
-                    el.style.height = startHeight + e.clientY - startY + 'px';
+                    const parentRect = uploadFrame.getBoundingClientRect();
+
+                    let newWidth = startWidth + e.clientX - startX;
+                    let newHeight = startHeight + e.clientY - startY;
+
+                    // Ограничение ширины и высоты так, чтобы элемент не вышел за границы uploadFrame
+                    const maxWidth = parentRect.width - startLeft;
+                    const maxHeight = parentRect.height - startTop;
+
+                    if (newWidth > maxWidth) newWidth = maxWidth;
+                    if (newHeight > maxHeight) newHeight = maxHeight;
+
+                    el.style.width = newWidth + 'px';
+                    el.style.height = newHeight + 'px';
                 }
 
                 function stopDrag() {
@@ -159,6 +173,91 @@
 
                 document.addEventListener('mousemove', doDrag);
                 document.addEventListener('mouseup', stopDrag);
+            });
+        }
+
+        function addDeleteButton(el) {
+            const delBtn = document.createElement('div');
+            delBtn.textContent = '×';
+            delBtn.style.position = 'absolute';
+            delBtn.style.top = '-10px';
+            delBtn.style.right = '-10px';
+            delBtn.style.background = '#f44336';
+            delBtn.style.color = 'white';
+            delBtn.style.width = '20px';
+            delBtn.style.height = '20px';
+            delBtn.style.borderRadius = '50%';
+            delBtn.style.display = 'flex';
+            delBtn.style.justifyContent = 'center';
+            delBtn.style.alignItems = 'center';
+            delBtn.style.cursor = 'pointer';
+            delBtn.style.fontWeight = 'bold';
+            delBtn.style.zIndex = 1001;
+
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // чтобы не мешал drag
+                el.remove();
+            });
+
+            el.appendChild(delBtn);
+        }
+
+        function addRotateButton(el) {
+            const rotateBtn = document.createElement('div');
+            rotateBtn.textContent = '⟳';
+            rotateBtn.style.position = 'absolute';
+            rotateBtn.style.top = '-10px';
+            rotateBtn.style.left = '-10px';
+            rotateBtn.style.background = '#2196f3';
+            rotateBtn.style.color = 'white';
+            rotateBtn.style.width = '20px';
+            rotateBtn.style.height = '20px';
+            rotateBtn.style.borderRadius = '50%';
+            rotateBtn.style.display = 'flex';
+            rotateBtn.style.justifyContent = 'center';
+            rotateBtn.style.alignItems = 'center';
+            rotateBtn.style.cursor = 'grab';
+            rotateBtn.style.fontWeight = 'bold';
+            rotateBtn.style.zIndex = 1001;
+
+            el.appendChild(rotateBtn);
+
+            let isRotating = false;
+            let initialAngle = 0;
+
+            rotateBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isRotating = true;
+                rotateBtn.style.cursor = 'grabbing';
+
+                const rect = el.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+                initialAngle = parseFloat(el.getAttribute('data-rotation') || '0');
+
+                function rotate(eMove) {
+                    if (!isRotating) return;
+
+                    const currentAngle = Math.atan2(eMove.clientY - centerY, eMove.clientX - centerX);
+                    const delta = currentAngle - startAngle;
+                    const degrees = initialAngle + delta * (180 / Math.PI);
+
+                    el.style.transform = `rotate(${degrees}deg)`;
+                    el.setAttribute('data-rotation', degrees);
+                }
+
+                function stopRotate() {
+                    isRotating = false;
+                    rotateBtn.style.cursor = 'grab';
+                    document.removeEventListener('mousemove', rotate);
+                    document.removeEventListener('mouseup', stopRotate);
+                }
+
+                document.addEventListener('mousemove', rotate);
+                document.addEventListener('mouseup', stopRotate);
             });
         }
 
@@ -173,9 +272,15 @@
             textEl.style.padding = '4px 8px';
             textEl.style.background = 'rgba(0, 0, 0, 0.6)';
             textEl.style.borderRadius = '4px';
-    
+
+            textEl.style.position = 'absolute';
+            textEl.style.left = '100px';
+            textEl.style.top = '100px';
+
             uploadFrame.appendChild(textEl);
             makeDraggable(textEl);
+            addDeleteButton(textEl);
+            addRotateButton(textEl);
         });
     
         // Добавление изображения
@@ -188,11 +293,11 @@
             container.style.height = '120px';
 
             const imgEl = document.createElement('img');
-            imgEl.src = '{% static "users/placeholder_pic.png" %}';
+            imgEl.src = '{% static "register/placeholder_pic.png" %}';
             imgEl.style.width = '100%';
             imgEl.style.height = '100%';
             imgEl.style.borderRadius = '8px';
-            imgEl.style.pointerEvents = 'none'; // Чтобы не мешал drag/resize
+            imgEl.style.pointerEvents = 'none';
             imgEl.style.userSelect = 'none';
 
             container.appendChild(imgEl);
@@ -200,6 +305,8 @@
 
             makeDraggable(container);
             makeResizable(container);
+            addDeleteButton(container);
+            addRotateButton(container);
         });
     </script>
     
