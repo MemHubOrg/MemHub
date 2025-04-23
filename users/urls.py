@@ -11,4 +11,5 @@ urlpatterns = [
     path("send-telegram-code/", views.send_telegram_code, name="send_telegram_code"),
     path('profile/', views.profile, name='profile'),
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
+    path('change-password/', views.change_password_view, name='change_password'),
 ]
