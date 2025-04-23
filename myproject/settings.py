@@ -59,7 +59,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users',  # добавь сюда свое приложение
+    'users', 
+    'register',
+    'backend',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +156,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 AUTH_USER_MODEL = 'users.User'
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # Другие классы аутентификации, если нужно
+    ),
+}
+ 
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Вставь сюда JWT токен как: **Bearer &lt;токен&gt;**'
+        }
+    }
+}

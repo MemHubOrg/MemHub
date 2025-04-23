@@ -4,3 +4,6 @@ requests
 pyotp
 Flask
 telebot
+drf-yasg
+djangorestframework-simplejwt
+Pillow

@@ -10,6 +10,11 @@ body {
     position: relative;
 }
 
+.upload-frame {
+    position: relative; /* обязательно */
+    overflow: hidden;
+}
+
 .logo {
     position: absolute;
     top: 20px;
