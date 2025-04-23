@@ -17,6 +17,17 @@ body {
     width: 100px;
 }
 
+.logo-link {
+    display: inline-block;
+}
+
+.logo-link img.logo {
+    display: block;
+    width: 100%; /* или конкретная ширина, если ты её используешь */
+    height: auto;
+}
+
+
 .login-box {
     background-color: transparent;
     border: 4px dashed #ED9E1D;

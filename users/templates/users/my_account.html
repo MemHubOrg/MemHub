@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="{% static 'users/styles.css' %}">
 </head>
 <body>
-    <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип" class="logo">
+    <a href="{% url 'index' %}" class="logo">
+        <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип">
+    </a>
 
     <div class="login-box">
         <h2>Личный кабинет</h2>
