@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Для определения HTTPS
+SECURE_SSL_REDIRECT = True  # Перенаправлять HTTP → HTTPS (если Nginx не сделал)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,9 +29,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-33oz0vhql=z2bytl=*twl^)zrg$hu!-)#=b&xxv(()4y!oh0@2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["192.168.0.3", '127.0.0.1', 'localhost', '109.68.215.67', 'memhubpoly.ru', 'www.memhubpoly.ru']
+ALLOWED_HOSTS = ["www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru","109.68.215.67", "localhost", "127.0.0.1"]
 
 LOGGING = {
     'version': 1,
@@ -60,10 +65,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',  # добавь сюда свое приложение
+    'captcha',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -102,7 +109,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', 'django_db'),
         'USER': os.getenv('POSTGRES_USER', 'django_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'django_password'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),  # 'db' для Docker, 'localhost' для локали
+        'HOST': os.getenv('DB_HOST', 'db'), 
         'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
@@ -151,5 +158,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'users.User'

@@ -14,7 +14,9 @@
     <header class="header">
         <img src="{% static 'users/header_bg.png' %}" alt="Фон шапки" class="header-bg">
         <div class="header-content">
-            <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип" class="header-logo">
+            <a href="{% url 'index' %}">
+                <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип" class="header-logo">
+            </a>
             <span class="header-title">– сервис для поиска и генерации мемов</span>
         </div>
 

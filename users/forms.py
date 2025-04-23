@@ -1,4 +1,5 @@
 from django import forms
+from captcha.fields import CaptchaField
 import re
 
 from django.shortcuts import render
@@ -21,7 +22,7 @@ class LoginForm(forms.Form):
         required=True,
         label='Пароль'
     )
-
+    
     def clean_username(self):
         username = self.cleaned_data['username']
         if len(username) < 5 or len(username) > 31:
@@ -32,30 +33,39 @@ class LoginForm(forms.Form):
 
 class PasswordChangeForm(forms.Form):
     old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control',
-                                          'placeholder': 'Введите старый пароль'}),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Введите старый пароль',
+            'id': 'id_old_password'
+        }),
         max_length=12,
         min_length=8,
         required=True,
         label='Старый пароль'
     )
     new_password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control',
-                                          'placeholder': 'Введите новый пароль'}),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Введите новый пароль',
+            'id': 'id_new_password1'
+        }),
         max_length=12,
         min_length=8,
         required=True,
         label='Новый пароль'
     )
-
     new_password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control',
-                                          'placeholder': 'Подтвердите новый пароль'}),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Подтвердите новый пароль',
+            'id': 'id_new_password2'
+        }),
         max_length=12,
         min_length=8,
         required=True,
         label='Подтвердите новый пароль'
     )
+
 
     def change_password(request):
         if request.method == 'POST':
@@ -118,7 +128,9 @@ class RegisterForm(forms.Form):
         required=True,
         label='Подтверждение пароля'
     )
-
+    
+    captcha = CaptchaField()
+        
     def clean_username(self):
         username = self.cleaned_data['username']
         if len(username) < 5 or len(username) > 31:
