@@ -8,4 +8,5 @@ urlpatterns = [
     path('verify-telegram-code/', views.verify_telegram_code, name="verify_telegram_code"),
     #path("check-telegram-user/", views.check_telegram_user, name="check_telegram_user"),
     path("send-telegram-code/", views.send_telegram_code, name="send_telegram_code"),
+    path('profile/', views.profile, name='profile')
 ]

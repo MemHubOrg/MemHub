@@ -148,3 +148,6 @@ def send_code_to_user(username):
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
         return False
+
+def profile(request):
+    return render(request, 'users/my_account.html')
