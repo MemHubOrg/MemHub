@@ -68,6 +68,7 @@
                         <div class="upload-icons-left">
                             <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn">
                             <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn">
+                            <input type="file" id="image-input" accept="image/*" style="display: none;" />
                         </div>
                         <div class="upload-icons-right">
                             <img src="{% static 'register/telegram_icon.svg' %}" alt="">
@@ -282,31 +283,48 @@
             addDeleteButton(textEl);
             addRotateButton(textEl);
         });
-    
-        // Добавление изображения
-        addImageBtn.addEventListener('click', () => {
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.left = '100px';
-            container.style.top = '100px';
-            container.style.width = '120px';
-            container.style.height = '120px';
 
-            const imgEl = document.createElement('img');
-            imgEl.src = '{% static "register/placeholder_pic.png" %}';
-            imgEl.style.width = '100%';
-            imgEl.style.height = '100%';
-            imgEl.style.borderRadius = '8px';
-            imgEl.style.pointerEvents = 'none';
-            imgEl.style.userSelect = 'none';
+        // Добавление картинки
+        document.getElementById('addImageBtn').addEventListener('click', () => {
+            document.getElementById('image-input').click();
+        });
 
-            container.appendChild(imgEl);
-            uploadFrame.appendChild(container);
+        document.getElementById('image-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-            makeDraggable(container);
-            makeResizable(container);
-            addDeleteButton(container);
-            addRotateButton(container);
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите файл изображения.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '100px';
+                container.style.top = '100px';
+                container.style.width = '150px';
+                container.style.height = '150px';
+
+                const imgEl = document.createElement('img');
+                imgEl.src = event.target.result;
+                imgEl.style.width = '100%';
+                imgEl.style.height = '100%';
+                imgEl.style.borderRadius = '8px';
+                imgEl.style.pointerEvents = 'none';
+                imgEl.style.userSelect = 'none';
+
+                container.appendChild(imgEl);
+                uploadFrame.appendChild(container);
+
+                makeDraggable(container);
+                makeResizable(container);
+                addDeleteButton(container);
+                addRotateButton(container);
+            };
+
+            reader.readAsDataURL(file);
         });
     </script>
     
