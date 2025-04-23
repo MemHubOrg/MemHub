@@ -163,3 +163,6 @@ def change_password_view(request):
     else:
         form = PasswordChangeForm()
     return render(request, 'users/change_password.html', {'form': form})
+
+def my_memes_view(request):
+    return render(request, 'users/my_meme_list.html')
