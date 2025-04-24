@@ -155,8 +155,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'register.User'
 
+MEDIA_ROOT = 'media/'
 
 
 REST_FRAMEWORK = {

@@ -12,4 +12,5 @@ urlpatterns = [
     # path('profile/', views.profile, name='profile'),
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     # path('change-password/', views.change_password_view, name='change_password'),
+    path('send_meme_to_telegram/', views.send_meme_to_telegram, name='send_meme_to_telegram')
 ]

@@ -73,7 +73,8 @@
                         </div>
                         <div class="upload-icons-right">
                             {% if user.is_authenticated %}
-                                <img src="{% static 'users/telegram_icon.svg' %}" alt="">
+                                <img src="{% static 'users/telegram_icon.svg' %}" alt=""
+                                    id="sendToTelegram">
                             {% endif %}
                             <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" 
                                 id="downloadBtn">
@@ -84,6 +85,77 @@
 
         </main>
     </div>
+
+    <!-- Отправка в ТГ мема -->
+    <script>
+        const sendToTelegram = document.getElementById('sendToTelegram');
+    
+        sendToTelegram.addEventListener('click', () => {
+            const target = document.querySelector('.upload-inner');
+            if (!target) {
+                console.error('Элемент .upload-inner не найден');
+                return;
+            }
+    
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
+            const hiddenElements = [];
+            toHide.forEach(el => {
+                hiddenElements.push({ element: el, display: el.style.display });
+                el.style.display = 'none';
+            });
+    
+            const containers = target.querySelectorAll('div[style*="position: absolute"]');
+            const containerStyles = [];
+            containers.forEach(el => {
+                containerStyles.push({
+                    element: el,
+                    border: el.style.border,
+                    boxShadow: el.style.boxShadow,
+                    transform: el.style.transform
+                });
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+            });
+    
+            setTimeout(() => {
+                html2canvas(target, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 2
+                }).then(canvas => {
+                    canvas.toBlob((blob) => {
+                        const formData = new FormData();
+                        formData.append('file', blob, 'meme.png');
+    
+                        fetch('/send_meme_to_telegram/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Мем успешно отправлен в Telegram!');
+                            } else {
+                                alert('Ошибка: ' + (data.error || 'неизвестная'));
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    });
+                });
+    
+                hiddenElements.forEach(({ element, display }) => {
+                    element.style.display = display;
+                });
+                containerStyles.forEach(({ element, border, boxShadow }) => {
+                    element.style.border = border;
+                    element.style.boxShadow = boxShadow;
+                });
+            }, 50);
+        });
+    </script>
 
     <script>
         html2canvas(document.querySelector('#memeWrapper'), {
