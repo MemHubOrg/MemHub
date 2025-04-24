@@ -29,7 +29,7 @@ from io import BytesIO
 
 
 logger = logging.getLogger(__name__)
-EXTERNAL_API_IP = "192.168.0.153"
+EXTERNAL_API_IP = "172.20.10.4"
 
 def index(request):
     #return render(request, 'users/index.html')
