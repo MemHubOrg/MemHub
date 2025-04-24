@@ -17,8 +17,8 @@
         <h2>Личный кабинет</h2>
 
         <button onclick="window.location.href='{% url 'users:change_password' %}'">Изменить пароль</button>
-        <button class="register" onclick="window.location.href='/saved-memes/'">Мои сохранённые мемы</button>
-
+        <button class="register" onclick="window.location.href='{% url 'users:my_memes' %}'">Мои сохранённые мемы</button>
+        
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit" class="exit">Выход</button>

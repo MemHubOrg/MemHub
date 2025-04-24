@@ -1,10 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <title>Memhub – Личный кабинет</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/styles.css' %}">
 </head>
-<body>
+<script>
+    const TOTAL_IMAGES = 21;
+    const IMAGES_PER_PAGE = 8;
+    let currentPage = 0;
 
+    function renderImages() {
+        const container = document.getElementById('memGrid');
+        container.innerHTML = '';
+        const start = currentPage * IMAGES_PER_PAGE;
+        const end = Math.min(start + IMAGES_PER_PAGE, TOTAL_IMAGES);
+
+        for (let i = start; i < end; i++) {
+            const link = document.createElement('a');
+            link.href = `/selected_meme/${i + 1}/`;
+            link.className = 'mem-item';
+
+            const img = document.createElement('img');
+            img.src = "{% static 'users/placeholder_pic.png' %}";
+            img.alt = `Мем ${i + 1}`;
+
+            link.appendChild(img);
+            container.appendChild(link);
+        }
+
+        const leftArrow = document.querySelector('.nav-icon.left');
+        const rightArrow = document.querySelector('.nav-icon.right');
+
+        if (currentPage > 0) {
+            leftArrow.classList.remove('disabled');
+        } else {
+            leftArrow.classList.add('disabled');
+        }
+
+        if (end < TOTAL_IMAGES) {
+            rightArrow.classList.remove('disabled');
+        } else {
+            rightArrow.classList.add('disabled');
+        }
+    }
+
+    function nextPage() {
+        const maxPage = Math.floor((TOTAL_IMAGES - 1) / IMAGES_PER_PAGE);
+        if (currentPage < maxPage) {
+            currentPage++;
+            renderImages();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            currentPage--;
+            renderImages();
+        }
+    }
+
+    window.addEventListener('load', renderImages);
+</script>
+
+<body>
+    <a href="{% url 'index' %}" class="logo">
+        <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип">
+    </a>
+
+    <div class="mem-block">
+        <h2>Личный кабинет</h2>
+        <h3 class="mem-section-title">Сохранённые мемы</h3>
+
+        <div class="mem-container">
+            <div class="nav-icon left" onclick="prevPage()">&#10094;</div>
+
+            <div class="mem-grid" id="memGrid">
+                <!-- Картинки-заглушки вставляются через JS -->
+            </div>
+
+            <div class="nav-icon right" onclick="nextPage()">&#10095;</div>
+        </div>
+    </div>
+
+    <img src="{% static 'users/cat_lupa.png' %}" alt="" class="bottom-left">
+    <img src="{% static 'users/tapaem_homyaka.png' %}" alt="" class="top-right">
 </body>
 </html>

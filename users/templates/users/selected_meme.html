@@ -1,10 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <title>Memhub – Просмотр мема</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/styles.css' %}">
 </head>
 <body>
+    <a href="{% url 'index' %}" class="logo">
+        <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип">
+    </a>
+
+    <div class="mem-block">
+        <h2>Личный кабинет</h2>
+        <h3 class="mem-section-title">Сохранённые мемы</h3>
+
+        <div class="mem-detail-container">
+            <div class="mem-detail-wrapper">
+                <img id="memImage" src="{% static meme_image_url %}" alt="Мем">
+
+                <div class="icon top-left">
+                    <img src="{% static 'users/download_icon.svg' %}" alt="Загрузка">
+                </div>
+                <div class="icon top-right">
+                    <img src="{% static 'users/telegram_icon.svg' %}" alt="Телеграм">
+                </div>
+                <div class="icon bottom-left">
+                    <a href="{% url 'my_memes' %}" class="icon bottom-left">
+                        <img src="{% static 'users/back_button.svg' %}" alt="Назад">
+                    </a>
+                </div>
+                <div class="icon bottom-right">
+                    <img src="{% static 'users/edit_icon.svg' %}" alt="Редактирование">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <img src="{% static 'users/cat_lupa.png' %}" alt="" class="bottom-left">
+    <img src="{% static 'users/tapaem_homyaka.png' %}" alt="" class="top-right">
 
 </body>
 </html>
