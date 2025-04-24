@@ -33,7 +33,7 @@ class DB():
             self.cur.execute(
                 sql.SQL(
                     """
-                    update django_db.public.users_user 
+                    update django_db.public.register_user 
                     set chat_id = %s
                     where username = %s
                     """
@@ -49,9 +49,9 @@ class DB():
             return "No data found."
 
         if data_type == "username":
-            return data[0][1]
-        elif data_type == "chat_id":
             return data[0][3]
+        elif data_type == "chat_id":
+            return data[0][5]
         elif data_type == "secret":
             return data[0][4]
         else:
@@ -61,7 +61,7 @@ class DB():
         try:
             self.cur.execute(
                 sql.SQL("""
-                    SELECT * FROM django_db.public.users_user WHERE chat_id = %s or username = %s
+                    SELECT * FROM django_db.public.register_user WHERE chat_id = %s or username = %s
                 """),
                 (identifier, identifier)
             )

@@ -182,6 +182,19 @@ body {
     height: 80px;
 }
 
+<<<<<<< HEAD
+=======
+/* мое */
+.upload-frame {
+    background-color: transparent;
+}
+
+.hide-ui .rotate-btn,
+.hide-ui .remove-btn {
+    display: none !important;
+}
+
+>>>>>>> Vadim
 /* Как сделать мем */
 .howto-section {
     width: 100%;

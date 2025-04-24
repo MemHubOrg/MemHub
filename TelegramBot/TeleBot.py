@@ -2,8 +2,12 @@ import pyotp
 import telebot
 import os
 from telebot import types
+import logging
 
 from DataBase import DB
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class Bot():
@@ -14,7 +18,7 @@ class Bot():
             db_user=os.getenv("POSTGRES_USER", "django_user"),
             db_password=os.getenv("POSTGRES_PASSWORD", "django_password"),
             db_host=os.getenv("DB_HOST", "db"),
-            db_port=int(os.getenv("DB_PORT", "5432"))
+            db_port=int(os.getenv("DB_PORT", "5431"))
         )
 
         self.setup_handlers()

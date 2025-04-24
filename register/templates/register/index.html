@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memhub – Главная</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'register/main_styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Шапка -->
+    <header class="header">
+        <img src="{% static 'register/header_bg.png' %}" alt="Фон шапки" class="header-bg">
+        <div class="header-content">
+            <a href="{% url 'index' %}">
+                <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип" class="header-logo">
+            </a>
+            <span class="header-title">– сервис для поиска и генерации мемов</span>
+        </div>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'users:profile' %}" class="profile-icon">
+                <img src="{% static 'register/profile_icon.svg' %}" alt="Профиль">
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="header-login-btn">Вход</a>
+        {% endif %}
+    </header>
+
+    <!-- Серая линия-разделитель -->
+    <div class="divider"></div>
+
+    <!-- Основной контент -->
+    <div class="main-content-wrapper">
+        <main class="main-content">
+
+            <!-- Кнопки -->
+            <div class="button-row">
+                <button class="main-btn">Создание мема</button>
+                <button class="main-btn">Шаблоны</button>
+            </div>
+
+            <!-- Раздел "Как сделать мем" -->
+            <div class="howto-section">
+                <p class="howto-title">Как сделать мем</p>
+                <div class="howto-gallery">
+                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
+                </div>
+            </div>
+
+            <!-- Зона загрузки -->
+            <div class="upload-wrapper">
+                <div class="upload-frame">
+                    <div class="upload-inner">
+                        <p class="upload-title">Перетащите изображение сюда</p>
+                        <p class="upload-subtitle">Или нажмите, чтобы выбрать изображение</p>
+                        <input type="file" id="fileInput" accept="image/*" style="display:none">
+                        <div id="preview"></div>
+                        <button type="button" class="upload-btn" id="customBtn">Выбрать файл</button>
+                        <p class="upload-note">Максимальный размер файла 25MB</p>
+                        <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки" 
+                            class="upload-icon">
+                    </div>
+                    <div class="upload-icons">
+                        <div class="upload-icons-left">
+                            <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn">
+                            <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn">
+                            <input type="file" id="image-input" accept="image/*" style="display: none;" />
+                        </div>
+                        <div class="upload-icons-right">
+                            {% if user.is_authenticated %}
+                                <img src="{% static 'users/telegram_icon.svg' %}" alt=""
+                                    id="sendToTelegram">
+                            {% endif %}
+                            <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" 
+                                id="downloadBtn">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Отправка в ТГ мема -->
+    <script>
+        const sendToTelegram = document.getElementById('sendToTelegram');
+    
+        sendToTelegram.addEventListener('click', () => {
+            const target = document.querySelector('.upload-inner');
+            if (!target) {
+                console.error('Элемент .upload-inner не найден');
+                return;
+            }
+    
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
+            const hiddenElements = [];
+            toHide.forEach(el => {
+                hiddenElements.push({ element: el, display: el.style.display });
+                el.style.display = 'none';
+            });
+    
+            const containers = target.querySelectorAll('div[style*="position: absolute"]');
+            const containerStyles = [];
+            containers.forEach(el => {
+                containerStyles.push({
+                    element: el,
+                    border: el.style.border,
+                    boxShadow: el.style.boxShadow,
+                    transform: el.style.transform
+                });
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+            });
+    
+            setTimeout(() => {
+                html2canvas(target, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 2
+                }).then(canvas => {
+                    canvas.toBlob((blob) => {
+                        const formData = new FormData();
+                        formData.append('file', blob, 'meme.png');
+    
+                        fetch('/send_meme_to_telegram/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Мем успешно отправлен в Telegram!');
+                            } else {
+                                alert('Ошибка: ' + (data.error || 'неизвестная'));
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    });
+                });
+    
+                hiddenElements.forEach(({ element, display }) => {
+                    element.style.display = display;
+                });
+                containerStyles.forEach(({ element, border, boxShadow }) => {
+                    element.style.border = border;
+                    element.style.boxShadow = boxShadow;
+                });
+            }, 50);
+        });
+    </script>
+
+    <script>
+        html2canvas(document.querySelector('#memeWrapper'), {
+            useCORS: true,
+            backgroundColor: null,
+            scale: 2,
+            logging: true
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'meme.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    </script>
+
+    <script 
+        src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
+    </script>
+
+    <!-- Скачивание мема -->
+    <script>
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        downloadBtn.addEventListener('click', () => {
+            const target = document.querySelector('.upload-inner');
+            if (!target) {
+                console.error('Элемент .upload-inner не найден');
+                return;
+            }
+
+            // Соберем все элементы, которые надо временно скрыть
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div'); // все вложенные кнопки управления
+
+            // Сохраняем оригинальные стили
+            const hiddenElements = [];
+            toHide.forEach(el => {
+                hiddenElements.push({
+                    element: el,
+                    display: el.style.display
+                });
+                el.style.display = 'none';
+            });
+
+            // Убираем возможные рамки у контейнеров
+            const containers = target.querySelectorAll('div[style*="position: absolute"]');
+            const containerStyles = [];
+            containers.forEach(el => {
+                containerStyles.push({
+                    element: el,
+                    border: el.style.border,
+                    boxShadow: el.style.boxShadow,
+                    transform: el.style.transform
+                });
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+            });
+
+            setTimeout(() => {
+                html2canvas(target, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 2
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'meme.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                    // Возвращаем стили
+                    hiddenElements.forEach(({ element, display }) => {
+                        element.style.display = display;
+                    });
+                    containerStyles.forEach(({ element, border, boxShadow }) => {
+                        element.style.border = border;
+                        element.style.boxShadow = boxShadow;
+                    });
+                });
+            }, 50); // подождать, чтобы DOM успел применить изменения
+        });
+    </script>
+
+    <!-- Добавление текста/картинок + возможность менять размер/вращать их -->
+    <script>
+        const addImageBtn = document.getElementById('addImageBtn');
+        const addTextBtn = document.getElementById('addTextBtn');
+        const uploadFrame = document.querySelector('.upload-inner');
+    
+        function makeDraggable(el) {
+            let offsetX = 0, offsetY = 0, isDragging = false;
+
+            el.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                offsetX = e.clientX - el.offsetLeft;
+                offsetY = e.clientY - el.offsetTop;
+                el.style.zIndex = 1000;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const parent = uploadFrame.getBoundingClientRect();
+                    const elemRect = el.getBoundingClientRect();
+
+                    let newLeft = e.clientX - offsetX;
+                    let newTop = e.clientY - offsetY;
+
+                    // Ограничение по левому и верхнему краю
+                    if (newLeft < 0) newLeft = 0;
+                    if (newTop < 0) newTop = 0;
+
+                    // Ограничение по правому и нижнему краю
+                    const maxLeft = parent.width - elemRect.width;
+                    const maxTop = parent.height - elemRect.height;
+                    if (newLeft > maxLeft) newLeft = maxLeft;
+                    if (newTop > maxTop) newTop = maxTop;
+
+                    el.style.left = newLeft + 'px';
+                    el.style.top = newTop + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            el.style.position = 'absolute';
+            el.style.cursor = 'move';
+        }
+        
+        function makeResizable(el) {
+            const resizer = document.createElement('div');
+            resizer.style.width = '15px';
+            resizer.style.height = '15px';
+            resizer.style.background = '#ff9800';
+            resizer.style.position = 'absolute';
+            resizer.style.right = '0';
+            resizer.style.bottom = '0';
+            resizer.style.cursor = 'se-resize';
+            resizer.style.borderRadius = '3px';
+            el.appendChild(resizer);
+
+            resizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // Чтобы не мешал drag
+
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startWidth = parseInt(window.getComputedStyle(el).width, 10);
+                const startHeight = parseInt(window.getComputedStyle(el).height, 10);
+                const startLeft = el.offsetLeft;
+                const startTop = el.offsetTop;
+
+                function doDrag(e) {
+                    const parentRect = uploadFrame.getBoundingClientRect();
+
+                    let newWidth = startWidth + e.clientX - startX;
+                    let newHeight = startHeight + e.clientY - startY;
+
+                    // Ограничение ширины и высоты так, чтобы элемент не вышел за границы uploadFrame
+                    const maxWidth = parentRect.width - startLeft;
+                    const maxHeight = parentRect.height - startTop;
+
+                    if (newWidth > maxWidth) newWidth = maxWidth;
+                    if (newHeight > maxHeight) newHeight = maxHeight;
+
+                    el.style.width = newWidth + 'px';
+                    el.style.height = newHeight + 'px';
+                }
+
+                function stopDrag() {
+                    document.removeEventListener('mousemove', doDrag);
+                    document.removeEventListener('mouseup', stopDrag);
+                }
+
+                document.addEventListener('mousemove', doDrag);
+                document.addEventListener('mouseup', stopDrag);
+            });
+        }
+
+        function addDeleteButton(el) {
+            const delBtn = document.createElement('div');
+            delBtn.textContent = '×';
+            delBtn.style.position = 'absolute';
+            delBtn.style.top = '-10px';
+            delBtn.style.right = '-10px';
+            delBtn.style.background = '#f44336';
+            delBtn.style.color = 'white';
+            delBtn.style.width = '20px';
+            delBtn.style.height = '20px';
+            delBtn.style.borderRadius = '50%';
+            delBtn.style.display = 'flex';
+            delBtn.style.justifyContent = 'center';
+            delBtn.style.alignItems = 'center';
+            delBtn.style.cursor = 'pointer';
+            delBtn.style.fontWeight = 'bold';
+            delBtn.style.zIndex = 1001;
+
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // чтобы не мешал drag
+                el.remove();
+            });
+
+            el.appendChild(delBtn);
+        }
+
+        function addRotateButton(el) {
+            const rotateBtn = document.createElement('div');
+            rotateBtn.textContent = '⟳';
+            rotateBtn.style.position = 'absolute';
+            rotateBtn.style.top = '-10px';
+            rotateBtn.style.left = '-10px';
+            rotateBtn.style.background = '#2196f3';
+            rotateBtn.style.color = 'white';
+            rotateBtn.style.width = '20px';
+            rotateBtn.style.height = '20px';
+            rotateBtn.style.borderRadius = '50%';
+            rotateBtn.style.display = 'flex';
+            rotateBtn.style.justifyContent = 'center';
+            rotateBtn.style.alignItems = 'center';
+            rotateBtn.style.cursor = 'grab';
+            rotateBtn.style.fontWeight = 'bold';
+            rotateBtn.style.zIndex = 1001;
+
+            el.appendChild(rotateBtn);
+
+            let isRotating = false;
+            let initialAngle = 0;
+
+            rotateBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isRotating = true;
+                rotateBtn.style.cursor = 'grabbing';
+
+                const rect = el.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+                initialAngle = parseFloat(el.getAttribute('data-rotation') || '0');
+
+                function rotate(eMove) {
+                    if (!isRotating) return;
+
+                    const currentAngle = Math.atan2(eMove.clientY - centerY, eMove.clientX - centerX);
+                    const delta = currentAngle - startAngle;
+                    const degrees = initialAngle + delta * (180 / Math.PI);
+
+                    el.style.transform = `rotate(${degrees}deg)`;
+                    el.setAttribute('data-rotation', degrees);
+                }
+
+                function stopRotate() {
+                    isRotating = false;
+                    rotateBtn.style.cursor = 'grab';
+                    document.removeEventListener('mousemove', rotate);
+                    document.removeEventListener('mouseup', stopRotate);
+                }
+
+                document.addEventListener('mousemove', rotate);
+                document.addEventListener('mouseup', stopRotate);
+            });
+        }
+
+        // Добавление текста
+        addTextBtn.addEventListener('click', () => {
+            const textEl = document.createElement('div');
+            textEl.textContent = 'Ваш текст';
+            textEl.contentEditable = true;
+            textEl.style.color = 'white';
+            textEl.style.fontSize = '20px';
+            textEl.style.fontWeight = 'bold';
+            textEl.style.padding = '4px 8px';
+            textEl.style.background = 'rgba(0, 0, 0, 0.6)';
+            textEl.style.borderRadius = '4px';
+
+            textEl.style.position = 'absolute';
+            textEl.style.left = '100px';
+            textEl.style.top = '100px';
+
+            uploadFrame.appendChild(textEl);
+            makeDraggable(textEl);
+            addDeleteButton(textEl);
+            addRotateButton(textEl);
+        });
+
+        // Добавление картинки
+        document.getElementById('addImageBtn').addEventListener('click', () => {
+            document.getElementById('image-input').click();
+        });
+
+        document.getElementById('image-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите файл изображения.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '100px';
+                container.style.top = '100px';
+                container.style.width = '150px';
+                container.style.height = '150px';
+
+                const imgEl = document.createElement('img');
+                imgEl.src = event.target.result;
+                imgEl.style.width = '100%';
+                imgEl.style.height = '100%';
+                imgEl.style.borderRadius = '8px';
+                imgEl.style.pointerEvents = 'none';
+                imgEl.style.userSelect = 'none';
+
+                container.appendChild(imgEl);
+                uploadFrame.appendChild(container);
+
+                makeDraggable(container);
+                makeResizable(container);
+                addDeleteButton(container);
+                addRotateButton(container);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    </script>
+    
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const customBtn = document.getElementById('customBtn');
+        const preview = document.getElementById('preview');
+    
+        // Элементы, которые нужно скрыть после загрузки
+        const uploadTitle = document.querySelector('.upload-title');
+        const uploadSubtitle = document.querySelector('.upload-subtitle');
+        const uploadNote = document.querySelector('.upload-note');
+        const uploadIcon = document.querySelector('.upload-icon');
+    
+        customBtn.addEventListener('click', () => {
+            fileInput.click(); // открытие проводника
+        });
+    
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file && file.type.startsWith('image/')) {
+                // Скрываем лишнее
+                uploadTitle.style.display = 'none';
+                uploadSubtitle.style.display = 'none';
+                uploadNote.style.display = 'none';
+                customBtn.style.display = 'none';
+                uploadIcon.style.display = 'none';
+    
+                // Показываем превью
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.innerHTML = ''; // очистка
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '100%';
+                    img.style.marginTop = '15px';
+                    img.style.borderRadius = '12px';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '<p style="color: red;">Пожалуйста, выберите изображение.</p>';
+            }
+        });
+    </script>
+
+</body>
+</html>
