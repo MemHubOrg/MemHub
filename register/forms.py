@@ -1,6 +1,7 @@
 from django import forms
 import re
 
+from captcha.fields import CaptchaField
 from django.shortcuts import render
 
 
@@ -127,6 +128,8 @@ class RegisterForm(forms.Form):
         required=True,
         label='Подтверждение пароля'
     )
+
+    captcha = CaptchaField()
 
     def clean_username(self):
         username = self.cleaned_data['username']

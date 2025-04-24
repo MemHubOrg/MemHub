@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'register',
     'backend',
     'drf_yasg',
+    'captcha',
 ]
 
 MIDDLEWARE = [

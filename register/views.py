@@ -37,45 +37,40 @@ def index(request):
 
 
 def register(request):
-    if request.method == 'POST':
-        image_file = request.FILES.get('file')
-        if not image_file:
-            return JsonResponse({'success': False, 'error': 'Файл не получен'})
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
 
-        try:
-            user_profile = User.objects.get(username=request.user)
-            chat_id = user_profile.chat_id
-        except User.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Профиль пользователя не найден'})
+            if User.objects.filter(username=username).exists():
+                return render(
+                    request,
+                    #"users/register.html",
+                    "register/register.html",
+                    {"form": form, "error": "Пользователь с таким именем уже существует!"}
+                )
 
-        # Считываем содержимое файла в память
-        buffer = BytesIO()
-        for chunk in image_file.chunks():
-            buffer.write(chunk)
-        buffer.seek(0)
+            user = User.objects.create(
+                username=username,
+                password=make_password(password),
+                unique_token=pyotp.random_base32()
+            )
+            user.save()
 
-        if buffer.getbuffer().nbytes == 0:
-            return JsonResponse({'success': False, 'error': 'Файл пустой'})
+            return render(
+                request, 'register/verify_code.html',  #'users/verify_code.html', 
+                {'username': username, "form": TelegramCodeForm(request.POST)}
+            )
 
-        files = {
-            'file': ('meme.png', buffer, 'image/png')  # Принудительно отправляем как PNG
-        }
-        data = {
-            'chat_id': chat_id
-        }
+        else:
+            #return render(request, "users/register.html", {"form": form})
+            return render(request, "register/register.html", {"form": form})
 
-        url = f'http://{EXTERNAL_API_IP}:8081/send_meme'
-
-        try:
-            response = requests.post(url, files=files, data=data)
-            if response.status_code == 200:
-                return JsonResponse({'success': True})
-            else:
-                return JsonResponse({'success': False, 'error': response.text})
-        except requests.exceptions.RequestException as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-
-    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
+    else:
+        form = RegisterForm()
+        # return render(request, "users/register.html", {"form": form})
+        return render(request, "register/register.html", {"form": form})
 
 @csrf_exempt
 def verify_telegram_code(request):

@@ -7,3 +7,4 @@ telebot
 drf-yasg
 djangorestframework-simplejwt
 Pillow
+django-simple-captcha~=0.6.2
