@@ -209,7 +209,6 @@ def send_telegram_code(request):
     return JsonResponse({"success": False}, status=400)
 
 def send_code_to_user(username):
-    #url = 'http://109.68.215.67:8081/send_code'
     url = f'http://{EXTERNAL_API_IP}:8081/send_code'
     payload = {'username': username}
     

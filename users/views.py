@@ -1,17 +1,11 @@
-import json
-import requests
 import logging
-import pyotp
+
 from django.contrib.auth.decorators import login_required
-
-from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
-
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.hashers import make_password
-from django.views.decorators.csrf import csrf_exempt
 
-from users.forms import LoginForm, RegisterForm, TelegramCodeForm, PasswordChangeForm
+from users.forms import CustomPasswordChangeForm
 from users.models import User
 
 logger = logging.getLogger(__name__)
@@ -25,12 +19,14 @@ def profile(request):
 @login_required
 def change_password_view(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.POST)
-        # if form.is_valid():
-        #     #TODO логика смены пароля
-        #
+        form = CustomPasswordChangeForm(request.POST)
+        if form.is_valid():
+            form.save(request.user)
+            auth_login(request, request.user)
+            # TODO Показать сообщение об успешной смене пароля
+            return render(request, 'users/my_account.html')
     else:
-        form = PasswordChangeForm()
+        form = CustomPasswordChangeForm()
     return render(request, 'users/change_password.html', {'form': form})
 
 def my_memes_view(request):

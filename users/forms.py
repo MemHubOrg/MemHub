@@ -3,6 +3,7 @@ from captcha.fields import CaptchaField
 import re
 
 from django.shortcuts import render
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 class LoginForm(forms.Form):
@@ -31,7 +32,7 @@ class LoginForm(forms.Form):
             raise forms.ValidationError("Неверный формат никнейма: допустимы символы a-z, 0-9 и подчёркивание!")
         return username
 
-class PasswordChangeForm(forms.Form):
+class CustomPasswordChangeForm(forms.Form):
     old_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
@@ -67,17 +68,13 @@ class PasswordChangeForm(forms.Form):
     )
 
 
-    def change_password(request):
-        if request.method == 'POST':
-            form = PasswordChangeForm(user=request.user, data=request.POST)
-            if form.is_valid():
-                form.save()
-                #TODO логика редиректа и сообщения
+    def save(self, user):
+        if self.cleaned_data['new_password1'] == self.cleaned_data['new_password2']:
+            user.set_password(self.cleaned_data['new_password1'])
+            user.save()
         else:
-            form = PasswordChangeForm(user=request.user)
-
-        return render(request, 'users/change_password.html', {'form': form})
-
+            raise ValueError("Пароли не совпадают.")
+        
 class TelegramCodeForm(forms.Form):
     telegram_code = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control',
