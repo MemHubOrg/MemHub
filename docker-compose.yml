@@ -19,6 +19,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    labels:
+      - "com.docker.compose.project=memhub"
 
   web:
     build: .
@@ -45,6 +47,13 @@ services:
       - POSTGRES_DB=django_db
       - POSTGRES_USER=django_user
       - POSTGRES_PASSWORD=django_password
+    labels:
+      - "com.docker.compose.project=memhub"
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://109.68.215.67:3100/loki/api/v1/push"
+        loki-external-labels: "container=django_app"
 
   api:
     build: .
@@ -65,6 +74,13 @@ services:
     depends_on:
       - db
       - web
+    labels:
+      - "com.docker.compose.project=memhub"
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://109.68.215.67:3100/loki/api/v1/push"
+        loki-external-labels: "container=telegram_bot_api"
 
   bot:
     build: .
@@ -84,6 +100,13 @@ services:
       - db
       - web
       - api
+    labels:
+      - "com.docker.compose.project=memhub"
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://109.68.215.67:3100/loki/api/v1/push"
+        loki-external-labels: "container=telegram_bot"
 
 volumes:
   postgres_data:
