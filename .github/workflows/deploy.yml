@@ -1,8 +1,8 @@
-name: Deploy to MemHub Server
+name: Deploy MemHub to Production
 
 on:
   push:
-    branches: [ main ]  # Или master, в зависимости от вашей основной ветки
+    branches: [ main ]  # Или master, если используете эту ветку
 
 jobs:
   deploy:
@@ -17,17 +17,18 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Copy files to server
+    - name: Sync files to server
       run: |
         rsync -avz --delete \
           --exclude='.git/' \
           --exclude='.github/' \
-          -e ssh ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/path/to/VadimProd/
+          --exclude='media/' \  # Исключаем media, если используете Docker volumes
+          -e ssh ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/srv/MemHub/
 
-    - name: Restart containers
+    - name: Rebuild and restart containers
       run: |
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-        cd /path/to/VadimProd
+        cd /srv/MemHub
         docker-compose down
         docker-compose pull
         docker-compose build --no-cache
