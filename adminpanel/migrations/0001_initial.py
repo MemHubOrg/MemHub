@@ -12,14 +12,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name='Admin',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(max_length=128, verbose_name='password')),
                 ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('username', models.CharField(max_length=100, unique=True)),
-                ('unique_token', models.CharField(blank=True, max_length=33, null=True, unique=True)),
-                ('chat_id', models.CharField(blank=True, max_length=10, null=True, unique=True)),
+                ('login', models.CharField(max_length=100, unique=True)),
+                ('password', models.CharField(max_length=128)),
             ],
             options={
                 'abstract': False,

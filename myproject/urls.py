@@ -55,7 +55,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # Обновление токена
     path('api/token/', CustomTokenView.as_view(), name='token_obtain_pair'),
     path('captcha/', include('captcha.urls')),
-    path('users/', include(('users.urls', 'users'), namespace='users'))
+    path('users/', include(('users.urls', 'users'), namespace='users')),
+    path('adminpanel/', include('adminpanel.urls'))
 ]
 
 # Для доступа к изображениям
