@@ -13,10 +13,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Для определения HTTPS
-SECURE_SSL_REDIRECT = True  # Перенаправлять HTTP → HTTPS (если Nginx не сделал)
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Для определения HTTPS
+# SECURE_SSL_REDIRECT = True  # Перенаправлять HTTP → HTTPS (если Nginx не сделал)
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,11 +29,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-33oz0vhql=z2bytl=*twl^)zrg$hu!-)#=b&xxv(()4y!oh0@2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru","109.68.215.67", 
-    "localhost", "127.0.0.1", "172.20.10.4", 
+    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104" 
 ]
 
 LOGGING = {
@@ -115,7 +115,8 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', 'django_db'),
         'USER': os.getenv('POSTGRES_USER', 'django_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'django_password'),
-        'HOST': os.getenv('DB_HOST', 'db'), 
+        # 'HOST': os.getenv('DB_HOST', 'db'), 
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
     }
 }

@@ -11,7 +11,8 @@ services:
       POSTGRES_USER: django_user
       POSTGRES_PASSWORD: django_password
       POSTGRES_DB: django_db
-      POSTGRES_HOST: "109.68.215.67"
+      POSTGRES_HOST: "localhost"
+      # POSTGRES_HOST: "109.68.215.67"
     ports:
       - "5431:5432"
     healthcheck:

@@ -1,9 +1,9 @@
 Django>=4.0,<5.0
 psycopg2-binary<3.0,>=2.9
-requests
-pyotp
-Flask
-telebot
+requests~=2.32.3
+pyotp~=2.9.0
+Flask~=3.1.0
+telebot~=0.0.5
 drf-yasg
 djangorestframework-simplejwt
 Pillow
