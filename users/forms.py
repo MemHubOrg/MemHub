@@ -1,7 +1,7 @@
-from django import forms
-from captcha.fields import CaptchaField
 import re
 
+from django import forms
+from captcha.fields import CaptchaField
 from django.shortcuts import render
 from django.contrib.auth.forms import PasswordChangeForm
 
