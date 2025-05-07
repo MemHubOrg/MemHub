@@ -1,0 +1,35 @@
+name: Deploy to MemHub Server
+
+on:
+  push:
+    branches: [ main ]  # Или master, в зависимости от вашей основной ветки
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Copy files to server
+      run: |
+        rsync -avz --delete \
+          --exclude='.git/' \
+          --exclude='.github/' \
+          -e ssh ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/path/to/VadimProd/
+
+    - name: Restart containers
+      run: |
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+        cd /path/to/VadimProd
+        docker-compose down
+        docker-compose pull
+        docker-compose build --no-cache
+        docker-compose up -d
+        EOF
