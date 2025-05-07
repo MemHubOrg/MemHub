@@ -1,0 +1,272 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    position: relative;
+}
+
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 100px;
+}
+
+.logo-link {
+    display: inline-block;
+}
+
+.logo-link img.logo {
+    display: block;
+    width: 100%; /* или конкретная ширина, если ты её используешь */
+    height: auto;
+}
+
+
+.login-box {
+    background-color: transparent;
+    border: 4px dashed #ED9E1D;
+    border-radius: 15px;
+    padding: 50px 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 900px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+h2 {
+    color: #fff;
+    margin-bottom: 40px;
+}
+
+button, .form-control {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    background: white;
+    color: #121212;
+    outline: none;
+    font-size: 20px;
+    font-family: 'Roboto', sans-serif;
+    width: 700px;
+    height: 50px;
+    box-sizing: border-box;
+}
+
+.form-control {
+    padding-left: 20px;
+    color: #121212;
+    text-align: left;
+}
+
+button {
+    color: white;
+    border: none;
+    cursor: pointer;
+    background-color: #ED9E1D;
+}
+
+button.register {
+    background-color: #ED9E1D;
+    margin-left: 0;
+    width: 100%;
+}
+
+.bottom-left, .top-right {
+    position: absolute;
+    width: 350px;
+}
+
+.bottom-left {
+    bottom: 0px;
+    left: 0px;
+    transform: none;
+}
+
+.top-right {
+    top: 0px;
+    right: 0px;
+    transform: none;
+}
+
+.telegram-code-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.telegram-code-container input {
+    flex: 1;
+}
+
+.telegram-code-container button {
+    margin-left: 10px;
+    padding: 10px;
+    background-color: #ED9E1D;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.modal-title {
+    color: #4CAF50;
+    margin-bottom: 20px;
+}
+
+.modal-close-btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.modal-close-btn:hover {
+    background-color: #45a049;
+}
+
+/* Стили для кнопок */
+.action-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+.send-code-btn {
+    background-color: #4a76a8;
+}
+
+.send-code-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.verify-code-btn {
+    background-color: #5cb85c;
+}
+
+.sendCodeBtn {
+    background-color: #4a76a8;
+    color: white;
+}
+.verifyCodeBtn {
+    background-color: #5cb85c;
+    color: white;
+}
+
+/* Адаптация под мобильные устройства */
+
+@media (max-width: 768px) {
+    .login-box {
+        padding: 30px 20px;
+        width: 90%;
+    }
+
+    .logo {
+        width: 70px;
+        top: 10px;
+        left: 10px;
+    }
+
+    h2 {
+        font-size: 22px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    button, .form-control {
+        width: 100%;
+        font-size: 16px;
+        height: 45px;
+    }
+
+    .bottom-left, .top-right {
+        width: 180px;
+    }
+
+    .bottom-left {
+        bottom: 10px;
+        left: 10px;
+    }
+
+    .top-right {
+        top: 10px;
+        right: 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .modal-close-btn {
+        font-size: 14px;
+        padding: 8px 20px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        width: 60px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    button, .form-control {
+        font-size: 15px;
+        height: 40px;
+    }
+
+    .bottom-left, .top-right {
+        width: 150px;
+    }
+}
+

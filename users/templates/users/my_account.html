@@ -16,15 +16,9 @@
     <div class="login-box">
         <h2>Личный кабинет</h2>
 
-<<<<<<< HEAD
-        <button onclick="window.location.href='{% url 'change_password' %}'">Изменить пароль</button>
-        <button class="register" onclick="window.location.href='{% url 'my_memes' %}'">Мои сохранённые мемы</button>
-
-=======
         <button onclick="window.location.href='{% url 'users:change_password' %}'">Изменить пароль</button>
         <button class="register" onclick="window.location.href='{% url 'users:my_memes' %}'">Мои сохранённые мемы</button>
         
->>>>>>> Vadim
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit" class="exit">Выход</button>
