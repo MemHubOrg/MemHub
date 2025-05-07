@@ -2,25 +2,31 @@ name: Deploy MemHub
 
 on:
   push:
-    branches: [main]  # Активируется при пуше в main ветку
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Проверка кода
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Шаг 2: Установка SSH ключа
       - name: Add SSH key
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Шаг 3: Выполнение команд на сервере
-      - name: Run deployment commands
+      - name: Copy files to server
+        run: |
+          rsync -avz --delete \
+            --exclude '.git' \
+            --exclude '.env' \
+            --exclude 'venv' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ root@109.68.215.67:/srv/MemHub/
+
+      - name: Restart containers
         run: |
           ssh -o StrictHostKeyChecking=no root@109.68.215.67 "
             cd /srv/MemHub
