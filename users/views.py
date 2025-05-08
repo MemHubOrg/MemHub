@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password
 
 from users.forms import CustomPasswordChangeForm
 from users.models import User
+from backend.models import Meme
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +31,14 @@ def change_password_view(request):
     return render(request, 'users/change_password.html', {'form': form})
 
 def my_memes_view(request):
-     return render(request, 'users/my_meme_list.html')
+    #memes = Meme.objects.all()
+    #return render(request, 'users/my_meme_list.html', {'memes': memes})
+    return render(request, 'users/my_meme_list.html')
 
 def selected_meme_view(request, image_id):
-     # TODO логика забора реального айди реальной картинки
- 
-     # А пока заглушка.
-     meme_image_url = f"users/placeholder_pic.png"
- 
-     return render(request, 'users/selected_meme.html', {'meme_image_url': meme_image_url})
+    # TODO логика забора реального айди реальной картинки
+
+    # А пока заглушка.
+    meme_image_url = f"users/placeholder_pic.png"
+
+    return render(request, 'users/selected_meme.html', {'meme_image_url': meme_image_url})
