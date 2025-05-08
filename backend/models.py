@@ -17,7 +17,7 @@ class Meme(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     image = models.ImageField(upload_to='media/memes/')
     created_at = models.DateTimeField(auto_now_add=True)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 @receiver(post_delete, sender=Template)

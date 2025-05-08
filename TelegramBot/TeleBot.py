@@ -49,6 +49,9 @@ class Bot():
 
     def send_verification_code(self, chat_id: str, code: str) -> None:
         self.bot.send_message(chat_id, f"Ваш код верификации: {code}")
+    
+    def send_sticker(self, chat_id: str, sticker):
+        return self.bot.send_sticker(chat_id=chat_id, sticker=sticker)
 
     def generate_code(self, secret: str) -> str:
         totp = pyotp.TOTP(secret, interval=300)

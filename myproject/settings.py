@@ -18,6 +18,18 @@ import os
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
 
+# Yandex storage
+AWS_ACCESS_KEY_ID = "YCAJEViHoPprYN0Cq-b91mg3y"
+AWS_SECRET_ACCESS_KEY = "YCMXK2KDXlqsC94VelxbzzqdoXnQ5TK4BWfAsJaH"
+AWS_STORAGE_BUCKET_NAME = 'memhub.bucket'
+AWS_S3_ENDPOINT_URL = 'https://storage.yandexcloud.net'
+
+# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.storage.yandexcloud.net'
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_ADDRESSING_STYLE = "path"
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,7 +45,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru","109.68.215.67", 
-    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104" 
+    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", "https://storage.yandexcloud.net", 
 ]
 
 LOGGING = {
@@ -72,6 +84,7 @@ INSTALLED_APPS = [
     'backend',
     'drf_yasg',
     'captcha',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -169,7 +182,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'register.User'
 
-MEDIA_ROOT = 'media/'
+# MEDIA_ROOT = f'https://{AWS_S3_CUSTOM_DOMAIN}/'#'media/'
+# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 
 REST_FRAMEWORK = {
