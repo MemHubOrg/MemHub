@@ -26,7 +26,7 @@ from drf_yasg import openapi
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 EXTERNAL_API_IP = "192.168.0.104"

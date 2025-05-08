@@ -1,13 +1,8 @@
 import pyotp
 import telebot
 import os
-from telebot import types
-import logging
 
 from DataBase import DB
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class Bot():

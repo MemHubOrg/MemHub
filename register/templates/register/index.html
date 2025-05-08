@@ -157,49 +157,35 @@
         });
     </script>
 
-    <script>
-        html2canvas(document.querySelector('#memeWrapper'), {
-            useCORS: true,
-            backgroundColor: null,
-            scale: 2,
-            logging: true
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'meme.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        });
-    </script>
-
+    <!-- Cкачивание элемента как PNG -->
     <script 
         src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
     </script>
 
     <!-- Скачивание мема -->
+     
     <script>
         const downloadBtn = document.getElementById('downloadBtn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', downloadImage);
+        }
 
-        downloadBtn.addEventListener('click', () => {
+        function downloadImage() {
             const target = document.querySelector('.upload-inner');
             if (!target) {
                 console.error('Элемент .upload-inner не найден');
                 return;
             }
-
-            // Соберем все элементы, которые надо временно скрыть
-            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div'); // все вложенные кнопки управления
-
-            // Сохраняем оригинальные стили
+    
+            // Скрыть управляющие кнопки
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
             const hiddenElements = [];
             toHide.forEach(el => {
-                hiddenElements.push({
-                    element: el,
-                    display: el.style.display
-                });
+                hiddenElements.push({ element: el, display: el.style.display });
                 el.style.display = 'none';
             });
-
-            // Убираем возможные рамки у контейнеров
+    
+            // Убрать рамки и тени
             const containers = target.querySelectorAll('div[style*="position: absolute"]');
             const containerStyles = [];
             containers.forEach(el => {
@@ -212,8 +198,8 @@
                 el.style.border = 'none';
                 el.style.boxShadow = 'none';
             });
-
-            setTimeout(() => {
+    
+            requestAnimationFrame(() => {
                 html2canvas(target, {
                     useCORS: true,
                     backgroundColor: null,
@@ -223,18 +209,19 @@
                     link.download = 'meme.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
-
-                    // Возвращаем стили
+    
+                    // Восстановить стили
                     hiddenElements.forEach(({ element, display }) => {
                         element.style.display = display;
                     });
-                    containerStyles.forEach(({ element, border, boxShadow }) => {
+                    containerStyles.forEach(({ element, border, boxShadow, transform }) => {
                         element.style.border = border;
                         element.style.boxShadow = boxShadow;
+                        element.style.transform = transform;
                     });
                 });
-            }, 50); // подождать, чтобы DOM успел применить изменения
-        });
+            });
+        };
     </script>
 
     <!-- Добавление текста/картинок + возможность менять размер/вращать их -->
