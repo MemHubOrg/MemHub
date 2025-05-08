@@ -5,6 +5,8 @@ import pyotp
 import uuid
 import boto3
 
+from backend.models import Meme
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
@@ -26,7 +28,7 @@ from drf_yasg import openapi
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 EXTERNAL_API_IP = "192.168.0.104"
@@ -34,7 +36,6 @@ EXTERNAL_API_IP = "192.168.0.104"
 def index(request):
     #return render(request, 'users/index.html')
     return render(request, 'register/index.html')
-
 
 def register(request):
     if request.method == "POST":
@@ -170,8 +171,7 @@ def send_meme_to_telegram(request):
             file_url = s3_storage.url(saved_path)
 
             # Получаем chat_id из профиля
-            user_profile = User.objects.get(username=request.user)
-            chat_id = user_profile.chat_id
+            chat_id = request.user.chat_id
 
             # Формируем json-файл
             url = f'http://{EXTERNAL_API_IP}:8081/send_meme'
@@ -195,6 +195,32 @@ def send_meme_to_telegram(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Файл не получен'}, status=400)
+
+@csrf_exempt
+def save_meme_to_profile(request):
+    if request.method == 'POST':
+        uploaded_file = request.FILES['file']
+        username = request.user.username
+        filename = f"memes/profiles/{username}/{uuid.uuid4().hex}.png"
+        
+        try:
+            # Сохраняем в объектное хранилище
+            saved_path = s3_storage.save(filename, ContentFile(uploaded_file.read()))
+            file_url = s3_storage.url(saved_path)
+
+            # Сохраняем в БД
+            meme = Meme.objects.create(
+                image_url = file_url,
+                user=request.user
+            )
+            meme.save()
+
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
+    return JsonResponse({'success': False})
 
 @csrf_exempt
 def send_telegram_code(request):

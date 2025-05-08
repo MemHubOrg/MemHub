@@ -19,7 +19,7 @@
 
         <div class="mem-detail-container">
             <div class="mem-detail-wrapper">
-                <img id="memImage" src="{% static meme_image_url %}" alt="Мем">
+                <img id="memImage" src="{{ meme_image_url }}" alt="Мем">
 
                 <div class="icon top-left">
                     <img src="{% static 'users/download_icon.svg' %}" alt="Загрузка">
@@ -28,7 +28,7 @@
                     <img src="{% static 'users/telegram_icon.svg' %}" alt="Телеграм">
                 </div>
                 <div class="icon bottom-left">
-                    <a href="{% url 'my_memes' %}" class="icon bottom-left">
+                    <a href="{% url 'users:my_memes' %}" class="icon bottom-left">
                         <img src="{% static 'users/back_button.svg' %}" alt="Назад">
                     </a>
                 </div>

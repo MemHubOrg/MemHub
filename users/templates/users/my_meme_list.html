@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="{% static 'users/styles.css' %}">
 </head>
 <script>
-    const TOTAL_IMAGES = 21;
     const IMAGES_PER_PAGE = 8;
+    const memes = {{ memes_json|safe }};
+    const TOTAL_IMAGES = memes.length;
     let currentPage = 0;
 
     function renderImages() {
@@ -21,11 +22,12 @@
 
         for (let i = start; i < end; i++) {
             const link = document.createElement('a');
-            link.href = `/selected_meme/${i + 1}/`;
+            link.href = `/users/selected_meme/${memes[i].id}/`;//link.href = `/selected_meme/${i + 1}/`;  // Убираем арифметику внутри шаблона
             link.className = 'mem-item';
 
             const img = document.createElement('img');
-            img.src = "{% static 'users/placeholder_pic.png' %}";
+            
+            img.src = memes[i]['image_url']
             img.alt = `Мем ${i + 1}`;
 
             link.appendChild(img);
@@ -79,7 +81,13 @@
             <div class="nav-icon left" onclick="prevPage()">&#10094;</div>
 
             <div class="mem-grid" id="memGrid">
-                <!-- Картинки-заглушки вставляются через JS -->
+                {% for meme in memes %}
+                    <a href="{% url 'users:selected_meme' meme.id %}" class="mem-item">
+                        <img src="{{ meme.image_url }}" alt="Мем {{ forloop.counter }}">
+                    </a>
+                {% empty %}
+                    <p>Вы ещё не сохранили ни одного мема</p>
+                {% endfor %}
             </div>
 
             <div class="nav-icon right" onclick="nextPage()">&#10095;</div>
@@ -90,3 +98,5 @@
     <img src="{% static 'users/tapaem_homyaka.png' %}" alt="" class="top-right">
 </body>
 </html>
+
+
