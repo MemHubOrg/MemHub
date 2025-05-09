@@ -270,3 +270,26 @@ button.register {
     }
 }
 
+
+.captcha-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.captcha-wrapper img {
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    max-width: 100%;
+}
+
+.captcha-wrapper input {
+    width: 100%;
+    max-width: 280px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #999;
+}

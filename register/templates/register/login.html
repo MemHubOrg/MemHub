@@ -25,6 +25,10 @@
             <label>
                 {{ form.password }}
             </label>
+            <div class="captcha-wrapper">
+                {{ form.captcha.image }}
+                {{ form.captcha }}
+            </div>
             <button type="submit">Войти</button>
             <button class="register" onclick="window.location.href='/register/'">Зарегистрироваться</button>
             {% if form.errors %}

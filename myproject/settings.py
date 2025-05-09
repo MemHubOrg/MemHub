@@ -44,8 +44,8 @@ SECRET_KEY = 'django-insecure-33oz0vhql=z2bytl=*twl^)zrg$hu!-)#=b&xxv(()4y!oh0@2
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru","109.68.215.67", 
-    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", 
+    "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru", "109.68.215.67",
+    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", "192.168.0.6"
 ]
 
 LOGGING = {

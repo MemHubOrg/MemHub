@@ -22,12 +22,22 @@ class Bot():
         @self.bot.message_handler(commands=['start'])
         def send_welcome(message):
             username = message.from_user.username
-            username_db = self.db.get_data("username", username)
+            chat_id = str(message.chat.id)
 
-            if username == username_db:
-                self.db.update_data(data=message.chat.id, username=username)
+            if not username:
+                self.bot.reply_to(message, "У вас не установлен username в Telegram.")
+                return
 
-            self.bot.reply_to(message, "Привет! Ваш chat ID: {}, username: {}".format(message.chat.id, username))
+            # self.db.update_data(data=chat_id, username=username)
+            self.db.create_user_with_chat_id(username=username, chat_id=chat_id)
+            self.bot.reply_to(message, f"Привет, {username}! Ваш chat ID: {chat_id}")
+            # username = message.from_user.username
+            # username_db = self.db.get_data("username", username)
+            #
+            # if username == username_db:
+            #     self.db.update_data(data=message.chat.id, username=username)
+            #
+            # self.bot.reply_to(message, "Привет! Ваш chat ID: {}, username: {}".format(message.chat.id, username))
 
         @self.bot.message_handler(func=lambda message: True)
         def send_code(message):

@@ -22,6 +22,7 @@ class LoginForm(forms.Form):
         required=True,
         label='Пароль'
     )
+    captcha = CaptchaField()
 
     def clean_username(self):
         username = self.cleaned_data['username']

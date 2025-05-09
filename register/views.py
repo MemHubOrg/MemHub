@@ -29,7 +29,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
-EXTERNAL_API_IP = "192.168.0.104"
+EXTERNAL_API_IP = "192.168.0.6"
 
 def index(request):
     #return render(request, 'users/index.html')
@@ -37,6 +37,8 @@ def index(request):
 
 
 def register(request):
+    message = request.session.pop('register_message', None)
+
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -46,36 +48,37 @@ def register(request):
             if User.objects.filter(username=username).exists():
                 return render(
                     request,
-                    #"users/register.html",
                     "register/register.html",
-                    {"form": form, "error": "Пользователь с таким именем уже существует!"}
+                    {"form": form, "error": "Пользователь с таким именем уже существует!", "message": message}
                 )
 
-            user = User.objects.create(
-                username=username,
-                password=make_password(password),
-                unique_token=pyotp.random_base32()
-            )
-            user.save()
+            # user = User.objects.create(
+            #     username=username,
+            #     password=make_password(password),
+            #     unique_token=pyotp.random_base32()
+            # )
+            # user.save()
+            request.session['register_data'] = {
+                "username": username,
+                "password": password,
+                "unique_token": pyotp.random_base32()
+            }
 
             return render(
-                request, 'register/verify_code.html',  #'users/verify_code.html', 
+                request,
+                'register/verify_code.html',
                 {'username': username, "form": TelegramCodeForm(request.POST)}
             )
 
-        else:
-            #return render(request, "users/register.html", {"form": form})
-            return render(request, "register/register.html", {"form": form})
+        return render(request, "register/register.html", {"form": form, "message": message})
 
     else:
         form = RegisterForm()
-        # return render(request, "users/register.html", {"form": form})
-        return render(request, "register/register.html", {"form": form})
+        return render(request, "register/register.html", {"form": form, "message": message})
 
 @csrf_exempt
 def verify_telegram_code(request):
     if request.method != 'POST':
-        logger.warning("Invalid request method")
         return JsonResponse({
             "success": False,
             "error": "Only POST requests are allowed"
@@ -83,8 +86,7 @@ def verify_telegram_code(request):
 
     try:
         json_data = json.loads(request.body)
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error: {str(e)}")
+    except json.JSONDecodeError:
         return JsonResponse({
             "success": False,
             "error": "Invalid JSON format"
@@ -92,36 +94,98 @@ def verify_telegram_code(request):
 
     form = TelegramCodeForm(data=json_data)
 
-    if form.is_valid():
-        user_input = form.cleaned_data['telegram_code']
-        username = form.cleaned_data['username']
+    if not form.is_valid():
+        return JsonResponse({"success": False, "error": "Некорректные данные формы"}, status=400)
 
+    user_input = form.cleaned_data['telegram_code']
+    username = form.cleaned_data['username']
+
+    register_data = request.session.get("register_data")
+
+    if not register_data or register_data.get("username") != username:
+        return JsonResponse({"success": False, "error": "Нет данных для подтверждения"}, status=400)
+
+    unique_token = register_data.get("unique_token")
+
+    if pyotp.TOTP(unique_token, interval=300).now() != user_input:
+        return JsonResponse({
+            "success": False,
+            "error": "Неверный код. Попробуйте ещё раз."
+        }, status=400)
+
+    try:
         user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse({
+            "success": False,
+            "error": "Пользователь не найден в базе. Сначала инициализируйте диалог с ботом."
+        }, status=404)
 
-        if pyotp.TOTP(user.unique_token, interval=300).now() == user_input:
-            auth_login(request, user)
-             
-            # JWT-token
-            refresh = RefreshToken.for_user(user)
-            token_data = {
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
-            }
- 
-            form = LoginForm()
-            return JsonResponse({
-                "success": True,
-                "access_token": token_data["access"],
-                "refresh_token": token_data["refresh"],
-                "redirect_url": "/"
-            }, status=200)
-        else:
-            return JsonResponse({
-                "success": False,
-                "error": "Неверный код. Попробуйте ещё раз."
-            }, status=400)
+    # Обновляем данные пользователя
+    user.password = make_password(register_data.get("password"))
+    user.unique_token = unique_token
+    user.save()
 
-    return JsonResponse({"success": False}, status=400)
+    del request.session["register_data"]
+    auth_login(request, user)
+
+    refresh = RefreshToken.for_user(user)
+    return JsonResponse({
+        "success": True,
+        "access_token": str(refresh.access_token),
+        "refresh_token": str(refresh),
+        "redirect_url": "/"
+    }, status=200)
+# @csrf_exempt
+# def verify_telegram_code(request):
+#     if request.method != 'POST':
+#         logger.warning("Invalid request method")
+#         return JsonResponse({
+#             "success": False,
+#             "error": "Only POST requests are allowed"
+#         }, status=405)
+#
+#     try:
+#         json_data = json.loads(request.body)
+#     except json.JSONDecodeError as e:
+#         logger.error(f"JSON decode error: {str(e)}")
+#         return JsonResponse({
+#             "success": False,
+#             "error": "Invalid JSON format"
+#         }, status=400)
+#
+#     form = TelegramCodeForm(data=json_data)
+#
+#     if form.is_valid():
+#         user_input = form.cleaned_data['telegram_code']
+#         username = form.cleaned_data['username']
+#
+#         user = User.objects.get(username=username)
+#
+#         if pyotp.TOTP(user.unique_token, interval=300).now() == user_input:
+#             auth_login(request, user)
+#
+#             # JWT-token
+#             refresh = RefreshToken.for_user(user)
+#             token_data = {
+#                 "access": str(refresh.access_token),
+#                 "refresh": str(refresh),
+#             }
+#
+#             form = LoginForm()
+#             return JsonResponse({
+#                 "success": True,
+#                 "access_token": token_data["access"],
+#                 "refresh_token": token_data["refresh"],
+#                 "redirect_url": "/"
+#             }, status=200)
+#         else:
+#             return JsonResponse({
+#                 "success": False,
+#                 "error": "Неверный код. Попробуйте ещё раз."
+#             }, status=400)
+#
+#     return JsonResponse({"success": False}, status=400)
 
 def login(request):
     if request.method == "POST":
@@ -131,12 +195,14 @@ def login(request):
             password = form.cleaned_data['password']
 
             if not User.objects.filter(username=username).exists():
-                form = RegisterForm(initial={"username": ""})
-                return render(
-                    request,
-                    "register/register.html",#"users/register.html",
-                    {"form": form, "error": "Пользователь с таким именем не найден! Пройдите регистрацию!"}
-                )
+                request.session['register_message'] = "Пользователь с таким именем не найден! Пройдите регистрацию!"
+                return redirect("register")  # перенаправляем на путь, который обрабатывает регистрацию
+                # form = RegisterForm(initial={"username": ""})
+                # return render(
+                #     request,
+                #     "register/register.html",#"users/register.html",
+                #     {"form": form, "error": "Пользователь с таким именем не найден! Пройдите регистрацию!"}
+                # )
 
             user = authenticate(request, username=username, password=password)
 
@@ -196,31 +262,68 @@ def send_meme_to_telegram(request):
 
     return JsonResponse({'success': False, 'error': 'Файл не получен'}, status=400)
 
+# @csrf_exempt
+# def send_telegram_code(request):
+#     if request.method == "POST":
+#         register_data = request.session.get("register_data")
+#         username = register_data.get("username")
+#         # data = json.loads(request.body)
+#         # username = data.get("username", "")
+#         success = send_code_to_user(username)
+#         return JsonResponse({"success": success})
+#
+#     return JsonResponse({"success": False}, status=400)
 @csrf_exempt
 def send_telegram_code(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        username = data.get("username", "")
-        success = send_code_to_user(username)
+        register_data = request.session.get("register_data")
+
+        if not register_data:
+            return JsonResponse({"success": False, "error": "Нет данных для регистрации"}, status=400)
+
+        username = register_data.get("username")
+        unique_token = register_data.get("unique_token")
+
+        if not username or not unique_token:
+            return JsonResponse({"success": False, "error": "Недостаточно данных"}, status=400)
+
+        # Теперь передаём и токен
+        success = send_code_to_user(username, unique_token)
         return JsonResponse({"success": success})
 
     return JsonResponse({"success": False}, status=400)
 
-def send_code_to_user(username):
+
+def send_code_to_user(username, unique_token):
     url = f'http://{EXTERNAL_API_IP}:8081/send_code'
-    payload = {'username': username}
-    
+    payload = {
+        'username': username,
+        'token': unique_token
+    }
+
     try:
         response = requests.post(url, json=payload)
-        
-        if response.status_code == 200:
-            return True
-        else:
-            print(f"Error: {response.json().get('message')}")
-            return False
+        print("BOT response:", response.status_code, response.text)
+        return response.status_code == 200
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
         return False
+
+# def send_code_to_user(username):
+#     url = f'http://{EXTERNAL_API_IP}:8081/send_code'
+#     payload = {'username': username}
+#
+#     try:
+#         response = requests.post(url, json=payload)
+#
+#         if response.status_code == 200:
+#             return True
+#         else:
+#             print(f"Error: {response.json().get('message')}")
+#             return False
+#     except requests.exceptions.RequestException as e:
+#         print(f"Request failed: {e}")
+#         return False
     
 class CustomTokenView(TokenObtainPairView):
      @swagger_auto_schema(

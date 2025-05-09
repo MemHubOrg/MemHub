@@ -26,6 +26,16 @@
                 {{ error }}
             </div>
         {% endif %}
+        {% if message %}
+            <div class="error" style="color: red;
+                 font-size: 16px;
+                 padding: 0px;
+                 text-align: center;
+                 border: 1px solid black;
+                 margin-bottom: 10px;">
+                {{ message }}
+            </div>
+        {% endif %}
 
         <form method="POST">
             {% csrf_token %}
@@ -38,9 +48,13 @@
             <label>
                 {{ form.confirm_password }}
             </label>
-            <label>
+<!--            <label>-->
+<!--                {{ form.captcha }}-->
+<!--            </label>-->
+            <div class="captcha-wrapper">
+                {{ form.captcha.image }}
                 {{ form.captcha }}
-            </label>
+            </div>
 
             <button class="register">Зарегистрироваться</button>
             {% if form.errors %}
@@ -71,40 +85,60 @@
     </script>
 
     <script>
-        document.getElementById("sendCodeBtn").addEventListener("click", function() {
-            let username = document.querySelector("input[name='username']").value;
+<!--        document.getElementById("sendCodeBtn").addEventListener("click", function() {-->
+<!--            let username = document.querySelector("input[name='username']").value;-->
 
-            if (!username) {
-                alert("Введите логин перед отправкой кода!");
-                return;
-            }
+<!--            if (!username) {-->
+<!--                alert("Введите логин перед отправкой кода!");-->
+<!--                return;-->
+<!--            }-->
 
-            fetch(`/check-telegram-user/?username=${username}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.exists) {
-                        return fetch("/send-telegram-code/", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRFToken": "{{ csrf_token }}"
-                            },
-                            body: JSON.stringify({ username: username })
-                        });
-                    } else {
-                        throw new Error("Пользователь с таким ником не найден!");
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById("sendCodeBtn").style.display = "none";
-                        document.getElementById("codeError").style.display = "block";
-                    }
-                })
-                .catch(error => {
-                    alert(error.message);
-                });
+<!--            fetch(`/check-telegram-user/?username=${username}`)-->
+<!--                .then(response => response.json())-->
+<!--                .then(data => {-->
+<!--                    if (data.exists) {-->
+<!--                        return fetch("/send-telegram-code/", {-->
+<!--                            method: "POST",-->
+<!--                            headers: {-->
+<!--                                "Content-Type": "application/json",-->
+<!--                                "X-CSRFToken": "{{ csrf_token }}"-->
+<!--                            },-->
+<!--                            body: JSON.stringify({ username: username })-->
+<!--                        });-->
+<!--                    } else {-->
+<!--                        throw new Error("Пользователь с таким ником не найден!");-->
+<!--                    }-->
+<!--                })-->
+<!--                .then(response => response.json())-->
+<!--                .then(data => {-->
+<!--                    if (data.success) {-->
+<!--                        document.getElementById("sendCodeBtn").style.display = "none";-->
+<!--                        document.getElementById("codeError").style.display = "block";-->
+<!--                    }-->
+<!--                })-->
+<!--                .catch(error => {-->
+<!--                    alert(error.message);-->
+<!--                });-->
+<!--        });-->
+        document.getElementById("sendCodeBtn").addEventListener("click", function () {
+            fetch("/send-telegram-code/", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("sendCodeBtn").style.display = "none";
+                    document.getElementById("codeError").style.display = "block";
+                } else {
+                    alert(data.error || "Ошибка при отправке кода");
+                }
+            })
+            .catch(error => {
+                alert("Ошибка: " + error.message);
+            });
         });
         </script>
 

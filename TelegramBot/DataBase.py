@@ -68,3 +68,18 @@ class DB():
             return self.cur.fetchall()
         except Exception as e:
             print(f"An error occurred: {e}")
+
+    def create_user_with_chat_id(self, username: str, chat_id: str):
+        try:
+            self.cur.execute(
+                sql.SQL("""
+                    INSERT INTO django_db.public.register_user (username, chat_id, unique_token, password)
+                    VALUES (%s, %s, '', '')
+                    ON CONFLICT (username) DO NOTHING
+                """),
+                (username, chat_id)
+            )
+            self.conn.commit()
+            print(f"[INFO] Created new user in DB: username={username}, chat_id={chat_id}")
+        except Exception as e:
+            print(f"[ERROR] create_user_with_chat_id: {e}")
