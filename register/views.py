@@ -103,33 +103,51 @@ def verify_telegram_code(request):
 
     register_data = request.session.get("register_data")
 
-    if not register_data or register_data.get("username") != username:
-        return JsonResponse({"success": False, "error": "Нет данных для подтверждения"}, status=400)
+    if register_data and register_data.get("username") == username:
+        # Пользователь на этапе регистрации
+        unique_token = register_data.get("unique_token")
 
-    unique_token = register_data.get("unique_token")
+        if pyotp.TOTP(unique_token, interval=300).now() != user_input:
+            return JsonResponse({
+                "success": False,
+                "error": "Неверный код. Попробуйте ещё раз."
+            }, status=400)
 
-    if pyotp.TOTP(unique_token, interval=300).now() != user_input:
-        return JsonResponse({
-            "success": False,
-            "error": "Неверный код. Попробуйте ещё раз."
-        }, status=400)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return JsonResponse({
+                "success": False,
+                "error": "Пользователь не найден в базе. Сначала инициализируйте диалог с ботом."
+            }, status=404)
 
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return JsonResponse({
-            "success": False,
-            "error": "Пользователь не найден в базе. Сначала инициализируйте диалог с ботом."
-        }, status=404)
+        # Обновляем пароль и токен
+        user.password = make_password(register_data.get("password"))
+        user.unique_token = unique_token
+        user.save()
 
-    # Обновляем данные пользователя
-    user.password = make_password(register_data.get("password"))
-    user.unique_token = unique_token
-    user.save()
+        del request.session["register_data"]
+        auth_login(request, user)
 
-    del request.session["register_data"]
-    auth_login(request, user)
+    else:
+        # Пользователь на этапе логина
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return JsonResponse({
+                "success": False,
+                "error": "Пользователь не найден"
+            }, status=404)
 
+        if pyotp.TOTP(user.unique_token, interval=300).now() != user_input:
+            return JsonResponse({
+                "success": False,
+                "error": "Неверный код. Попробуйте ещё раз."
+            }, status=400)
+
+        auth_login(request, user)
+
+    # Возвращаем JWT токены
     refresh = RefreshToken.for_user(user)
     return JsonResponse({
         "success": True,
@@ -209,7 +227,8 @@ def login(request):
 
             if user is not None:
                 auth_login(request, user)
-                send_code_to_user(username)
+                unique_token = user.unique_token
+                send_code_to_user(username, unique_token)
                 return render(request, "register/verify_code.html",
                               {'username': username,
                                "form": TelegramCodeForm(request.POST)})
