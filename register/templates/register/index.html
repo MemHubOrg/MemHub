@@ -103,9 +103,18 @@
                         {% for template in templates %}
                         <div class="template-item">
                             <img src="{{ template.image_url }}" alt="">
-                            <button class="template-action-btn">Сделать мем</button>
+                            <button class="template-action-btn"
+                                    onclick="selectTemplate('{{ template.image_url }}')">
+                                Сделать мем
+                            </button>
                         </div>
                         {% endfor %}
+<!--                        {% for i in "123456" %}-->
+<!--                        <div class="template-item">-->
+<!--                            <img src="{% static 'users/placeholder_pic.png' %}" alt="">-->
+<!--                            <button class="template-action-btn">Сделать мем</button>-->
+<!--                        </div>-->
+<!--                        {% endfor %}-->
                     </div>
                 </div>
             </div>
@@ -656,5 +665,69 @@
         });
     </script>
 
+    <!-- Перенос шаблона для создания мема -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const imageUrl = sessionStorage.getItem("selected_template");
+    if (imageUrl) {
+        sessionStorage.removeItem("selected_template");
+
+        switchSection('create');
+
+        const preview = document.getElementById("preview");
+        preview.innerHTML = "";
+
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = "Шаблон";
+        img.style.maxWidth = "100%";
+        img.style.marginTop = "15px";
+        img.style.borderRadius = "12px";
+        preview.appendChild(img);
+
+        // Скрыть управляющие элементы, как при обычной загрузке
+        const uploadTitle = document.querySelector('.upload-title');
+        const uploadSubtitle = document.querySelector('.upload-subtitle');
+        const uploadNote = document.querySelector('.upload-note');
+        const customBtn = document.getElementById('customBtn');
+        const uploadIcon = document.querySelector('.upload-icon');
+
+        if (uploadTitle) uploadTitle.style.display = 'none';
+        if (uploadSubtitle) uploadSubtitle.style.display = 'none';
+        if (uploadNote) uploadNote.style.display = 'none';
+        if (customBtn) customBtn.style.display = 'none';
+        if (uploadIcon) uploadIcon.style.display = 'none';
+    }
+});
+<!--    document.addEventListener("DOMContentLoaded", function () {-->
+<!--        const imageUrl = sessionStorage.getItem("selected_template");-->
+<!--        if (imageUrl) {-->
+<!--            sessionStorage.removeItem("selected_template");  // очищаем-->
+
+<!--            // Показываем раздел создания мема-->
+<!--            switchSection('create');-->
+
+<!--            // Создаем img и вставляем в preview-->
+<!--            const preview = document.getElementById("preview");-->
+<!--            preview.innerHTML = ""; // очищаем, если что-то было-->
+
+<!--            const img = document.createElement("img");-->
+<!--            img.src = imageUrl;-->
+<!--            img.alt = "Шаблон";-->
+<!--            img.style.maxWidth = "100%";-->
+
+<!--            preview.appendChild(img);-->
+<!--        }-->
+<!--    });-->
+    </script>
+
+    <script>
+    function selectTemplate(imageUrl) {
+        // Сохраняем путь в sessionStorage
+        sessionStorage.setItem("selected_template", imageUrl);
+        // Перенаправляем на главную
+        window.location.href = "/";
+    }
+    </script>
 </body>
 </html>
