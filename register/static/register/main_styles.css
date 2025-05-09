@@ -212,11 +212,12 @@ body {
 }
 
 .howto-item {
-    flex: 1;
-    aspect-ratio: 1/1;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    display: block;
     border: 2px dashed #ED9E1D;
     border-radius: 10px;
-    overflow: hidden;
 }
 
 .howto-item img {
@@ -225,4 +226,93 @@ body {
     object-fit: cover;
 }
 
+.section-create,
+.section-templates {
+    width: 100%;
+    margin: 0 auto;
+}
 
+/* Активная кнопка */
+.active-btn {
+    background-color: #444;
+    color: white;
+    cursor: default;
+}
+
+/* Поиск шаблонов */
+.template-search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.template-search-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+}
+
+.template-search-btn,
+.template-clear-btn {
+    background-color: #ED9E1D;
+    color: #121212;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Сетка шаблонов */
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.template-item {
+    background-color: #2e2e2e;
+    border: 2px dashed #ED9E1D;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.template-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.template-action-btn {
+    background-color: #ED9E1D;
+    color: #121212;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-size: 14px;
+    cursor: pointer;
+    border-top: 1px solid #444;
+}
+
+@media {
+    .header-logo {
+        height: 30px;
+    }
+
+    .header-title {
+        font-size: 18px;  /* Уменьшаем размер текста */
+    }
+
+    .profile-icon img {
+        width: 40px;  /* Уменьшаем размер иконки профиля */
+        height: 40px;  /* Уменьшаем размер иконки профиля */
+    }
+
+    .header-login-btn {
+        font-size: 14px;  /* Уменьшаем шрифт кнопки "Вход" */
+    }
+}
