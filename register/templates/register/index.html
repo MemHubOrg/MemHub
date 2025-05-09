@@ -660,40 +660,71 @@
     </script>
 
     <!-- Перенос шаблона для создания мема -->
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const imageUrl = sessionStorage.getItem("selected_template");
-        if (imageUrl) {
-            sessionStorage.removeItem("selected_template");
+     <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const imageUrl = sessionStorage.getItem("selected_template");
+            if (imageUrl) {
+                sessionStorage.removeItem("selected_template");
 
-            switchSection('create');
+                switchSection('create');
 
-            const preview = document.getElementById("preview");
-            preview.innerHTML = "";
+                try {
+                    // Загружаем картинку и создаем объект File
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    const file = new File([blob], "template.jpg", { type: blob.type });
 
-            const img = document.createElement("img");
-            img.src = imageUrl;
-            img.alt = "Шаблон";
-            img.style.maxWidth = "100%";
-            img.style.marginTop = "15px";
-            img.style.borderRadius = "12px";
-            preview.appendChild(img);
+                    // Создаем DataTransfer и помещаем туда файл
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
 
-            // Скрыть управляющие элементы, как при обычной загрузке
-            const uploadTitle = document.querySelector('.upload-title');
-            const uploadSubtitle = document.querySelector('.upload-subtitle');
-            const uploadNote = document.querySelector('.upload-note');
-            const customBtn = document.getElementById('customBtn');
-            const uploadIcon = document.querySelector('.upload-icon');
+                    // Назначаем "виртуальный" файл в input
+                    const input = document.getElementById("fileInput");
+                    input.files = dataTransfer.files;
 
-            if (uploadTitle) uploadTitle.style.display = 'none';
-            if (uploadSubtitle) uploadSubtitle.style.display = 'none';
-            if (uploadNote) uploadNote.style.display = 'none';
-            if (customBtn) customBtn.style.display = 'none';
-            if (uploadIcon) uploadIcon.style.display = 'none';
-        }
-    });
+                    // Вручную вызываем обработчик изменения, если он есть
+                    const event = new Event("change", { bubbles: true });
+                    input.dispatchEvent(event);
+                } catch (err) {
+                    console.error("Ошибка при подстановке шаблона:", err);
+                }
+            }
+        });
     </script>
+    <!-- <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const imageUrl = sessionStorage.getItem("selected_template");
+            if (imageUrl) {
+                sessionStorage.removeItem("selected_template");
+
+                switchSection('create');
+
+                const preview = document.getElementById("preview");
+                preview.innerHTML = "";
+
+                const img = document.createElement("img");
+                img.src = imageUrl;
+                img.alt = "Шаблон";
+                img.style.maxWidth = "100%";
+                img.style.marginTop = "15px";
+                img.style.borderRadius = "12px";
+                preview.appendChild(img);
+
+                // Скрыть управляющие элементы, как при обычной загрузке
+                const uploadTitle = document.querySelector('.upload-title');
+                const uploadSubtitle = document.querySelector('.upload-subtitle');
+                const uploadNote = document.querySelector('.upload-note');
+                const customBtn = document.getElementById('customBtn');
+                const uploadIcon = document.querySelector('.upload-icon');
+
+                if (uploadTitle) uploadTitle.style.display = 'none';
+                if (uploadSubtitle) uploadSubtitle.style.display = 'none';
+                if (uploadNote) uploadNote.style.display = 'none';
+                if (customBtn) customBtn.style.display = 'none';
+                if (uploadIcon) uploadIcon.style.display = 'none';
+            }
+        });
+    </script> -->
 
     <script>
     function selectTemplate(imageUrl) {
