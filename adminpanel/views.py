@@ -37,6 +37,6 @@ def adminpanel_index(request):
 
 
 def admin_dashboard(request):
-    if not request.session.get("admin_id"):
-        return redirect("admin_login")
-    return HttpResponse("Добро пожаловать, админ!")
+    # if not request.session.get("admin_id"):
+    #     return redirect("admin_login")
+    return render(request, 'adminpanel/dashboard.html')

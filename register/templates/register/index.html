@@ -38,53 +38,177 @@
 
             <!-- Кнопки -->
             <div class="button-row">
-                <button class="main-btn">Создание мема</button>
-                <button class="main-btn">Шаблоны</button>
+                <button id="btn-create" class="main-btn active-btn" onclick="switchSection('create')">Создание мема</button>
+                <button id="btn-templates" class="main-btn" onclick="switchSection('templates')">Шаблоны</button>
             </div>
 
             <!-- Раздел "Как сделать мем" -->
             <div class="howto-section">
                 <p class="howto-title">Как сделать мем</p>
                 <div class="howto-gallery">
-                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
-                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
-                    <div class="howto-item"><img src="{% static 'register/placeholder_pic.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/first_instr.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/second_instr.png' %}" alt=""></div>
+                    <div class="howto-item"><img src="{% static 'register/third_instr.png' %}" alt=""></div>
                 </div>
             </div>
 
+            <!-- Раздел: Создание мема -->
+            <div id="section-create" class="section-create">
             <!-- Зона загрузки -->
-            <div class="upload-wrapper">
-                <div class="upload-frame">
-                    <div class="upload-inner">
-                        <p class="upload-title">Перетащите изображение сюда</p>
-                        <p class="upload-subtitle">Или нажмите, чтобы выбрать изображение</p>
-                        <input type="file" id="fileInput" accept="image/*" style="display:none">
-                        <div id="preview"></div>
-                        <button type="button" class="upload-btn" id="customBtn">Выбрать файл</button>
-                        <p class="upload-note">Максимальный размер файла 25MB</p>
-                        <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки" 
-                            class="upload-icon">
+                <div class="upload-wrapper">
+                    <div class="upload-frame">
+                        <div class="upload-inner">
+                            <p class="upload-title">Перетащите изображение сюда</p>
+                            <p class="upload-subtitle">Или нажмите, чтобы выбрать изображение</p>
+                            <input type="file" id="fileInput" accept="image/*" style="display:none">
+                            <div id="preview"></div>
+                            <button type="button" class="upload-btn" id="customBtn">Выбрать файл</button>
+                            <p class="upload-note">Максимальный размер файла 25MB</p>
+                            <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки"
+                                class="upload-icon">
+                        </div>
+                        <div class="upload-icons">
+                            <div class="upload-icons-left">
+                                <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn">
+                                <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn">
+                                <input type="file" id="image-input" accept="image/*" style="display: none;" />
+                            </div>
+                            <div class="upload-icons-right">
+                                {% if user.is_authenticated %}
+                                    <a href="#" id="saveMeme" class="text-button">Сохранить мем</a>
+                                {% endif %}
+                                {% if user.is_authenticated %}
+                                    <img src="{% static 'users/telegram_icon.svg' %}" alt="" id="sendToTelegram">
+                                {% endif %}
+                                <img src="{% static 'register/download_icon.svg' %}" alt="Скачать"
+                                    id="downloadBtn">
+                            </div>
+                        </div>
                     </div>
-                    <div class="upload-icons">
-                        <div class="upload-icons-left">
-                            <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn">
-                            <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn">
-                            <input type="file" id="image-input" accept="image/*" style="display: none;" />
+                </div>
+            </div>
+
+            <!-- Раздел: Шаблоны -->
+            <div id="section-templates" class="section-templates" style="display: none;">
+                <div class="howto-section">
+                    <p class="howto-title">Шаблоны</p>
+
+                    <div class="template-search-row">
+                        <input type="text" placeholder="Поиск по ключевым словам" class="template-search-input">
+                        <button class="template-search-btn">🔍</button>
+                        <button class="template-clear-btn">✖</button>
+                    </div>
+
+                    <div class="template-grid">
+                        {% for i in "123456" %}
+                        <div class="template-item">
+                            <img src="{% static 'users/placeholder_pic.png' %}" alt="">
+                            <button class="template-action-btn">Сделать мем</button>
                         </div>
-                        <div class="upload-icons-right">
-                            {% if user.is_authenticated %}
-                                <img src="{% static 'users/telegram_icon.svg' %}" alt=""
-                                    id="sendToTelegram">
-                            {% endif %}
-                            <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" 
-                                id="downloadBtn">
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
 
         </main>
     </div>
+
+    <!-- Переключение разделов -->
+    <script>
+        console.log('Скрипт загружен');
+        function switchSection(section) {
+            // Скрываем оба раздела
+            console.log('Функция запущена');
+            console.log('Нажата кнопка:', section);
+            document.getElementById('section-create').style.display = 'none';
+            document.getElementById('section-templates').style.display = 'none';
+
+            // Показываем выбранный раздел
+            if (section === 'create') {
+                document.getElementById('section-create').style.display = 'block';
+            } else if (section === 'templates') {
+                document.getElementById('section-templates').style.display = 'block';
+            }
+
+            // Меняем цвет кнопок
+            document.getElementById('btn-create').style.backgroundColor = section === 'templates' ? '#ED9E1D' : '#999';
+            document.getElementById('btn-templates').style.backgroundColor = section === 'create' ? '#ED9E1D' : '#999';
+        }
+    </script>
+
+    <!-- Сохранение мема в профиль -->
+    <script>
+        const saveMeme= document.getElementById('saveMeme');
+        if (saveMeme) {
+            saveMeme.addEventListener('click', saveMemeToProfile);
+        }
+    
+        function saveMemeToProfile() {
+            const target = document.querySelector('.upload-inner');
+            if (!target) {
+                console.error('Элемент .upload-inner не найден');
+                return;
+            }
+    
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
+            const hiddenElements = [];
+            toHide.forEach(el => {
+                hiddenElements.push({ element: el, display: el.style.display });
+                el.style.display = 'none';
+            });
+    
+            const containers = target.querySelectorAll('div[style*="position: absolute"]');
+            const containerStyles = [];
+            containers.forEach(el => {
+                containerStyles.push({
+                    element: el,
+                    border: el.style.border,
+                    boxShadow: el.style.boxShadow,
+                    transform: el.style.transform
+                });
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+            });
+    
+            setTimeout(() => {
+                html2canvas(target, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 2
+                }).then(canvas => {
+                    canvas.toBlob((blob) => {
+                        const formData = new FormData();
+                        formData.append('file', blob, 'meme.png');
+    
+                        fetch('/save_meme_to_profile/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Мем успешно сохранен в профиль!');
+                            } else {
+                                alert('Ошибка: ' + (data.error || 'неизвестная'));
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    });
+                });
+    
+                hiddenElements.forEach(({ element, display }) => {
+                    element.style.display = display;
+                });
+                containerStyles.forEach(({ element, border, boxShadow }) => {
+                    element.style.border = border;
+                    element.style.boxShadow = boxShadow;
+                });
+            }, 50);
+        };
+    </script>
 
     <!-- Отправка в ТГ мема -->
     <script>
@@ -161,8 +285,6 @@
     <script 
         src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
     </script>
-
-    <!-- Скачивание мема -->
      
     <script>
         const downloadBtn = document.getElementById('downloadBtn');

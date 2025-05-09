@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <title>Панель администратора</title>
+    {% load static %}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 100px;
+        }
+
+        h2 {
+            color: #fff;
+            text-align: center;
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        /* Панель администратора */
+        .admin-panel {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Левая колонка */
+        .admin-left {
+            width: 25%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .admin-left button {
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ED9E1D;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        /* Правая колонка с таблицей */
+        .admin-right {
+            width: 70%;
+            padding: 20px;
+            border-left: 2px solid #ccc;
+        }
+
+        .table-wrapper {
+            max-height: 400px; /* Ограничиваем высоту таблицы */
+            overflow-y: auto; /* Добавляем вертикальную прокрутку */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: white; /* Белый цвет текста */
+        }
+
+        table th {
+            background-color: #333;
+        }
+
+        table td {
+            background-color: #222;
+        }
+
+        /* Стили для кликабельной строки */
+        tr {
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background-color: #333; /* Подсвечиваем строку при наведении */
+        }
+
+        /* Выделенная строка - изменения цвета текста */
+        tr.selected td {
+            color: #ED9E1D; /* Оранжевый цвет текста при выборе */
+        }
+
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'index' %}" class="logo">
+        <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип">
+    </a>
+
+    <h2>Панель администратора</h2>
+
+    <div class="admin-panel">
+
+        <div class="admin-left">
+            <button id="button1">Кнопка 1</button>
+            <button id="button2">Кнопка 2</button>
+            <button id="button3">Кнопка 3</button>
+            <button id="button4">Кнопка 4</button>
+        </div>
+
+        <!-- Правая колонка с таблицей пользователей -->
+        <div class="admin-right">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Никнейм</th>
+                            <th>Последний вход</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Примеры строк таблицы -->
+                        <tr class="user-row">
+                            <td>user1</td>
+                            <td>2025-05-09 14:30</td>
+                        </tr>
+                        <tr class="user-row">
+                            <td>user2</td>
+                            <td>2025-05-08 09:00</td>
+                        </tr>
+                        <tr class="user-row">
+                            <td>user3</td>
+                            <td>2025-05-07 18:45</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Получаем все строки таблицы
+        const rows = document.querySelectorAll('tr.user-row');
+
+        // Добавляем обработчик событий для каждой строки
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                // Убираем выделение у всех строк
+                rows.forEach(r => r.classList.remove('selected'));
+                // Добавляем класс 'selected' для выделенной строки
+                row.classList.add('selected');
+            });
+        });
+    </script>
+
+</body>
+</html>
