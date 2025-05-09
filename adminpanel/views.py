@@ -8,6 +8,8 @@ from django.http import HttpResponse
 from backend.models import Template
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.core.files.storage import default_storage as s3_storage
+from urllib.parse import urlparse
 
 def admin_login(request):
     if request.method == 'POST':
@@ -45,19 +47,32 @@ def admin_dashboard(request):
     #     return redirect("admin_login")
     return render(request, 'adminpanel/dashboard.html')
 
-# @csrf_exempt
-# def manage_templates(request):
-#     if request.method == 'POST':
-#         if 'delete_id' in request.POST:
-#             Template.objects.filter(id=request.POST['delete_id']).delete()
-#         elif 'add_url' in request.POST:
-#             Template.objects.create(image_url=request.POST['add_url'], tags=[])
-#         elif 'edit_id' in request.POST:
-#             template = Template.objects.get(id=request.POST['edit_id'])
-#             new_tags = [tag.strip() for tag in request.POST['edit_tags'].split(',') if tag.strip()]
-#             template.tags = new_tags
-#             template.save()
-#         return redirect('manage_templates')
-#
-#     templates = Template.objects.all().order_by('id')
-#     return render(request, 'adminpanel/manage_templates.html', {'templates': templates})
+@csrf_exempt
+def manage_templates(request):
+    if request.method == 'POST':
+        if 'delete_id' in request.POST:
+            Template.objects.filter(id=request.POST['delete_id']).delete()
+        # if 'delete_id' in request.POST:
+        #     template = Template.objects.filter(id=request.POST['delete_id']).first()
+        #     if template:
+        #         # Извлекаем путь внутри бакета
+        #         parsed = urlparse(template.image_url)
+        #         s3_path = parsed.path.lstrip('/')  # Удалить ведущий /
+        #
+        #         # Удаляем из S3
+        #         if s3_storage.exists(s3_path):
+        #             s3_storage.delete(s3_path)
+        #
+        #         # Удаляем из базы
+        #         template.delete()
+        elif 'add_url' in request.POST:
+            Template.objects.create(image_url=request.POST['add_url'], tags=[])
+        elif 'edit_id' in request.POST:
+            template = Template.objects.get(id=request.POST['edit_id'])
+            new_tags = [tag.strip() for tag in request.POST['edit_tags'].split(',') if tag.strip()]
+            template.tags = new_tags
+            template.save()
+        return redirect('manage_templates')
+
+    templates = Template.objects.all().order_by('id')
+    return render(request, 'adminpanel/manage_templates.html', {'templates': templates})
