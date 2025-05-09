@@ -119,6 +119,7 @@
             <button id="button2">Кнопка 2</button>
             <button id="button3">Кнопка 3</button>
             <button id="button4">Кнопка 4</button>
+            <button id="editTemplatesBtn">Изменить шаблоны</button>
         </div>
 
         <!-- Правая колонка с таблицей пользователей -->
@@ -164,6 +165,12 @@
                 // Добавляем класс 'selected' для выделенной строки
                 row.classList.add('selected');
             });
+        });
+    </script>
+
+    <script>
+        document.getElementById('editTemplatesBtn').addEventListener('click', () => {
+            window.location.href = '/adminpanel/templates/';
         });
     </script>
 

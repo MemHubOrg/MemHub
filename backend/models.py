@@ -7,10 +7,18 @@ from django.conf import settings
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
+# class Tag(models.Model):
+#     name = models.CharField(max_length=32, unique=True)
+#
+#     def __str__(self):
+#         return self.name
+
 
 class Template(models.Model):
     image_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
+    # tags = models.ManyToManyField(Tag, blank=True, related_name='templates')
+    tags = models.JSONField(default=list, blank=True)
 
 class Meme(models.Model):
     image_url = models.CharField(max_length=256, unique=True, null=True)

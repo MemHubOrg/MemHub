@@ -734,5 +734,33 @@
         window.location.href = "/";
     }
     </script>
+
+    <!--Поиск по тегам-->
+    <script>
+    document.querySelector('.template-search-btn').addEventListener('click', () => {
+        const input = document.querySelector('.template-search-input');
+        const query = input.value.trim();
+
+        fetch(`/api/templates/?tag=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                const grid = document.querySelector('.template-grid');
+                grid.innerHTML = "";
+
+                data.forEach(template => {
+                    const item = document.createElement('div');
+                    item.classList.add('template-item');
+
+                    item.innerHTML = `
+                        <img src="${template.imageUrl}" alt="">
+                        <button class="template-action-btn" onclick="selectTemplate('${template.imageUrl}')">
+                            Сделать мем
+                        </button>
+                    `;
+                    grid.appendChild(item);
+                });
+            });
+    });
+    </script>
 </body>
 </html>
