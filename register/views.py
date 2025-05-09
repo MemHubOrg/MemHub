@@ -36,11 +36,8 @@ logger = logging.getLogger(__name__)
 EXTERNAL_API_IP = "192.168.0.6"
 
 def index(request):
-    templates = Template.objects.all()  # получаем все записи
-    #print(f"\nTemplate: {templates}\n")
+    templates = Template.objects.all()
     return render(request, 'register/index.html', {'templates': templates})
-
-    #return render(request, 'register/index.html')
 
 def register(request):
     message = request.session.pop('register_message', None)
@@ -57,13 +54,7 @@ def register(request):
                     "register/register.html",
                     {"form": form, "error": "Пользователь с таким именем уже существует!", "message": message}
                 )
-
-            # user = User.objects.create(
-            #     username=username,
-            #     password=make_password(password),
-            #     unique_token=pyotp.random_base32()
-            # )
-            # user.save()
+            
             request.session['register_data'] = {
                 "username": username,
                 "password": password,
@@ -160,56 +151,6 @@ def verify_telegram_code(request):
         "refresh_token": str(refresh),
         "redirect_url": "/"
     }, status=200)
-# @csrf_exempt
-# def verify_telegram_code(request):
-#     if request.method != 'POST':
-#         logger.warning("Invalid request method")
-#         return JsonResponse({
-#             "success": False,
-#             "error": "Only POST requests are allowed"
-#         }, status=405)
-#
-#     try:
-#         json_data = json.loads(request.body)
-#     except json.JSONDecodeError as e:
-#         logger.error(f"JSON decode error: {str(e)}")
-#         return JsonResponse({
-#             "success": False,
-#             "error": "Invalid JSON format"
-#         }, status=400)
-#
-#     form = TelegramCodeForm(data=json_data)
-#
-#     if form.is_valid():
-#         user_input = form.cleaned_data['telegram_code']
-#         username = form.cleaned_data['username']
-#
-#         user = User.objects.get(username=username)
-#
-#         if pyotp.TOTP(user.unique_token, interval=300).now() == user_input:
-#             auth_login(request, user)
-#
-#             # JWT-token
-#             refresh = RefreshToken.for_user(user)
-#             token_data = {
-#                 "access": str(refresh.access_token),
-#                 "refresh": str(refresh),
-#             }
-#
-#             form = LoginForm()
-#             return JsonResponse({
-#                 "success": True,
-#                 "access_token": token_data["access"],
-#                 "refresh_token": token_data["refresh"],
-#                 "redirect_url": "/"
-#             }, status=200)
-#         else:
-#             return JsonResponse({
-#                 "success": False,
-#                 "error": "Неверный код. Попробуйте ещё раз."
-#             }, status=400)
-#
-#     return JsonResponse({"success": False}, status=400)
 
 def login(request):
     if request.method == "POST":
@@ -286,17 +227,6 @@ def send_meme_to_telegram(request):
 
     return JsonResponse({'success': False, 'error': 'Файл не получен'}, status=400)
 
-# @csrf_exempt
-# def send_telegram_code(request):
-#     if request.method == "POST":
-#         register_data = request.session.get("register_data")
-#         username = register_data.get("username")
-#         # data = json.loads(request.body)
-#         # username = data.get("username", "")
-#         success = send_code_to_user(username)
-#         return JsonResponse({"success": success})
-#
-#     return JsonResponse({"success": False}, status=400)
 @csrf_exempt
 def save_meme_to_profile(request):
     if request.method == 'POST':
@@ -358,22 +288,6 @@ def send_code_to_user(username, unique_token):
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
         return False
-
-# def send_code_to_user(username):
-#     url = f'http://{EXTERNAL_API_IP}:8081/send_code'
-#     payload = {'username': username}
-#
-#     try:
-#         response = requests.post(url, json=payload)
-#
-#         if response.status_code == 200:
-#             return True
-#         else:
-#             print(f"Error: {response.json().get('message')}")
-#             return False
-#     except requests.exceptions.RequestException as e:
-#         print(f"Request failed: {e}")
-#         return False
 
 class CustomTokenView(TokenObtainPairView):
      @swagger_auto_schema(
