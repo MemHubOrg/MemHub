@@ -7,6 +7,8 @@ import boto3
 
 from backend.models import Meme
 
+from backend.models import Template
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
@@ -28,14 +30,17 @@ from drf_yasg import openapi
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 EXTERNAL_API_IP = "192.168.0.6"
 
 def index(request):
-    #return render(request, 'users/index.html')
-    return render(request, 'register/index.html')
+    templates = Template.objects.all()  # получаем все записи
+    #print(f"\nTemplate: {templates}\n")
+    return render(request, 'register/index.html', {'templates': templates})
+
+    #return render(request, 'register/index.html')
 
 def register(request):
     message = request.session.pop('register_message', None)
@@ -369,7 +374,7 @@ def send_code_to_user(username, unique_token):
 #     except requests.exceptions.RequestException as e:
 #         print(f"Request failed: {e}")
 #         return False
-    
+
 class CustomTokenView(TokenObtainPairView):
      @swagger_auto_schema(
          request_body=openapi.Schema(

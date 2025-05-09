@@ -11,8 +11,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Инициализация бота
-TOKEN = '7728653033:AAGLTd8eFy8XR8CNEHaHiR0O0ZJU4o-hMfI'
-# TOKEN = '7958894633:AAGtpGxa9CSIyGLOeobjdEwWhOcCQS7V0Qs'
+#TOKEN = '7728653033:AAGLTd8eFy8XR8CNEHaHiR0O0ZJU4o-hMfI'
+TOKEN = '7958894633:AAGtpGxa9CSIyGLOeobjdEwWhOcCQS7V0Qs'
 bot = Bot(token=TOKEN)
 
 @app.route('/send_meme', methods=['POST'])

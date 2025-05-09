@@ -100,9 +100,9 @@
                     </div>
 
                     <div class="template-grid">
-                        {% for i in "123456" %}
+                        {% for template in templates %}
                         <div class="template-item">
-                            <img src="{% static 'users/placeholder_pic.png' %}" alt="">
+                            <img src="{{ template.image_url }}" alt="">
                             <button class="template-action-btn">Сделать мем</button>
                         </div>
                         {% endfor %}
@@ -213,8 +213,11 @@
     <!-- Отправка в ТГ мема -->
     <script>
         const sendToTelegram = document.getElementById('sendToTelegram');
+        if (sendToTelegram) {
+            sendToTelegram.addEventListener('click', sendToTelegramfunc);
+        }
     
-        sendToTelegram.addEventListener('click', () => {
+        function sendToTelegramfunc() {
             const target = document.querySelector('.upload-inner');
             if (!target) {
                 console.error('Элемент .upload-inner не найден');
@@ -278,7 +281,7 @@
                     element.style.boxShadow = boxShadow;
                 });
             }, 50);
-        });
+        };
     </script>
 
     <!-- Cкачивание элемента как PNG -->
