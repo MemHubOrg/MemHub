@@ -89,6 +89,7 @@ button.register {
     bottom: 0px;
     left: 0px;
     transform: none;
+    pointer-events: none;
 }
 
 .top-right {
@@ -256,6 +257,8 @@ button.register {
     user-select: none;
     padding: 0 10px;
     transition: transform 0.2s ease;
+    z-index: 10; /* ← поднимаем стрелку над котом */
+    position: relative; /* ← чтобы z-index сработал */
 }
 
 .nav-icon:hover {
@@ -264,6 +267,8 @@ button.register {
 
 .nav-icon.left {
     margin-right: 10px;
+    z-index: 10; /* ← поднимаем стрелку над котом */
+    position: relative; /* ← чтобы z-index сработал */
 }
 
 .nav-icon.right {
@@ -357,6 +362,7 @@ button.register {
     .bottom-left {
         bottom: 10px;
         left: 10px;
+        pointer-events: none;
     }
 
     .top-right {
@@ -395,6 +401,8 @@ button.register {
 
     .bottom-left, .top-right {
         width: 150px;
+        pointer-events: none;
     }
 }
+
 

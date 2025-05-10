@@ -16,6 +16,15 @@
 
     function renderImages() {
         const container = document.getElementById('memGrid');
+
+        // Если мемов нет, показываем сообщение и выходим
+        if (TOTAL_IMAGES === 0) {
+            container.innerHTML = '<p>Вы ещё не сохранили ни одного мема</p>';
+            document.querySelector('.nav-icon.left').classList.add('disabled');
+            document.querySelector('.nav-icon.right').classList.add('disabled');
+            return;
+        }
+
         container.innerHTML = '';
         const start = currentPage * IMAGES_PER_PAGE;
         const end = Math.min(start + IMAGES_PER_PAGE, TOTAL_IMAGES);
@@ -80,14 +89,17 @@
         <div class="mem-container">
             <div class="nav-icon left" onclick="prevPage()">&#10094;</div>
 
+<!--            <div class="mem-grid" id="memGrid">-->
+<!--                {% for meme in memes %}-->
+<!--                    <a href="{% url 'users:selected_meme' meme.id %}" class="mem-item">-->
+<!--                        <img src="{{ meme.image_url }}" alt="Мем {{ forloop.counter }}">-->
+<!--                    </a>-->
+<!--                {% empty %}-->
+<!--                    <p>Вы ещё не сохранили ни одного мема</p>-->
+<!--                {% endfor %}-->
+<!--            </div>-->
             <div class="mem-grid" id="memGrid">
-                {% for meme in memes %}
-                    <a href="{% url 'users:selected_meme' meme.id %}" class="mem-item">
-                        <img src="{{ meme.image_url }}" alt="Мем {{ forloop.counter }}">
-                    </a>
-                {% empty %}
-                    <p>Вы ещё не сохранили ни одного мема</p>
-                {% endfor %}
+                <!-- мемы вставляются JavaScript'ом -->
             </div>
 
             <div class="nav-icon right" onclick="nextPage()">&#10095;</div>

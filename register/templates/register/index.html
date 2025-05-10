@@ -74,9 +74,9 @@
                                 <input type="file" id="image-input" accept="image/*" style="display: none;" />
                             </div>
                             <div class="upload-icons-right">
-                                {% if user.is_authenticated %}
-                                    <a href="#" id="saveMeme" class="text-button">Сохранить мем</a>
-                                {% endif %}
+<!--                                {% if user.is_authenticated %}-->
+<!--                                    <a href="#" id="saveMeme" class="text-button">Сохранить мем</a>-->
+<!--                                {% endif %}-->
                                 {% if user.is_authenticated %}
                                     <img src="{% static 'users/telegram_icon.svg' %}" alt="" id="sendToTelegram">
                                 {% endif %}
@@ -116,6 +116,10 @@
         </main>
     </div>
 
+    <script>
+        const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+    </script>
+
     <!-- Переключение разделов -->
     <script>
         console.log('Скрипт загружен');
@@ -140,100 +144,100 @@
     </script>
 
     <!-- Сохранение мема в профиль -->
-    <script>
-        const saveMeme= document.getElementById('saveMeme');
-        if (saveMeme) {
-            saveMeme.addEventListener('click', saveMemeToProfile);
-        }
-    
-        function saveMemeToProfile() {
-            const target = document.querySelector('.upload-inner');
-            if (!target) {
-                console.error('Элемент .upload-inner не найден');
-                return;
-            }
-    
-            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
-            const hiddenElements = [];
-            toHide.forEach(el => {
-                hiddenElements.push({ element: el, display: el.style.display });
-                el.style.display = 'none';
-            });
-    
-            const containers = target.querySelectorAll('div[style*="position: absolute"]');
-            const containerStyles = [];
-            containers.forEach(el => {
-                containerStyles.push({
-                    element: el,
-                    border: el.style.border,
-                    boxShadow: el.style.boxShadow,
-                    transform: el.style.transform
-                });
-                el.style.border = 'none';
-                el.style.boxShadow = 'none';
-            });
-    
-            setTimeout(() => {
-                html2canvas(target, {
-                    useCORS: true,
-                    backgroundColor: null,
-                    scale: 2
-                }).then(canvas => {
-                    canvas.toBlob((blob) => {
-                        const formData = new FormData();
-                        formData.append('file', blob, 'meme.png');
-    
-                        fetch('/save_meme_to_profile/', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}'
-                            },
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Мем успешно сохранен в профиль!');
-                            } else {
-                                alert('Ошибка: ' + (data.error || 'неизвестная'));
-                            }
-                        })
-                        .catch(error => console.error('Error:', error));
-                    });
-                });
-    
-                hiddenElements.forEach(({ element, display }) => {
-                    element.style.display = display;
-                });
-                containerStyles.forEach(({ element, border, boxShadow }) => {
-                    element.style.border = border;
-                    element.style.boxShadow = boxShadow;
-                });
-            }, 50);
-        };
-    </script>
+<!--    <script>-->
+<!--        const saveMeme= document.getElementById('saveMeme');-->
+<!--        if (saveMeme) {-->
+<!--            saveMeme.addEventListener('click', saveMemeToProfile);-->
+<!--        }-->
+<!--    -->
+<!--        function saveMemeToProfile() {-->
+<!--            const target = document.querySelector('.upload-inner');-->
+<!--            if (!target) {-->
+<!--                console.error('Элемент .upload-inner не найден');-->
+<!--                return;-->
+<!--            }-->
+<!--    -->
+<!--            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');-->
+<!--            const hiddenElements = [];-->
+<!--            toHide.forEach(el => {-->
+<!--                hiddenElements.push({ element: el, display: el.style.display });-->
+<!--                el.style.display = 'none';-->
+<!--            });-->
+<!--    -->
+<!--            const containers = target.querySelectorAll('div[style*="position: absolute"]');-->
+<!--            const containerStyles = [];-->
+<!--            containers.forEach(el => {-->
+<!--                containerStyles.push({-->
+<!--                    element: el,-->
+<!--                    border: el.style.border,-->
+<!--                    boxShadow: el.style.boxShadow,-->
+<!--                    transform: el.style.transform-->
+<!--                });-->
+<!--                el.style.border = 'none';-->
+<!--                el.style.boxShadow = 'none';-->
+<!--            });-->
+<!--    -->
+<!--            setTimeout(() => {-->
+<!--                html2canvas(target, {-->
+<!--                    useCORS: true,-->
+<!--                    backgroundColor: null,-->
+<!--                    scale: 2-->
+<!--                }).then(canvas => {-->
+<!--                    canvas.toBlob((blob) => {-->
+<!--                        const formData = new FormData();-->
+<!--                        formData.append('file', blob, 'meme.png');-->
+<!--    -->
+<!--                        fetch('/save_meme_to_profile/', {-->
+<!--                            method: 'POST',-->
+<!--                            headers: {-->
+<!--                                'X-CSRFToken': '{{ csrf_token }}'-->
+<!--                            },-->
+<!--                            body: formData-->
+<!--                        })-->
+<!--                        .then(response => response.json())-->
+<!--                        .then(data => {-->
+<!--                            if (data.success) {-->
+<!--                                alert('Мем успешно сохранен в профиль!');-->
+<!--                            } else {-->
+<!--                                alert('Ошибка: ' + (data.error || 'неизвестная'));-->
+<!--                            }-->
+<!--                        })-->
+<!--                        .catch(error => console.error('Error:', error));-->
+<!--                    });-->
+<!--                });-->
+<!--    -->
+<!--                hiddenElements.forEach(({ element, display }) => {-->
+<!--                    element.style.display = display;-->
+<!--                });-->
+<!--                containerStyles.forEach(({ element, border, boxShadow }) => {-->
+<!--                    element.style.border = border;-->
+<!--                    element.style.boxShadow = boxShadow;-->
+<!--                });-->
+<!--            }, 50);-->
+<!--        };-->
+<!--    </script>-->
 
-    <!-- Отправка в ТГ мема -->
+    <!-- Отправка в ТГ мема и сохранение его в профиле -->
     <script>
         const sendToTelegram = document.getElementById('sendToTelegram');
         if (sendToTelegram) {
             sendToTelegram.addEventListener('click', sendToTelegramfunc);
         }
-    
+
         function sendToTelegramfunc() {
             const target = document.querySelector('.upload-inner');
             if (!target) {
                 console.error('Элемент .upload-inner не найден');
                 return;
             }
-    
+
             const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
             const hiddenElements = [];
             toHide.forEach(el => {
                 hiddenElements.push({ element: el, display: el.style.display });
                 el.style.display = 'none';
             });
-    
+
             const containers = target.querySelectorAll('div[style*="position: absolute"]');
             const containerStyles = [];
             containers.forEach(el => {
@@ -246,7 +250,7 @@
                 el.style.border = 'none';
                 el.style.boxShadow = 'none';
             });
-    
+
             setTimeout(() => {
                 html2canvas(target, {
                     useCORS: true,
@@ -256,26 +260,22 @@
                     canvas.toBlob((blob) => {
                         const formData = new FormData();
                         formData.append('file', blob, 'meme.png');
-    
-                        fetch('/send_meme_to_telegram/', {
+
+                        // Сначала сохраняем в профиль, если пользователь авторизован
+                        {% if user.is_authenticated %}
+                        fetch('/save_meme_to_profile/', {
                             method: 'POST',
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}'
-                            },
+                            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
                             body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Мем успешно отправлен в Telegram!');
-                            } else {
-                                alert('Ошибка: ' + (data.error || 'неизвестная'));
-                            }
-                        })
-                        .catch(error => console.error('Error:', error));
+                        }).finally(() => {
+                            sendToTelegramNow(formData);
+                        });
+                        {% else %}
+                        sendToTelegramNow(formData);
+                        {% endif %}
                     });
                 });
-    
+
                 hiddenElements.forEach(({ element, display }) => {
                     element.style.display = display;
                 });
@@ -284,8 +284,97 @@
                     element.style.boxShadow = boxShadow;
                 });
             }, 50);
-        };
+        }
+
+        function sendToTelegramNow(formData) {
+            fetch('/send_meme_to_telegram/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Мем отправлен в Telegram${isAuthenticated ? " и сохранён в профиль" : ""}!`);
+                } else {
+                    alert('Ошибка при отправке в Telegram: ' + (data.error || 'неизвестная'));
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+        }
     </script>
+<!--    <script>-->
+<!--        const sendToTelegram = document.getElementById('sendToTelegram');-->
+<!--        if (sendToTelegram) {-->
+<!--            sendToTelegram.addEventListener('click', sendToTelegramfunc);-->
+<!--        }-->
+<!--    -->
+<!--        function sendToTelegramfunc() {-->
+<!--            const target = document.querySelector('.upload-inner');-->
+<!--            if (!target) {-->
+<!--                console.error('Элемент .upload-inner не найден');-->
+<!--                return;-->
+<!--            }-->
+<!--    -->
+<!--            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');-->
+<!--            const hiddenElements = [];-->
+<!--            toHide.forEach(el => {-->
+<!--                hiddenElements.push({ element: el, display: el.style.display });-->
+<!--                el.style.display = 'none';-->
+<!--            });-->
+<!--    -->
+<!--            const containers = target.querySelectorAll('div[style*="position: absolute"]');-->
+<!--            const containerStyles = [];-->
+<!--            containers.forEach(el => {-->
+<!--                containerStyles.push({-->
+<!--                    element: el,-->
+<!--                    border: el.style.border,-->
+<!--                    boxShadow: el.style.boxShadow,-->
+<!--                    transform: el.style.transform-->
+<!--                });-->
+<!--                el.style.border = 'none';-->
+<!--                el.style.boxShadow = 'none';-->
+<!--            });-->
+<!--    -->
+<!--            setTimeout(() => {-->
+<!--                html2canvas(target, {-->
+<!--                    useCORS: true,-->
+<!--                    backgroundColor: null,-->
+<!--                    scale: 2-->
+<!--                }).then(canvas => {-->
+<!--                    canvas.toBlob((blob) => {-->
+<!--                        const formData = new FormData();-->
+<!--                        formData.append('file', blob, 'meme.png');-->
+<!--    -->
+<!--                        fetch('/send_meme_to_telegram/', {-->
+<!--                            method: 'POST',-->
+<!--                            headers: {-->
+<!--                                'X-CSRFToken': '{{ csrf_token }}'-->
+<!--                            },-->
+<!--                            body: formData-->
+<!--                        })-->
+<!--                        .then(response => response.json())-->
+<!--                        .then(data => {-->
+<!--                            if (data.success) {-->
+<!--                                alert('Мем успешно отправлен в Telegram!');-->
+<!--                            } else {-->
+<!--                                alert('Ошибка: ' + (data.error || 'неизвестная'));-->
+<!--                            }-->
+<!--                        })-->
+<!--                        .catch(error => console.error('Error:', error));-->
+<!--                    });-->
+<!--                });-->
+<!--    -->
+<!--                hiddenElements.forEach(({ element, display }) => {-->
+<!--                    element.style.display = display;-->
+<!--                });-->
+<!--                containerStyles.forEach(({ element, border, boxShadow }) => {-->
+<!--                    element.style.border = border;-->
+<!--                    element.style.boxShadow = boxShadow;-->
+<!--                });-->
+<!--            }, 50);-->
+<!--        };-->
+<!--    </script>-->
 
     <!-- Cкачивание элемента как PNG -->
     <script 
@@ -304,7 +393,7 @@
                 console.error('Элемент .upload-inner не найден');
                 return;
             }
-    
+
             // Скрыть управляющие кнопки
             const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
             const hiddenElements = [];
@@ -312,7 +401,7 @@
                 hiddenElements.push({ element: el, display: el.style.display });
                 el.style.display = 'none';
             });
-    
+
             // Убрать рамки и тени
             const containers = target.querySelectorAll('div[style*="position: absolute"]');
             const containerStyles = [];
@@ -326,7 +415,7 @@
                 el.style.border = 'none';
                 el.style.boxShadow = 'none';
             });
-    
+
             requestAnimationFrame(() => {
                 html2canvas(target, {
                     useCORS: true,
@@ -337,7 +426,7 @@
                     link.download = 'meme.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
-    
+
                     // Восстановить стили
                     hiddenElements.forEach(({ element, display }) => {
                         element.style.display = display;
@@ -742,6 +831,45 @@
         const query = input.value.trim();
 
         fetch(`/api/templates/?tag=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                const grid = document.querySelector('.template-grid');
+                grid.innerHTML = "";
+
+                data.forEach(template => {
+                    const item = document.createElement('div');
+                    item.classList.add('template-item');
+
+                    item.innerHTML = `
+                        <img src="${template.imageUrl}" alt="">
+                        <button class="template-action-btn" onclick="selectTemplate('${template.imageUrl}')">
+                            Сделать мем
+                        </button>
+                    `;
+                    grid.appendChild(item);
+                });
+            });
+    });
+    </script>
+
+    <!--Обработка enter-->
+    <script>
+    document.querySelector('.template-search-input').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // предотвращает отправку формы, если вдруг будет
+            document.querySelector('.template-search-btn').click();
+        }
+    });
+    </script>
+
+    <!--Обработчик очищения поля-->
+    <script>
+    document.querySelector('.template-clear-btn').addEventListener('click', () => {
+        const input = document.querySelector('.template-search-input');
+        input.value = ''; // очищаем поле
+
+        // Загружаем все шаблоны заново
+        fetch(`/api/templates/`)
             .then(res => res.json())
             .then(data => {
                 const grid = document.querySelector('.template-grid');
