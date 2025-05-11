@@ -76,11 +76,10 @@
 <!--                                {% if user.is_authenticated %}-->
 <!--                                    <a href="#" id="saveMeme" class="text-button">Сохранить мем</a>-->
 <!--                                {% endif %}-->
+                                <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" id="downloadBtn" class="disabled-btn">
                                 {% if user.is_authenticated %}
-                                    <img src="{% static 'users/telegram_icon.svg' %}" alt="" id="sendToTelegram">
+                                    <img src="{% static 'register/telegram_icon.svg' %}" alt="Отправить" id="sendToTelegram" class="disabled-btn">
                                 {% endif %}
-                                <img src="{% static 'register/download_icon.svg' %}" alt="Скачать"
-                                    id="downloadBtn">
                             </div>
                         </div>
                     </div>
@@ -772,6 +771,13 @@
                     // Активируем кнопки
                     document.getElementById('addImageBtn').classList.remove('disabled-btn');
                     document.getElementById('addTextBtn').classList.remove('disabled-btn');
+                    document.getElementById('downloadBtn').classList.remove('disabled-btn');
+                    document.getElementById('sendToTelegram').classList.remove('disabled-btn');
+
+                    addImageBtn.style.cursor = 'pointer';
+                    addTextBtn.style.cursor = 'pointer';
+                    downloadBtn.style.cursor = 'pointer';
+                    sendToTelegram.style.cursor = 'pointer';
                 };
                 reader.readAsDataURL(file);
             } else {
