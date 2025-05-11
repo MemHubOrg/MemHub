@@ -80,8 +80,33 @@
                                     <img src="{% static 'register/telegram_icon.svg' %}" alt="Отправить" id="sendToTelegram" class="disabled-btn">
                                 {% endif %}
                                 <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" id="downloadBtn" class="disabled-btn">
+<!--                                <img src="{% static 'register/trash_icon.svg' %}" alt="Очистить" id="clearEditorBtn" class="disabled-btn">-->
                             </div>
                         </div>
+<!--                        <button id="clearEditorBtn" class="clear-editor-btn" title="Очистить">-->
+<!--                            <img src="{% static 'register/trash_icon.svg' %}" alt="Очистить">-->
+<!--                        </button>-->
+<!--    .clear-editor-btn {-->
+<!--    position: absolute;-->
+<!--    bottom: 10px;-->
+<!--    right: 10px;-->
+<!--    background: none;       /* Убирает белый фон */-->
+<!--    border: none;           /* Убирает рамку */-->
+<!--    padding: 0;-->
+<!--    cursor: pointer;-->
+<!--    z-index: 10;-->
+<!--    transition: transform 0.2s ease;-->
+<!--}-->
+
+<!--.clear-editor-btn img {-->
+<!--    width: 28px;-->
+<!--    height: 28px;-->
+<!--    filter: brightness(1) saturate(1) hue-rotate(0deg); /* Сохраняем оранжевый */-->
+<!--}-->
+
+<!--.clear-editor-btn:hover {-->
+<!--    transform: scale(1.1);-->
+<!--}-->
                     </div>
                 </div>
             </div>
@@ -935,5 +960,44 @@
             });
     });
     </script>
+
+    <!--Обработчик кнопки мусорки-->
+<!--    <script>-->
+<!--        const clearEditorBtn = document.getElementById('clearEditorBtn');-->
+<!--        if (clearEditorBtn) {-->
+<!--            clearEditorBtn.addEventListener('click', () => {-->
+<!--                const preview = document.getElementById('preview');-->
+<!--                const uploadInner = document.querySelector('.upload-inner');-->
+
+<!--                // Очищаем загруженное изображение-->
+<!--                preview.innerHTML = '';-->
+
+<!--                // Удаляем все элементы (тексты/картинки)-->
+<!--                const customElements = uploadInner.querySelectorAll('div[style*="position: absolute"]');-->
+<!--                customElements.forEach(el => el.remove());-->
+
+<!--                // Показываем элементы, скрытые после загрузки-->
+<!--                document.querySelector('.upload-title').style.display = 'block';-->
+<!--                document.querySelector('.upload-subtitle').style.display = 'block';-->
+<!--                document.querySelector('.upload-note').style.display = 'block';-->
+<!--                document.getElementById('customBtn').style.display = 'inline-block';-->
+<!--                document.querySelector('.upload-icon').style.display = 'block';-->
+
+<!--                // Деактивируем кнопки-->
+<!--                document.getElementById('addImageBtn').classList.add('disabled-btn');-->
+<!--                document.getElementById('addTextBtn').classList.add('disabled-btn');-->
+<!--                document.getElementById('downloadBtn').classList.add('disabled-btn');-->
+<!--                document.getElementById('sendToTelegram').classList.add('disabled-btn');-->
+
+<!--                document.getElementById('addImageBtn').style.cursor = 'default';-->
+<!--                document.getElementById('addTextBtn').style.cursor = 'default';-->
+<!--                document.getElementById('downloadBtn').style.cursor = 'default';-->
+<!--                document.getElementById('sendToTelegram').style.cursor = 'default';-->
+
+<!--                // Сброс file input-->
+<!--                document.getElementById('fileInput').value = '';-->
+<!--            });-->
+<!--        }-->
+<!--    </script>-->
 </body>
 </html>
