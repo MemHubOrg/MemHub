@@ -17,6 +17,8 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
     unique_token = models.CharField(max_length=33, unique=True, blank=True, null=True)
     chat_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    force_password_reset = models.BooleanField(default=False)
 
     objects = UserManager()
 

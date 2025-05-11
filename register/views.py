@@ -29,11 +29,12 @@ from drf_yasg import openapi
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from rest_framework_simplejwt.tokens import AccessToken
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-EXTERNAL_API_IP = "192.168.0.153"
+EXTERNAL_API_IP = "192.168.0.6"
 
 def index(request):
     templates = Template.objects.all()
@@ -309,3 +310,36 @@ class CustomTokenView(TokenObtainPairView):
      )
      def post(self, request, *args, **kwargs):
          return super().post(request, *args, **kwargs)
+
+@csrf_exempt
+def check_password_reset_flag(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        token_str = data.get("access_token")
+        if not token_str:
+            return JsonResponse({"error": "No token provided"}, status=400)
+
+        # Расшифровываем токен и получаем пользователя
+        token = AccessToken(token_str)
+        user_id = token['user_id']
+        user = User.objects.get(id=user_id)
+
+        return JsonResponse({"should_change_password": user.force_password_reset})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+# @csrf_exempt
+# def check_password_reset_flag(request):
+#     if request.method != "POST":
+#         return JsonResponse({"error": "Invalid method"}, status=405)
+#
+#     try:
+#         flag = request.user.force_password_reset
+#         return JsonResponse({"should_change_password": flag})
+#
+#     except Exception as e:
+#         return JsonResponse({"error": str(e)}, status=400)

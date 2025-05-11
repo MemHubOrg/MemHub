@@ -105,6 +105,7 @@
     </style>
 </head>
 <body>
+    {% csrf_token %}
 
     <a href="{% url 'index' %}" class="logo">
         <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип">
@@ -115,10 +116,10 @@
     <div class="admin-panel">
 
         <div class="admin-left">
-            <button id="button1">Кнопка 1</button>
-            <button id="button2">Кнопка 2</button>
-            <button id="button3">Кнопка 3</button>
-            <button id="button4">Кнопка 4</button>
+            <button id="button1">Забанить/Разбанить</button>
+            <button id="button2">Деактивация активных сессий</button>
+            <button id="button3">Запрос необходимости сброса пароля </button>
+            <button id="button4">Мониторинг</button>
             <button id="editTemplatesBtn">Изменить шаблоны</button>
         </div>
 
@@ -133,25 +134,56 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Примеры строк таблицы -->
-                        <tr class="user-row">
-                            <td>user1</td>
-                            <td>2025-05-09 14:30</td>
-                        </tr>
-                        <tr class="user-row">
-                            <td>user2</td>
-                            <td>2025-05-08 09:00</td>
-                        </tr>
-                        <tr class="user-row">
-                            <td>user3</td>
-                            <td>2025-05-07 18:45</td>
-                        </tr>
+                        {% for user in users %}
+                            <tr class="user-row">
+                                <td>{{ user.username }}</td>
+                                <td>
+                                    {% if user.last_login %}
+                                        {{ user.last_login|date:"Y-m-d H:i" }}
+                                    {% else %}
+                                        Никогда
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2">Пользователи не найдены</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
+<!--                    <tbody>-->
+<!--                        &lt;!&ndash; Примеры строк таблицы &ndash;&gt;-->
+<!--                        <tr class="user-row">-->
+<!--                            <td>user1</td>-->
+<!--                            <td>2025-05-09 14:30</td>-->
+<!--                        </tr>-->
+<!--                        <tr class="user-row">-->
+<!--                            <td>user2</td>-->
+<!--                            <td>2025-05-08 09:00</td>-->
+<!--                        </tr>-->
+<!--                        <tr class="user-row">-->
+<!--                            <td>user3</td>-->
+<!--                            <td>2025-05-07 18:45</td>-->
+<!--                        </tr>-->
+<!--                    </tbody>-->
                 </table>
             </div>
         </div>
 
     </div>
+    <script>
+        // Глобальная переменная
+        window.selectedUsername = null;
+
+        const rows = document.querySelectorAll('tr.user-row');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                rows.forEach(r => r.classList.remove('selected'));
+                row.classList.add('selected');
+                window.selectedUsername = row.cells[0].textContent;
+            });
+        });
+    </script>
 
     <script>
         // Получаем все строки таблицы
@@ -174,5 +206,91 @@
         });
     </script>
 
+    <script>
+        document.getElementById('button1').addEventListener('click', () => {
+
+            if (!window.selectedUsername) {
+                alert("Выберите пользователя");
+                return;
+            }
+
+            fetch('/adminpanel/toggle-ban/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ username: window.selectedUsername })
+            })
+            .then(res => res.json())
+            .then(data => alert(data.message))
+            .catch(err => alert('Ошибка: ' + err));
+        });
+    </script>
+
+    <script>
+        document.getElementById('button2').addEventListener('click', () => {
+            if (!window.selectedUsername) {
+                alert("Выберите пользователя");
+                return;
+            }
+
+            fetch('/adminpanel/kick-sessions/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ username: window.selectedUsername })
+            })
+            .then(res => res.json())
+            .then(data => alert(data.message))
+            .catch(err => alert('Ошибка: ' + err));
+        });
+    </script>
+
+    <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    </script>
+
+    <script>
+    document.getElementById('button3').addEventListener('click', () => {
+        if (!window.selectedUsername) {
+            alert("Выберите пользователя");
+            return;
+        }
+
+        fetch('/adminpanel/request-password-reset/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ username: window.selectedUsername })
+        })
+        .then(res => res.json())
+        .then(data => alert(data.message))
+        .catch(err => alert('Ошибка: ' + err));
+    });
+    </script>
+
+    <script>
+        document.getElementById('button4').addEventListener('click', () => {
+            window.location.href = 'http://109.68.215.67:3000';
+        });
+    </script>
 </body>
 </html>

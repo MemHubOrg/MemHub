@@ -1,6 +1,7 @@
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 from . import views
+from users.views import change_password_view
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -13,5 +14,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     # path('change-password/', views.change_password_view, name='change_password'),
     path('send_meme_to_telegram/', views.send_meme_to_telegram, name='send_meme_to_telegram'),
-    path('save_meme_to_profile/', views.save_meme_to_profile, name='save_meme_to_profile')
+    path('save_meme_to_profile/', views.save_meme_to_profile, name='save_meme_to_profile'),
+    path('reset_password/', views.check_password_reset_flag),
+    path('change-password/', change_password_view, name='change_password'),
 ]

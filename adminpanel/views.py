@@ -13,6 +13,12 @@ from urllib.parse import urlparse
 from .forms import AdminLoginForm
 from backend.models import Template
 
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+import json
+from register.models import User
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -46,10 +52,16 @@ def adminpanel_index(request):
     # Иначе на страницу входа
     return redirect("admin_login")
 
+# def admin_dashboard(request):
+#     # if not request.session.get("admin_id"):
+#     #     return redirect("admin_login")
+#     return render(request, 'adminpanel/dashboard.html')
 def admin_dashboard(request):
-    # if not request.session.get("admin_id"):
-    #     return redirect("admin_login")
-    return render(request, 'adminpanel/dashboard.html')
+    if not request.session.get("admin_id"):
+        return redirect("admin_login")
+
+    users = User.objects.all().order_by('-last_login')  # добавь это
+    return render(request, 'adminpanel/dashboard.html', {'users': users})  # передай в шаблон
 
 @csrf_exempt
 def manage_templates(request):
@@ -97,3 +109,46 @@ def manage_templates(request):
     # GET-запрос — отобразить список шаблонов
     templates = Template.objects.all().order_by('id')
     return render(request, 'adminpanel/manage_templates.html', {'templates': templates})
+@csrf_exempt
+@require_POST
+def toggle_ban(request):
+    data = json.loads(request.body)
+    username = data.get("username")
+    try:
+        user = User.objects.get(username=username)
+        user.is_active = not user.is_active
+        user.save()
+        status = "забанен" if not user.is_active else "разблокирован"
+        return JsonResponse({"message": f"Пользователь {username} {status}."})
+    except User.DoesNotExist:
+        return JsonResponse({"message": "Пользователь не найден"}, status=404)
+@csrf_exempt
+@require_POST
+def kick_sessions(request):
+    data = json.loads(request.body)
+    username = data.get("username")
+    try:
+        user = User.objects.get(username=username)
+        sessions = Session.objects.filter(expire_date__gte=timezone.now())
+        count = 0
+        for session in sessions:
+            session_data = session.get_decoded()
+            if str(session_data.get('_auth_user_id')) == str(user.id):
+                session.delete()
+                count += 1
+        return JsonResponse({"message": f"Завершено {count} сессий пользователя {username}."})
+    except User.DoesNotExist:
+        return JsonResponse({"message": "Пользователь не найден"}, status=404)
+
+@csrf_exempt
+@require_POST
+def request_password_reset_flag(request):
+    data = json.loads(request.body)
+    username = data.get("username")
+    try:
+        user = User.objects.get(username=username)
+        user.force_password_reset = True
+        user.save()
+        return JsonResponse({"message": f"{username} будет вынужден сменить пароль при следующем входе."})
+    except User.DoesNotExist:
+        return JsonResponse({"message": "Пользователь не найден"}, status=404)

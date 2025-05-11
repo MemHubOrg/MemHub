@@ -208,3 +208,5 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+CSRF_COOKIE_HTTPONLY = True
