@@ -90,7 +90,6 @@ def manage_templates(request):
                 template.save()
 
         except Exception as e:
-            # Можно логировать ошибку или показать пользователю (например, через messages)
             print(f"Ошибка в manage_templates: {e}")
 
         return redirect('manage_templates')
