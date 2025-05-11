@@ -17,11 +17,56 @@
 <h1>Управление шаблонами</h1>
 
 <h2>Добавить шаблон</h2>
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="add_url" placeholder="Image URL">
-    <button type="submit">Добавить</button>
-</form>
+
+<div id="local-upload-container" style="text-align: left;">
+    <label for="localImageInput" class="simple-upload-btn">Выбрать изображение</label>
+    <input type="file" id="localImageInput" accept="image/*" hidden>
+
+    <div id="localPreview" style="margin-top: 15px;"></div>
+
+    <form id="localImageForm" method="POST" enctype="multipart/form-data" style="margin-top: 10px;">
+        {% csrf_token %}
+        <input type="file" name="new_file" id="new_file_hidden_input" hidden>
+        <button type="submit" id="addLocalBtn" class="submit-btn" style="display: none;">Добавить в шаблоны</button>
+    </form>
+</div>
+
+<style>
+    .simple-upload-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #ED9E1D;
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .simple-upload-btn:hover {
+        background-color: #d18719;
+    }
+
+    .submit-btn {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background-color: #45a045;
+    }
+
+    #localPreview img {
+        max-width: 100%;
+        border-radius: 10px;
+    }
+</style>
 
 <table>
     <tr>
@@ -52,6 +97,42 @@
     </tr>
     {% endfor %}
 </table>
+
+
+<!-- Загрузка нового шаблона и его превью -->
+<script>
+    const localImageInput = document.getElementById('localImageInput');
+    const localPreview = document.getElementById('localPreview');
+    const addLocalBtn = document.getElementById('addLocalBtn');
+    const addFileHiddenInput = document.getElementById('new_file_hidden_input');
+
+    localImageInput.addEventListener('change', () => {
+        const file = localImageInput.files[0];
+        if (file && file.type.startsWith('image/')) {
+            // Отображаем превью
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                localPreview.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.maxWidth = '100%';
+                img.style.marginTop = '10px';
+                img.style.borderRadius = '10px';
+                localPreview.appendChild(img);
+                addLocalBtn.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+
+            // Подставляем файл в скрытое поле формы
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            addFileHiddenInput.files = dataTransfer.files;
+        } else {
+            localPreview.innerHTML = '<p style="color:red;">Выберите изображение</p>';
+            addLocalBtn.style.display = 'none';
+        }
+    });
+</script>
 
 </body>
 </html>
