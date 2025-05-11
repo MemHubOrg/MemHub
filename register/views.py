@@ -33,7 +33,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-EXTERNAL_API_IP = "192.168.0.6"
+EXTERNAL_API_IP = "192.168.0.153"
 
 def index(request):
     templates = Template.objects.all()
@@ -213,16 +213,16 @@ def send_meme_to_telegram(request):
 
             # Отправка
             response = requests.post(url, data=payload)
+            if s3_storage.exists(saved_path): s3_storage.delete(saved_path)
         
             if response.status_code == 200:
-                # Удаляем из хранилища
-                if s3_storage.exists(saved_path): s3_storage.delete(saved_path)
                 return JsonResponse({'success': True})
             else:
                 print(f"Error: {response.json().get('message')}")
                 return JsonResponse({'success': False})
 
         except Exception as e:
+            if s3_storage.exists(saved_path): s3_storage.delete(saved_path)
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Файл не получен'}, status=400)
@@ -249,6 +249,7 @@ def save_meme_to_profile(request):
             return JsonResponse({'success': True})
 
         except Exception as e:
+            if s3_storage.exists(saved_path): s3_storage.delete(saved_path)
             return JsonResponse({'success': False, 'error': str(e)})
         
     return JsonResponse({'success': False})

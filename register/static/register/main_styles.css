@@ -148,6 +148,11 @@ body {
     margin-top: 40px;
 }
 
+.upload-inner.dragover {
+    border-color: #333;
+    background-color: #f9f9f9;
+}
+
 .upload-title {
     font-size: 22px;
     color: #fff;
@@ -237,6 +242,12 @@ body {
     background-color: #444;
     color: white;
     cursor: default;
+}
+
+/* Cтиль для неактивных кнопок */
+.disabled-btn {
+    pointer-events: none;
+    opacity: 0.5;
 }
 
 /* Поиск шаблонов */

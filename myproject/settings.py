@@ -45,7 +45,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru", "109.68.215.67",
-    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", "192.168.0.6"
+    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", "192.168.0.6", "192.168.0.153"
 ]
 
 LOGGING = {

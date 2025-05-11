@@ -57,20 +57,19 @@
             <!-- Зона загрузки -->
                 <div class="upload-wrapper">
                     <div class="upload-frame">
-                        <div class="upload-inner">
+                        <div id="dropzone" class="upload-inner">
                             <p class="upload-title">Перетащите изображение сюда</p>
                             <p class="upload-subtitle">Или нажмите, чтобы выбрать изображение</p>
                             <input type="file" id="fileInput" accept="image/*" style="display:none">
                             <div id="preview"></div>
                             <button type="button" class="upload-btn" id="customBtn">Выбрать файл</button>
                             <p class="upload-note">Максимальный размер файла 25MB</p>
-                            <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки"
-                                class="upload-icon">
+                            <img src="{% static 'register/upload_icon.svg' %}" alt="Иконка загрузки" class="upload-icon">
                         </div>
                         <div class="upload-icons">
                             <div class="upload-icons-left">
-                                <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn">
-                                <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn">
+                                <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn" class="disabled-btn">
+                                <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn" class="disabled-btn">
                                 <input type="file" id="image-input" accept="image/*" style="display: none;" />
                             </div>
                             <div class="upload-icons-right">
@@ -416,6 +415,10 @@
                 el.style.boxShadow = 'none';
             });
 
+            // Убрать рамку у самой .upload-inner
+            const originalBorder = target.style.border;
+            target.style.border = 'none';
+
             requestAnimationFrame(() => {
                 html2canvas(target, {
                     useCORS: true,
@@ -436,6 +439,8 @@
                         element.style.boxShadow = boxShadow;
                         element.style.transform = transform;
                     });
+
+                    target.style.border = originalBorder; // восстановить рамку
                 });
             });
         };
@@ -709,43 +714,70 @@
         const fileInput = document.getElementById('fileInput');
         const customBtn = document.getElementById('customBtn');
         const preview = document.getElementById('preview');
+        const dropzone = document.getElementById('dropzone');
     
         // Элементы, которые нужно скрыть после загрузки
         const uploadTitle = document.querySelector('.upload-title');
         const uploadSubtitle = document.querySelector('.upload-subtitle');
         const uploadNote = document.querySelector('.upload-note');
         const uploadIcon = document.querySelector('.upload-icon');
-    
-        customBtn.addEventListener('click', () => {
-            fileInput.click(); // открытие проводника
+
+        // Кнопка вручную
+        customBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
         });
-    
+
+        // Обработка выбора файла
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
+            handleImageFile(file);
+        });
+
+        // Drag and Drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleImageFile(file);
+        });
+
+        function handleImageFile(file) {
             if (file && file.type.startsWith('image/')) {
-                // Скрываем лишнее
                 uploadTitle.style.display = 'none';
                 uploadSubtitle.style.display = 'none';
                 uploadNote.style.display = 'none';
                 customBtn.style.display = 'none';
                 uploadIcon.style.display = 'none';
-    
-                // Показываем превью
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    preview.innerHTML = ''; // очистка
+                    preview.innerHTML = '';
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.style.maxWidth = '100%';
                     img.style.marginTop = '15px';
                     img.style.borderRadius = '12px';
                     preview.appendChild(img);
+
+                    // Активируем кнопки
+                    document.getElementById('addImageBtn').classList.remove('disabled-btn');
+                    document.getElementById('addTextBtn').classList.remove('disabled-btn');
                 };
                 reader.readAsDataURL(file);
             } else {
                 preview.innerHTML = '<p style="color: red;">Пожалуйста, выберите изображение.</p>';
             }
-        });
+        }
     </script>
 
     <!-- Перенос шаблона для создания мема -->

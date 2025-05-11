@@ -18,6 +18,6 @@ EXPOSE 8000
 
 # Команда для запуска приложения
 # CMD ["python", "manage.py", "runserver", "192.168.0.104:8000"]
-CMD ["python", "manage.py", "runserver", "192.168.0.6:8000"]
+CMD ["python", "manage.py", "runserver", "192.168.0.153:8000"]
 
 # CMD ["python", "manage.py", "runserver", "109.68.215.67:8000"]
