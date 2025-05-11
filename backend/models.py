@@ -46,10 +46,10 @@ class Meme(models.Model):
 #         if s3_storage.exists(object_path):
 #             s3_storage.delete(object_path)
 
-@receiver(post_delete, sender=Meme)
-def delete_meme_file(sender, instance, **kwargs):
-    if instance.image and instance.image.path:
-        try:
-            os.remove(instance.image.path)
-        except FileNotFoundError:
-            pass
+# @receiver(post_delete, sender=Meme)
+# def delete_meme_file(sender, instance, **kwargs):
+#     if instance.image and instance.image.path:
+#         try:
+#             os.remove(instance.image.path)
+#         except FileNotFoundError:
+#             pass
