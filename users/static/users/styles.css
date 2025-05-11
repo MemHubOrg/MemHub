@@ -432,3 +432,11 @@ button.register {
 .mem-item:hover .delete-btn {
     opacity: 1;
 }
+
+.share-icon {
+    position: absolute;
+    bottom: 10px;     /* выравнивание по низу — такое же, как у .bottom-right */
+    right: 60px;      /* сдвиг левее от редактирования (которая обычно стоит на right: 10px или 20px) */
+    width: 40px;
+    height: 40px;
+}

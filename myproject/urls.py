@@ -26,7 +26,7 @@ from drf_yasg import openapi
 
 from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from users import views as user_views
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -56,7 +56,8 @@ urlpatterns = [
     path('api/token/', CustomTokenView.as_view(), name='token_obtain_pair'),
     path('captcha/', include('captcha.urls')),
     path('users/', include(('users.urls', 'users'), namespace='users')),
-    path('adminpanel/', include('adminpanel.urls'))
+    path('adminpanel/', include('adminpanel.urls')),
+    path("shared/<uuid:token>/", user_views.shared_meme_view, name="shared_meme"),
 ]
 
 # Для доступа к изображениям

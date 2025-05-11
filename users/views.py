@@ -4,6 +4,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login as auth_login
+from django.views.decorators.csrf import csrf_exempt
 
 from users.forms import CustomPasswordChangeForm
 from backend.models import Meme
@@ -13,6 +14,11 @@ from django.views.decorators.http import require_http_methods
 from urllib.parse import urlparse
 from django.conf import settings
 from django.core.files.storage import default_storage
+
+from django.utils import timezone
+from datetime import timedelta
+from .models import SharedMemeLink
+from backend.models import Meme
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -46,7 +52,7 @@ def my_memes_view(request):
 def selected_meme_view(request, image_id):
     meme = get_object_or_404(Meme, id=image_id)  # Получаем мем по id
     meme_image_url = meme.image_url  # Используем реальный URL изображения из модели
-    return render(request, 'users/selected_meme.html', {'meme': meme, 'meme_image_url': meme_image_url})
+    return render(request, 'users/selected_meme.html', {'meme': meme, 'meme_image_url': meme_image_url, 'meme_id': meme.id})
 
 # @require_http_methods(["DELETE"])
 # @login_required
@@ -74,3 +80,40 @@ def delete_meme(request, meme_id):
     # Удаляем запись из базы
     meme.delete()
     return JsonResponse({'status': 'ok'})
+
+
+@csrf_exempt
+def create_temp_link(request):
+    if request.method != "POST":
+        return JsonResponse({'error': 'Invalid method'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        meme_id = data.get("meme_id")
+        meme = Meme.objects.get(id=meme_id, user=request.user)
+
+        # Временная ссылка живёт 1 час
+        shared_link = SharedMemeLink.objects.create(
+            meme=meme,
+            expires_at=timezone.now() + timedelta(hours=1)
+        )
+
+        return JsonResponse({
+            "success": True,
+            "share_url": request.build_absolute_uri(
+                f"/shared/{shared_link.token}/"
+            )
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+def shared_meme_view(request, token):
+    shared = get_object_or_404(SharedMemeLink, token=token)
+
+    if shared.is_expired():
+        return render(request, "users/expired.html")  # Покажи "срок действия истёк"
+
+    return render(request, "users/shared_meme.html", {
+        "meme_image_url": shared.meme.image_url
+    })
