@@ -2,13 +2,17 @@ import logging
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login as auth_login
-from django.contrib.auth.hashers import make_password
 
 from users.forms import CustomPasswordChangeForm
-from users.models import User
 from backend.models import Meme
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from urllib.parse import urlparse
+from django.conf import settings
+from django.core.files.storage import default_storage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,3 +47,30 @@ def selected_meme_view(request, image_id):
     meme = get_object_or_404(Meme, id=image_id)  # Получаем мем по id
     meme_image_url = meme.image_url  # Используем реальный URL изображения из модели
     return render(request, 'users/selected_meme.html', {'meme': meme, 'meme_image_url': meme_image_url})
+
+# @require_http_methods(["DELETE"])
+# @login_required
+# def delete_meme(request, meme_id):
+#     try:
+#         meme = Meme.objects.get(id=meme_id, user=request.user)
+#         meme.delete()
+#         return JsonResponse({'status': 'ok'})
+#     except Meme.DoesNotExist:
+#         return JsonResponse({'error': 'Not found'}, status=404)
+
+@require_http_methods(["DELETE"])
+@login_required
+def delete_meme(request, meme_id):
+    meme = get_object_or_404(Meme, id=meme_id, user=request.user)
+
+    # Получаем путь к файлу из URL
+    parsed_url = urlparse(meme.image_url)
+    file_key = parsed_url.path.lstrip('/').removeprefix('memhub.bucket/')
+
+    # Удаляем файл из S3
+    if default_storage.exists(file_key):
+        default_storage.delete(file_key)
+
+    # Удаляем запись из базы
+    meme.delete()
+    return JsonResponse({'status': 'ok'})

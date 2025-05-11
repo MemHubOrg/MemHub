@@ -405,4 +405,33 @@ button.register {
     }
 }
 
+.mem-item {
+    position: relative;
+    display: inline-block;
+}
 
+.delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: red;
+    color: white;
+    font-size: 14px; /* меньше шрифт */
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px; /* по центру по вертикали */
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    pointer-events: auto;
+    box-shadow: 0 0 0 2px white; /* как обводка */
+}
+
+.mem-item:hover .delete-btn {
+    opacity: 1;
+}

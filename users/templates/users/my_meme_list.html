@@ -29,16 +29,40 @@
         const start = currentPage * IMAGES_PER_PAGE;
         const end = Math.min(start + IMAGES_PER_PAGE, TOTAL_IMAGES);
 
+<!--        for (let i = start; i < end; i++) {-->
+<!--            const link = document.createElement('a');-->
+<!--            link.href = `/users/selected_meme/${memes[i].id}/`;//link.href = `/selected_meme/${i + 1}/`;  // Убираем арифметику внутри шаблона-->
+<!--            link.className = 'mem-item';-->
+
+<!--            const img = document.createElement('img');-->
+<!--            -->
+<!--            img.src = memes[i]['image_url']-->
+<!--            img.alt = `Мем ${i + 1}`;-->
+
+<!--            link.appendChild(img);-->
+<!--            container.appendChild(link);-->
+<!--        }-->
         for (let i = start; i < end; i++) {
             const link = document.createElement('a');
-            link.href = `/users/selected_meme/${memes[i].id}/`;//link.href = `/selected_meme/${i + 1}/`;  // Убираем арифметику внутри шаблона
+            link.href = `/users/selected_meme/${memes[i].id}/`;
             link.className = 'mem-item';
 
+            // картинка мема
             const img = document.createElement('img');
-            
-            img.src = memes[i]['image_url']
+            img.src = memes[i]['image_url'];
             img.alt = `Мем ${i + 1}`;
 
+            // крестик
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'delete-btn';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.addEventListener('click', function(event) {
+                event.preventDefault(); // чтобы не сработал переход по ссылке
+                deleteMeme(memes[i].id);
+            });
+
+            // добавляем крестик и картинку в блок
+            link.appendChild(closeBtn);
             link.appendChild(img);
             container.appendChild(link);
         }
@@ -72,6 +96,43 @@
             currentPage--;
             renderImages();
         }
+    }
+
+    function deleteMeme(id) {
+        if (!confirm("Удалить мем?")) return;
+
+        fetch(`/users/delete_meme/${id}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Удаляем из массива и перерисовываем
+                const index = memes.findIndex(m => m.id === id);
+                if (index !== -1) {
+                    memes.splice(index, 1);
+                    renderImages();
+                }
+            } else {
+                alert('Ошибка при удалении мема');
+            }
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 
     window.addEventListener('load', renderImages);
