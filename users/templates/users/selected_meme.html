@@ -50,11 +50,11 @@
                 </div>
 
                 <!-- Кнопка для копирования ссылки -->
-                <div class="icon bottom-right share-icon">
-                    <a href="#" id="shareLinkBtn">
-                        <img src="{% static 'users/share_icon.svg' %}" alt="Поделиться">
-                    </a>
-                </div>
+<!--                <div class="icon bottom-right share-icon">-->
+<!--                    <a href="#" id="shareLinkBtn">-->
+<!--                        <img src="{% static 'users/share_icon.svg' %}" alt="Поделиться">-->
+<!--                    </a>-->
+<!--                </div>-->
             </div>
         </div>
     </div>
@@ -145,28 +145,28 @@
 </script>
 
 <!-- Поделиться -->
-<script>
-    document.getElementById("shareLinkBtn").addEventListener("click", async function (e) {
-        e.preventDefault();
+<!--<script>-->
+<!--    document.getElementById("shareLinkBtn").addEventListener("click", async function (e) {-->
+<!--        e.preventDefault();-->
 
-        const memeId = "{{ meme_id }}";  // Передай его в шаблон
-        const response = await fetch("/users/api/create-share-link/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({ meme_id: memeId })
-        });
+<!--        const memeId = "{{ meme_id }}";  // Передай его в шаблон-->
+<!--        const response = await fetch("/users/api/create-share-link/", {-->
+<!--            method: "POST",-->
+<!--            headers: {-->
+<!--                "Content-Type": "application/json",-->
+<!--                "X-CSRFToken": "{{ csrf_token }}"-->
+<!--            },-->
+<!--            body: JSON.stringify({ meme_id: memeId })-->
+<!--        });-->
 
-        const data = await response.json();
-        if (data.success) {
-            await navigator.clipboard.writeText(data.share_url);
-            alert("Ссылка скопирована! Вы можете отправить её в Telegram или ВК.");
-        } else {
-            alert("Ошибка: " + data.error);
-        }
-    });
-</script>
+<!--        const data = await response.json();-->
+<!--        if (data.success) {-->
+<!--            await navigator.clipboard.writeText(data.share_url);-->
+<!--            alert("Ссылка скопирована! Вы можете отправить её в Telegram или ВК.");-->
+<!--        } else {-->
+<!--            alert("Ошибка: " + data.error);-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
 </body>
 </html>

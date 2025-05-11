@@ -61,7 +61,17 @@
                 deleteMeme(memes[i].id);
             });
 
+            const shareBtn = document.createElement('span');
+            shareBtn.className = 'share-btn';
+            shareBtn.innerHTML = '🔗'; // или <img src="...">, если иконка
+            shareBtn.title = 'Поделиться';
+            shareBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                shareMeme(memes[i].id);
+            });
+
             // добавляем крестик и картинку в блок
+            link.appendChild(shareBtn);
             link.appendChild(closeBtn);
             link.appendChild(img);
             container.appendChild(link);
@@ -133,6 +143,29 @@
             }
         }
         return cookieValue;
+    }
+    async function shareMeme(id) {
+        try {
+            const response = await fetch("/users/api/create-share-link/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie('csrftoken')
+                },
+                body: JSON.stringify({ meme_id: id })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                await navigator.clipboard.writeText(data.share_url);
+                alert("Ссылка скопирована!");
+            } else {
+                alert("Ошибка: " + (data.error || "неизвестная"));
+            }
+        } catch (err) {
+            console.error("Ошибка при создании ссылки:", err);
+            alert("Ошибка при создании ссылки");
+        }
     }
 
     window.addEventListener('load', renderImages);

@@ -10,18 +10,9 @@ from urllib.parse import urlparse
 import boto3
 from django.core.files.storage import default_storage as s3_storage
 
-
-# class Tag(models.Model):
-#     name = models.CharField(max_length=32, unique=True)
-#
-#     def __str__(self):
-#         return self.name
-
-
 class Template(models.Model):
     image_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
-    # tags = models.ManyToManyField(Tag, blank=True, related_name='templates')
     tags = models.JSONField(default=list, blank=True)
 
 class Meme(models.Model):
