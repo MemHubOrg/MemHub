@@ -76,10 +76,10 @@
 <!--                                {% if user.is_authenticated %}-->
 <!--                                    <a href="#" id="saveMeme" class="text-button">Сохранить мем</a>-->
 <!--                                {% endif %}-->
-                                <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" id="downloadBtn" class="disabled-btn">
                                 {% if user.is_authenticated %}
                                     <img src="{% static 'register/telegram_icon.svg' %}" alt="Отправить" id="sendToTelegram" class="disabled-btn">
                                 {% endif %}
+                                <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" id="downloadBtn" class="disabled-btn">
                             </div>
                         </div>
                     </div>
@@ -249,6 +249,10 @@
                 el.style.boxShadow = 'none';
             });
 
+            // Убрать рамку у самой .upload-inner
+            const originalBorder = target.style.border;
+            target.style.border = 'none';
+
             setTimeout(() => {
                 html2canvas(target, {
                     useCORS: true,
@@ -261,15 +265,15 @@
 
                         // Сначала сохраняем в профиль, если пользователь авторизован
                         {% if user.is_authenticated %}
-                        fetch('/save_meme_to_profile/', {
-                            method: 'POST',
-                            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                            body: formData
-                        }).finally(() => {
-                            sendToTelegramNow(formData);
-                        });
+                            fetch('/save_meme_to_profile/', {
+                                method: 'POST',
+                                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                                body: formData
+                            }).finally(() => {
+                                sendToTelegramNow(formData);
+                            });
                         {% else %}
-                        sendToTelegramNow(formData);
+                            sendToTelegramNow(formData);
                         {% endif %}
                     });
                 });
@@ -281,6 +285,9 @@
                     element.style.border = border;
                     element.style.boxShadow = boxShadow;
                 });
+
+                target.style.border = originalBorder; // восстановить рамку
+
             }, 50);
         }
 
