@@ -99,13 +99,13 @@
 
                     <div class="template-grid">
                         {% for template in templates %}
-                        <div class="template-item">
-                            <img src="{{ template.image_url }}" alt="">
-                            <button class="template-action-btn"
-                                    onclick="selectTemplate('{{ template.image_url }}')">
-                                Сделать мем
-                            </button>
-                        </div>
+                            <div class="template-item">
+                                <img src="{{ template.image_url }}" alt="">
+                                <button class="template-action-btn"
+                                        onclick="selectTemplate('{{ template.image_url }}')">
+                                    Сделать мем
+                                </button>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -861,12 +861,12 @@
     </script> -->
 
     <script>
-    function selectTemplate(imageUrl) {
-        // Сохраняем путь в sessionStorage
-        sessionStorage.setItem("selected_template", imageUrl);
-        // Перенаправляем на главную
-        window.location.href = "/";
-    }
+        function selectTemplate(imageUrl) {
+            // Сохраняем путь в sessionStorage
+            sessionStorage.setItem("selected_template", imageUrl);
+            // Перенаправляем на главную
+            window.location.href = "/";
+        }
     </script>
 
     <!--Поиск по тегам-->

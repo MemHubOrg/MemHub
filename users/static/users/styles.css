@@ -89,7 +89,6 @@ button.register {
     bottom: 0px;
     left: 0px;
     transform: none;
-    pointer-events: none;
 }
 
 .top-right {
@@ -362,7 +361,6 @@ button.register {
     .bottom-left {
         bottom: 10px;
         left: 10px;
-        pointer-events: none;
     }
 
     .top-right {
@@ -401,7 +399,6 @@ button.register {
 
     .bottom-left, .top-right {
         width: 150px;
-        pointer-events: none;
     }
 }
 
