@@ -41,23 +41,6 @@
 
     <img src="../../static/register/cat_lupa.png" alt="" class="bottom-left">
     <img src="../../static/register/tapaem_homyaka.png" alt="" class="top-right">
-<!--    <script>-->
-<!--    function getCookie(name) {-->
-<!--        let cookieValue = null;-->
-<!--        if (document.cookie && document.cookie !== '') {-->
-<!--            const cookies = document.cookie.split(';');-->
-<!--            for (let cookie of cookies) {-->
-<!--                cookie = cookie.trim();-->
-<!--                if (cookie.startsWith(name + '=')) {-->
-<!--                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));-->
-<!--                    break;-->
-<!--                }-->
-<!--            }-->
-<!--        }-->
-<!--        return cookieValue;-->
-<!--    }-->
-<!--    </script>-->
-
     <script>
         {% if username %}
             sessionStorage.setItem("username", "{{ username }}");
@@ -107,7 +90,6 @@
                         headers: {
                             "Content-Type": "application/json",
                             "X-CSRFToken": "{{ csrf_token }}"
-<!--                            "X-CSRFToken": getCookie("csrftoken")-->
                         },
                         body: JSON.stringify({ access_token: data.access_token })
                     })
@@ -120,12 +102,6 @@
                             console.log("Not change password")
                             window.location.href = data.redirect_url;
                         }
-
-<!--                        if (result.should_change_password) {-->
-<!--                            window.location.href = "/change_password/";-->
-<!--                        } else {-->
-<!--                            window.location.href = data.redirect_url;-->
-<!--                        }-->
                     })
                     .catch(error => {
                         console.error("Ошибка при проверке флага:", error);

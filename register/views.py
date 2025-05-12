@@ -31,14 +31,21 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from rest_framework_simplejwt.tokens import AccessToken
 
+# For fail2ban
+logger_auth = logging.getLogger('django.security.Authentication')
+
+# For debugging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-EXTERNAL_API_IP = "192.168.0.6"
+EXTERNAL_API_IP = "192.168.0.153"
 
 def index(request):
     templates = Template.objects.all()
     return render(request, 'register/index.html', {'templates': templates})
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})
 
 def register(request):
     message = request.session.pop('register_message', None)
@@ -176,19 +183,28 @@ def login(request):
                 auth_login(request, user)
                 unique_token = user.unique_token
                 send_code_to_user(username, unique_token)
-                return render(request, "register/verify_code.html",
-                              {'username': username,
-                               "form": TelegramCodeForm(request.POST)})
-            return render(request, "register/login.html", {"form": form, "error": "Неверный логин или пароль!"})
-            #return render(request, "users/login.html", {"form": form, "error": "Неверный логин или пароль!"})
+                return render(
+                    request, "register/verify_code.html",
+                    {'username': username, "form": TelegramCodeForm(request.POST)}
+                )
+            
+            # Get IP
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
 
-        # return render(request, "users/login.html", {"form": form})
+            # if x_forwarded_for: 
+            #     ip = x_forwarded_for.split(',')[0].strip()
+            # else: 
+            ip = request.META.get('REMOTE_ADDR')
+
+            logger_auth.warning(f"Authentication failed for {username} from {ip}")
+
+            return render(request, "register/login.html", {"form": form, "error": "Неверный логин или пароль!"})
+
         return render(request, "register/login.html", {"form": form})
 
     else:
         form = LoginForm()
         return render(request, "register/login.html", {"form": form})
-        # return render(request, "users/login.html", {"form": form})
 
 @csrf_exempt
 def send_meme_to_telegram(request):
@@ -331,15 +347,3 @@ def check_password_reset_flag(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
-
-# @csrf_exempt
-# def check_password_reset_flag(request):
-#     if request.method != "POST":
-#         return JsonResponse({"error": "Invalid method"}, status=405)
-#
-#     try:
-#         flag = request.user.force_password_reset
-#         return JsonResponse({"should_change_password": flag})
-#
-#     except Exception as e:
-#         return JsonResponse({"error": str(e)}, status=400)

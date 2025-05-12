@@ -28,3 +28,9 @@ staticfiles/
 
 # Migrations
 migrations/
+
+# Ngnix
+nginx/
+
+# Logs
+logs/

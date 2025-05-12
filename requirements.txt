@@ -11,3 +11,4 @@ django-simple-captcha~=0.6.2
 whitenoise
 boto3 
 django-storages
+docker
