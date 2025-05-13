@@ -54,16 +54,6 @@ def selected_meme_view(request, image_id):
     meme_image_url = meme.image_url  # Используем реальный URL изображения из модели
     return render(request, 'users/selected_meme.html', {'meme': meme, 'meme_image_url': meme_image_url, 'meme_id': meme.id})
 
-# @require_http_methods(["DELETE"])
-# @login_required
-# def delete_meme(request, meme_id):
-#     try:
-#         meme = Meme.objects.get(id=meme_id, user=request.user)
-#         meme.delete()
-#         return JsonResponse({'status': 'ok'})
-#     except Meme.DoesNotExist:
-#         return JsonResponse({'error': 'Not found'}, status=404)
-
 @require_http_methods(["DELETE"])
 @login_required
 def delete_meme(request, meme_id):

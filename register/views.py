@@ -4,6 +4,7 @@ import logging
 import pyotp
 import uuid
 import boto3
+import time
 
 from backend.models import Meme
 
@@ -13,7 +14,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
 from django.core.files.storage import default_storage as s3_storage
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile, File
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
@@ -253,7 +254,7 @@ def save_meme_to_profile(request):
         
         try:
             # Сохраняем в объектное хранилище
-            saved_path = s3_storage.save(filename, ContentFile(uploaded_file.read()))
+            saved_path = s3_storage.save(filename, ContentFile(uploaded_file.read()))# File(uploaded_file))
             file_url = s3_storage.url(saved_path)
 
             # Сохраняем в БД

@@ -73,40 +73,12 @@
                                 <input type="file" id="image-input" accept="image/*" style="display: none;" />
                             </div>
                             <div class="upload-icons-right">
-<!--                                {% if user.is_authenticated %}-->
-<!--                                    <a href="#" id="saveMeme" class="text-button">Сохранить мем</a>-->
-<!--                                {% endif %}-->
                                 {% if user.is_authenticated %}
                                     <img src="{% static 'register/telegram_icon.svg' %}" alt="Отправить" id="sendToTelegram" class="disabled-btn">
                                 {% endif %}
                                 <img src="{% static 'register/download_icon.svg' %}" alt="Скачать" id="downloadBtn" class="disabled-btn">
-<!--                                <img src="{% static 'register/trash_icon.svg' %}" alt="Очистить" id="clearEditorBtn" class="disabled-btn">-->
                             </div>
                         </div>
-<!--                        <button id="clearEditorBtn" class="clear-editor-btn" title="Очистить">-->
-<!--                            <img src="{% static 'register/trash_icon.svg' %}" alt="Очистить">-->
-<!--                        </button>-->
-<!--    .clear-editor-btn {-->
-<!--    position: absolute;-->
-<!--    bottom: 10px;-->
-<!--    right: 10px;-->
-<!--    background: none;       /* Убирает белый фон */-->
-<!--    border: none;           /* Убирает рамку */-->
-<!--    padding: 0;-->
-<!--    cursor: pointer;-->
-<!--    z-index: 10;-->
-<!--    transition: transform 0.2s ease;-->
-<!--}-->
-
-<!--.clear-editor-btn img {-->
-<!--    width: 28px;-->
-<!--    height: 28px;-->
-<!--    filter: brightness(1) saturate(1) hue-rotate(0deg); /* Сохраняем оранжевый */-->
-<!--}-->
-
-<!--.clear-editor-btn:hover {-->
-<!--    transform: scale(1.1);-->
-<!--}-->
                     </div>
                 </div>
             </div>
@@ -166,82 +138,250 @@
         }
     </script>
 
-    <!-- Сохранение мема в профиль -->
-<!--    <script>-->
-<!--        const saveMeme= document.getElementById('saveMeme');-->
-<!--        if (saveMeme) {-->
-<!--            saveMeme.addEventListener('click', saveMemeToProfile);-->
-<!--        }-->
-<!--    -->
-<!--        function saveMemeToProfile() {-->
-<!--            const target = document.querySelector('.upload-inner');-->
-<!--            if (!target) {-->
-<!--                console.error('Элемент .upload-inner не найден');-->
-<!--                return;-->
-<!--            }-->
-<!--    -->
-<!--            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');-->
-<!--            const hiddenElements = [];-->
-<!--            toHide.forEach(el => {-->
-<!--                hiddenElements.push({ element: el, display: el.style.display });-->
-<!--                el.style.display = 'none';-->
-<!--            });-->
-<!--    -->
-<!--            const containers = target.querySelectorAll('div[style*="position: absolute"]');-->
-<!--            const containerStyles = [];-->
-<!--            containers.forEach(el => {-->
-<!--                containerStyles.push({-->
-<!--                    element: el,-->
-<!--                    border: el.style.border,-->
-<!--                    boxShadow: el.style.boxShadow,-->
-<!--                    transform: el.style.transform-->
-<!--                });-->
-<!--                el.style.border = 'none';-->
-<!--                el.style.boxShadow = 'none';-->
-<!--            });-->
-<!--    -->
-<!--            setTimeout(() => {-->
-<!--                html2canvas(target, {-->
-<!--                    useCORS: true,-->
-<!--                    backgroundColor: null,-->
-<!--                    scale: 2-->
-<!--                }).then(canvas => {-->
-<!--                    canvas.toBlob((blob) => {-->
-<!--                        const formData = new FormData();-->
-<!--                        formData.append('file', blob, 'meme.png');-->
-<!--    -->
-<!--                        fetch('/save_meme_to_profile/', {-->
-<!--                            method: 'POST',-->
-<!--                            headers: {-->
-<!--                                'X-CSRFToken': '{{ csrf_token }}'-->
-<!--                            },-->
-<!--                            body: formData-->
-<!--                        })-->
-<!--                        .then(response => response.json())-->
-<!--                        .then(data => {-->
-<!--                            if (data.success) {-->
-<!--                                alert('Мем успешно сохранен в профиль!');-->
-<!--                            } else {-->
-<!--                                alert('Ошибка: ' + (data.error || 'неизвестная'));-->
-<!--                            }-->
-<!--                        })-->
-<!--                        .catch(error => console.error('Error:', error));-->
-<!--                    });-->
-<!--                });-->
-<!--    -->
-<!--                hiddenElements.forEach(({ element, display }) => {-->
-<!--                    element.style.display = display;-->
-<!--                });-->
-<!--                containerStyles.forEach(({ element, border, boxShadow }) => {-->
-<!--                    element.style.border = border;-->
-<!--                    element.style.boxShadow = boxShadow;-->
-<!--                });-->
-<!--            }, 50);-->
-<!--        };-->
-<!--    </script>-->
-
     <!-- Отправка в ТГ мема и сохранение его в профиле -->
+
+    <!-- C воркерами -->
+    <!-- <script type="module">
+        import { WorkerPool } from "{% static 'js/workerPool.js' %}";
+
+        const pool = new WorkerPool("{% static 'js/image-compression-worker.js' %}", 1);
+
+        const sendToTelegram = document.getElementById('sendToTelegram');
+        if (sendToTelegram) {
+            sendToTelegram.addEventListener('click', sendToTelegramfunc);
+        }
+
+        function sendToTelegramfunc() {
+            const target = document.querySelector('.upload-inner');
+            if (!target) {
+                console.error('Элемент .upload-inner не найден');
+                return;
+            }
+
+
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = 'flex'; // показать спиннер
+
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
+            const hiddenElements = [];
+            toHide.forEach(el => {
+                hiddenElements.push({ element: el, display: el.style.display });
+                el.style.display = 'none';
+            });
+
+            const containers = target.querySelectorAll('div[style*="position: absolute"]');
+            const containerStyles = [];
+            containers.forEach(el => {
+                containerStyles.push({
+                    element: el,
+                    border: el.style.border,
+                    boxShadow: el.style.boxShadow,
+                    transform: el.style.transform
+                });
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+            });
+
+            // Убрать рамку у самой .upload-inner
+            const originalBorder = target.style.border;
+            target.style.border = 'none';
+
+            setTimeout(() => {
+                html2canvas(target, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 1.2
+                }).then(canvas => {
+                    const worker = new Worker("{% static 'js/image-compression-worker.js' %}");
+                    canvas.toBlob(async (blob) => {
+                        try {
+                            const compressedBlob = await pool.runTask(blob);
+
+                            const formData = new FormData();
+                            formData.append('file', compressedBlob, 'meme.jpg');
+
+                            if ({{ user.is_authenticated|yesno:"true,false" }}) {
+                                Promise.all([
+                                    fetch('/save_meme_to_profile/', {
+                                        method: 'POST',
+                                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                                        body: formData
+                                    }),
+                                    fetch('/send_meme_to_telegram/', {
+                                        method: 'POST',
+                                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                                        body: formData
+                                    })
+                                ]).then(([profileRes, telegramRes]) => Promise.all([profileRes.json(), telegramRes.json()]))
+                                .then(([profileData, telegramData]) => {
+                                    spinner.style.display = 'none';
+                                    if (telegramData.success) {
+                                        alert("Мем отправлен в Telegram и сохранён в профиль!");
+                                    } else {
+                                        alert('Ошибка отправки в Telegram: ' + (telegramData.error || 'неизвестная'));
+                                    }
+                                }).catch(err => {
+                                    spinner.style.display = 'none';
+                                    console.error(err);
+                                });
+                            } else {
+                                sendToTelegramNow(formData).finally(() => {
+                                    spinner.style.display = 'none';
+                                });
+                            }
+                        } catch (err) {
+                            console.error("Ошибка при сжатии изображения:", err);
+                            alert("Ошибка при сжатии изображения: " + err.message);
+                            spinner.style.display = 'none';
+                        }
+                    }, 'image/png');
+                });
+
+                hiddenElements.forEach(({ element, display }) => {
+                    element.style.display = display;
+                });
+                containerStyles.forEach(({ element, border, boxShadow }) => {
+                    element.style.border = border;
+                    element.style.boxShadow = boxShadow;
+                });
+
+                target.style.border = originalBorder; // восстановить рамку
+
+            }, 50);
+        }
+
+        function sendToTelegramNow(formData) {
+            fetch('/send_meme_to_telegram/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Мем отправлен в Telegram${isAuthenticated ? " и сохранён в профиль" : ""}!`);
+                } else {
+                    alert('Ошибка при отправке в Telegram: ' + (data.error || 'неизвестная'));
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+        }
+    </script> -->
+
+    <!-- Без воркеров -->
     <script>
+        const sendToTelegram = document.getElementById('sendToTelegram');
+        if (sendToTelegram) {
+            sendToTelegram.addEventListener('click', sendToTelegramfunc);
+        }
+
+        function sendToTelegramfunc() {
+            const target = document.querySelector('.upload-inner');
+            if (!target) {
+                console.error('Элемент .upload-inner не найден');
+                return;
+            }
+
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = 'flex'; // показать спиннер
+
+            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
+            const hiddenElements = [];
+            toHide.forEach(el => {
+                hiddenElements.push({ element: el, display: el.style.display });
+                el.style.display = 'none';
+            });
+
+            const containers = target.querySelectorAll('div[style*="position: absolute"]');
+            const containerStyles = [];
+            containers.forEach(el => {
+                containerStyles.push({
+                    element: el,
+                    border: el.style.border,
+                    boxShadow: el.style.boxShadow,
+                    transform: el.style.transform
+                });
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+            });
+
+            const originalBorder = target.style.border;
+            target.style.border = 'none';
+
+            setTimeout(() => {
+                html2canvas(target, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 1.0
+                }).then(canvas => {
+                    canvas.toBlob((blob) => {
+                        const formData = new FormData();
+                        formData.append('file', blob, 'meme.png');
+
+                        {% if user.is_authenticated %}
+                            Promise.all([
+                                fetch('/save_meme_to_profile/', {
+                                    method: 'POST',
+                                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                                    body: formData
+                                }),
+                                fetch('/send_meme_to_telegram/', {
+                                    method: 'POST',
+                                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                                    body: formData
+                                })
+                            ]).then(([profileRes, telegramRes]) => Promise.all([profileRes.json(), telegramRes.json()]))
+                            .then(([profileData, telegramData]) => {
+                                spinner.style.display = 'none'; // спрятать спиннер
+
+                                if (telegramData.success) {
+                                    alert("Мем отправлен в Telegram и сохранён в профиль!");
+                                } else {
+                                    alert('Ошибка отправки в Telegram: ' + (telegramData.error || 'неизвестная'));
+                                }
+                            }).catch(err => {
+                                spinner.style.display = 'none';
+                                console.error(err);
+                            });
+                        {% else %}
+                            sendToTelegramNow(formData).finally(() => {
+                                spinner.style.display = 'none';
+                            });
+                        {% endif %}
+                    }, 'image/png', 0.8);
+                });
+
+                hiddenElements.forEach(({ element, display }) => {
+                    element.style.display = display;
+                });
+                containerStyles.forEach(({ element, border, boxShadow }) => {
+                    element.style.border = border;
+                    element.style.boxShadow = boxShadow;
+                });
+
+                target.style.border = originalBorder;
+            }, 50);
+        }
+
+        function sendToTelegramNow(formData) {
+            fetch('/send_meme_to_telegram/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Мем отправлен в Telegram${isAuthenticated ? " и сохранён в профиль" : ""}!`);
+                } else {
+                    alert('Ошибка при отправке в Telegram: ' + (data.error || 'неизвестная'));
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+        }
+    </script>
+
+    <!-- <script>
         const sendToTelegram = document.getElementById('sendToTelegram');
         if (sendToTelegram) {
             sendToTelegram.addEventListener('click', sendToTelegramfunc);
@@ -332,79 +472,7 @@
             })
             .catch(error => console.error('Ошибка:', error));
         }
-    </script>
-<!--    <script>-->
-<!--        const sendToTelegram = document.getElementById('sendToTelegram');-->
-<!--        if (sendToTelegram) {-->
-<!--            sendToTelegram.addEventListener('click', sendToTelegramfunc);-->
-<!--        }-->
-<!--    -->
-<!--        function sendToTelegramfunc() {-->
-<!--            const target = document.querySelector('.upload-inner');-->
-<!--            if (!target) {-->
-<!--                console.error('Элемент .upload-inner не найден');-->
-<!--                return;-->
-<!--            }-->
-<!--    -->
-<!--            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');-->
-<!--            const hiddenElements = [];-->
-<!--            toHide.forEach(el => {-->
-<!--                hiddenElements.push({ element: el, display: el.style.display });-->
-<!--                el.style.display = 'none';-->
-<!--            });-->
-<!--    -->
-<!--            const containers = target.querySelectorAll('div[style*="position: absolute"]');-->
-<!--            const containerStyles = [];-->
-<!--            containers.forEach(el => {-->
-<!--                containerStyles.push({-->
-<!--                    element: el,-->
-<!--                    border: el.style.border,-->
-<!--                    boxShadow: el.style.boxShadow,-->
-<!--                    transform: el.style.transform-->
-<!--                });-->
-<!--                el.style.border = 'none';-->
-<!--                el.style.boxShadow = 'none';-->
-<!--            });-->
-<!--    -->
-<!--            setTimeout(() => {-->
-<!--                html2canvas(target, {-->
-<!--                    useCORS: true,-->
-<!--                    backgroundColor: null,-->
-<!--                    scale: 2-->
-<!--                }).then(canvas => {-->
-<!--                    canvas.toBlob((blob) => {-->
-<!--                        const formData = new FormData();-->
-<!--                        formData.append('file', blob, 'meme.png');-->
-<!--    -->
-<!--                        fetch('/send_meme_to_telegram/', {-->
-<!--                            method: 'POST',-->
-<!--                            headers: {-->
-<!--                                'X-CSRFToken': '{{ csrf_token }}'-->
-<!--                            },-->
-<!--                            body: formData-->
-<!--                        })-->
-<!--                        .then(response => response.json())-->
-<!--                        .then(data => {-->
-<!--                            if (data.success) {-->
-<!--                                alert('Мем успешно отправлен в Telegram!');-->
-<!--                            } else {-->
-<!--                                alert('Ошибка: ' + (data.error || 'неизвестная'));-->
-<!--                            }-->
-<!--                        })-->
-<!--                        .catch(error => console.error('Error:', error));-->
-<!--                    });-->
-<!--                });-->
-<!--    -->
-<!--                hiddenElements.forEach(({ element, display }) => {-->
-<!--                    element.style.display = display;-->
-<!--                });-->
-<!--                containerStyles.forEach(({ element, border, boxShadow }) => {-->
-<!--                    element.style.border = border;-->
-<!--                    element.style.boxShadow = boxShadow;-->
-<!--                });-->
-<!--            }, 50);-->
-<!--        };-->
-<!--    </script>-->
+    </script> -->
 
     <!-- Cкачивание элемента как PNG -->
     <script 
@@ -999,5 +1067,32 @@
 <!--            });-->
 <!--        }-->
 <!--    </script>-->
+
+<div id="loading-spinner" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.4);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+">
+    <div style="
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+    "></div>
+</div>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
 </body>
 </html>

@@ -29,19 +29,6 @@
         const start = currentPage * IMAGES_PER_PAGE;
         const end = Math.min(start + IMAGES_PER_PAGE, TOTAL_IMAGES);
 
-<!--        for (let i = start; i < end; i++) {-->
-<!--            const link = document.createElement('a');-->
-<!--            link.href = `/users/selected_meme/${memes[i].id}/`;//link.href = `/selected_meme/${i + 1}/`;  // Убираем арифметику внутри шаблона-->
-<!--            link.className = 'mem-item';-->
-
-<!--            const img = document.createElement('img');-->
-<!--            -->
-<!--            img.src = memes[i]['image_url']-->
-<!--            img.alt = `Мем ${i + 1}`;-->
-
-<!--            link.appendChild(img);-->
-<!--            container.appendChild(link);-->
-<!--        }-->
         for (let i = start; i < end; i++) {
             const link = document.createElement('a');
             link.href = `/users/selected_meme/${memes[i].id}/`;
@@ -114,7 +101,8 @@
         fetch(`/users/delete_meme/${id}/`, {
             method: 'DELETE',
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
+                // 'X-CSRFToken': getCookie('csrftoken'),
+                'X-CSRFToken': '{{ csrf_token }}'
             }
         }).then(response => {
             if (response.ok) {
@@ -129,28 +117,14 @@
             }
         });
     }
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                cookie = cookie.trim();
-                if (cookie.startsWith(name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
+    
     async function shareMeme(id) {
         try {
             const response = await fetch("/users/api/create-share-link/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie('csrftoken')
+                    'X-CSRFToken': '{{ csrf_token }}'
                 },
                 body: JSON.stringify({ meme_id: id })
             });
@@ -182,16 +156,6 @@
 
         <div class="mem-container">
             <div class="nav-icon left" onclick="prevPage()">&#10094;</div>
-
-<!--            <div class="mem-grid" id="memGrid">-->
-<!--                {% for meme in memes %}-->
-<!--                    <a href="{% url 'users:selected_meme' meme.id %}" class="mem-item">-->
-<!--                        <img src="{{ meme.image_url }}" alt="Мем {{ forloop.counter }}">-->
-<!--                    </a>-->
-<!--                {% empty %}-->
-<!--                    <p>Вы ещё не сохранили ни одного мема</p>-->
-<!--                {% endfor %}-->
-<!--            </div>-->
             <div class="mem-grid" id="memGrid">
                 <!-- мемы вставляются JavaScript'ом -->
             </div>
