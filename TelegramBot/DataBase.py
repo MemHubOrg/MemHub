@@ -74,7 +74,7 @@ class DB():
             self.cur.execute(
                 sql.SQL("""
                     INSERT INTO django_db.public.register_user (username, chat_id, unique_token, password, is_active, force_password_reset)
-                    VALUES (%s, %s, '', '', True, False)
+                    VALUES (%s, %s, NULL, '', True, False)
                     ON CONFLICT (username) DO NOTHING
                 """),
                 (username, chat_id)
