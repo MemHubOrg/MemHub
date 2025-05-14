@@ -287,7 +287,9 @@ button.register {
 
 .mem-detail-wrapper {
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
     border: 1px solid #999;
     background-color: #f1f1f1;
