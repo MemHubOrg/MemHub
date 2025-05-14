@@ -81,6 +81,7 @@ button.register {
 }
 
 .bottom-left, .top-right {
+    pointer-events: none;
     position: absolute;
     width: 350px;
 }

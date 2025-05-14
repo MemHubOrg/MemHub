@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{% static 'register/styles.css' %}">
 </head>
 <body>
+    <img src="../../static/register/cat_lupa.png" alt="" class="bottom-left">
+    <img src="../../static/register/tapaem_homyaka.png" alt="" class="top-right">
+
     <a href="{% url 'index' %}" class="logo">
         <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип">
     </a>
@@ -38,9 +41,6 @@
             <p id="statusMessage" style="text-align: center; font-size: 16px; color: red;"></p>
         </form>
     </div>
-
-    <img src="../../static/register/cat_lupa.png" alt="" class="bottom-left">
-    <img src="../../static/register/tapaem_homyaka.png" alt="" class="top-right">
     <script>
         {% if username %}
             sessionStorage.setItem("username", "{{ username }}");
