@@ -39,7 +39,7 @@ logger_auth = logging.getLogger('django.security.Authentication')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-EXTERNAL_API_IP = "192.168.0.153"
+EXTERNAL_API_IP = "192.168.0.6"
 
 def index(request):
     templates = Template.objects.all()

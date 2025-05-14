@@ -382,99 +382,6 @@
         }
     </script>
 
-    <!-- <script>
-        const sendToTelegram = document.getElementById('sendToTelegram');
-        if (sendToTelegram) {
-            sendToTelegram.addEventListener('click', sendToTelegramfunc);
-        }
-
-        function sendToTelegramfunc() {
-            const target = document.querySelector('.upload-inner');
-            if (!target) {
-                console.error('Элемент .upload-inner не найден');
-                return;
-            }
-
-            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
-            const hiddenElements = [];
-            toHide.forEach(el => {
-                hiddenElements.push({ element: el, display: el.style.display });
-                el.style.display = 'none';
-            });
-
-            const containers = target.querySelectorAll('div[style*="position: absolute"]');
-            const containerStyles = [];
-            containers.forEach(el => {
-                containerStyles.push({
-                    element: el,
-                    border: el.style.border,
-                    boxShadow: el.style.boxShadow,
-                    transform: el.style.transform
-                });
-                el.style.border = 'none';
-                el.style.boxShadow = 'none';
-            });
-
-            // Убрать рамку у самой .upload-inner
-            const originalBorder = target.style.border;
-            target.style.border = 'none';
-
-            setTimeout(() => {
-                html2canvas(target, {
-                    useCORS: true,
-                    backgroundColor: null,
-                    scale: 2
-                }).then(canvas => {
-                    canvas.toBlob((blob) => {
-                        const formData = new FormData();
-                        formData.append('file', blob, 'meme.png');
-
-                        // Сначала сохраняем в профиль, если пользователь авторизован
-                        {% if user.is_authenticated %}
-                            fetch('/save_meme_to_profile/', {
-                                method: 'POST',
-                                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                                body: formData
-                            }).finally(() => {
-                                sendToTelegramNow(formData);
-                            });
-                        {% else %}
-                            sendToTelegramNow(formData);
-                        {% endif %}
-                    });
-                });
-
-                hiddenElements.forEach(({ element, display }) => {
-                    element.style.display = display;
-                });
-                containerStyles.forEach(({ element, border, boxShadow }) => {
-                    element.style.border = border;
-                    element.style.boxShadow = boxShadow;
-                });
-
-                target.style.border = originalBorder; // восстановить рамку
-
-            }, 50);
-        }
-
-        function sendToTelegramNow(formData) {
-            fetch('/send_meme_to_telegram/', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Мем отправлен в Telegram${isAuthenticated ? " и сохранён в профиль" : ""}!`);
-                } else {
-                    alert('Ошибка при отправке в Telegram: ' + (data.error || 'неизвестная'));
-                }
-            })
-            .catch(error => console.error('Ошибка:', error));
-        }
-    </script> -->
-
     <!-- Cкачивание элемента как PNG -->
     <script 
         src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
@@ -874,6 +781,7 @@
                     document.getElementById('addTextBtn').classList.remove('disabled-btn');
                     document.getElementById('downloadBtn').classList.remove('disabled-btn');
                     document.getElementById('sendToTelegram').classList.remove('disabled-btn');
+                    document.getElementById('deleteBtn').classList.remove('disabled-btn');
 
                     addImageBtn.style.cursor = 'pointer';
                     addTextBtn.style.cursor = 'pointer';
@@ -919,40 +827,6 @@
             }
         });
     </script>
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const imageUrl = sessionStorage.getItem("selected_template");
-            if (imageUrl) {
-                sessionStorage.removeItem("selected_template");
-
-                switchSection('create');
-
-                const preview = document.getElementById("preview");
-                preview.innerHTML = "";
-
-                const img = document.createElement("img");
-                img.src = imageUrl;
-                img.alt = "Шаблон";
-                img.style.maxWidth = "100%";
-                img.style.marginTop = "15px";
-                img.style.borderRadius = "12px";
-                preview.appendChild(img);
-
-                // Скрыть управляющие элементы, как при обычной загрузке
-                const uploadTitle = document.querySelector('.upload-title');
-                const uploadSubtitle = document.querySelector('.upload-subtitle');
-                const uploadNote = document.querySelector('.upload-note');
-                const customBtn = document.getElementById('customBtn');
-                const uploadIcon = document.querySelector('.upload-icon');
-
-                if (uploadTitle) uploadTitle.style.display = 'none';
-                if (uploadSubtitle) uploadSubtitle.style.display = 'none';
-                if (uploadNote) uploadNote.style.display = 'none';
-                if (customBtn) customBtn.style.display = 'none';
-                if (uploadIcon) uploadIcon.style.display = 'none';
-            }
-        });
-    </script> -->
 
     <script>
         function selectTemplate(imageUrl) {
@@ -1031,10 +905,56 @@
     </script>
 
     <!--Обработчик кнопки мусорки-->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const deleteBtn = document.getElementById('deleteBtn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', resetEditor);
+        }
+
+        function resetEditor() {
+            // Очистка превью и удаление добавленных элементов
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+
+            const uploadTitle = document.querySelector('.upload-title');
+            const uploadSubtitle = document.querySelector('.upload-subtitle');
+            const uploadNote = document.querySelector('.upload-note');
+            const customBtn = document.getElementById('customBtn');
+            const uploadIcon = document.querySelector('.upload-icon');
+
+            if (uploadTitle) uploadTitle.style.display = 'block';
+            if (uploadSubtitle) uploadSubtitle.style.display = 'block';
+            if (uploadNote) uploadNote.style.display = 'block';
+            if (customBtn) customBtn.style.display = 'inline-block';
+            if (uploadIcon) uploadIcon.style.display = 'block';
+
+            // Очистка вручную добавленных картинок и текста
+            const elementsToRemove = document.querySelectorAll('.upload-inner > div[style*="position: absolute"]');
+            elementsToRemove.forEach(el => el.remove());
+
+            // Очистка input[type=file]
+            document.getElementById('fileInput').value = '';
+            document.getElementById('image-input').value = '';
+
+            // Деактивация кнопок
+            document.getElementById('addImageBtn').classList.add('disabled-btn');
+            document.getElementById('addTextBtn').classList.add('disabled-btn');
+            document.getElementById('downloadBtn').classList.add('disabled-btn');
+            document.getElementById('sendToTelegram')?.classList.add('disabled-btn');
+
+            // Сброс курсора
+            document.getElementById('addImageBtn').style.cursor = 'not-allowed';
+            document.getElementById('addTextBtn').style.cursor = 'not-allowed';
+            document.getElementById('downloadBtn').style.cursor = 'not-allowed';
+            document.getElementById('sendToTelegram').style.cursor = 'not-allowed';
+        }
+    });
+    </script>
 <!--    <script>-->
-<!--        const clearEditorBtn = document.getElementById('clearEditorBtn');-->
-<!--        if (clearEditorBtn) {-->
-<!--            clearEditorBtn.addEventListener('click', () => {-->
+<!--        const deleteBtn = document.getElementById('deleteBtn');-->
+<!--        if (deleteBtn) {-->
+<!--            deleteBtn.addEventListener('click', () => {-->
 <!--                const preview = document.getElementById('preview');-->
 <!--                const uploadInner = document.querySelector('.upload-inner');-->
 
