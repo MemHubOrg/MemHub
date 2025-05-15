@@ -14,7 +14,9 @@ from pathlib import Path
 import os
 
 # USE_X_FORWARDED_HOST = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'http')
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# USE_X_FORWARDED_PORT = True
 # SECURE_SSL_REDIRECT = True  # Перенаправлять HTTP → HTTPS (если Nginx не сделал)
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
@@ -46,7 +48,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru", "109.68.215.67",
-    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", "192.168.0.6", "192.168.0.153"
+    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", "192.168.0.6", "192.168.0.153",
+    "nginx"
 ]
 
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
@@ -204,9 +207,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'register.User'
-
-# MEDIA_ROOT = f'https://{AWS_S3_CUSTOM_DOMAIN}/'#'media/'
-# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 
 REST_FRAMEWORK = {

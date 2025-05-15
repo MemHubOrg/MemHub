@@ -29,8 +29,8 @@ staticfiles/
 # Migrations
 migrations/
 
-# Ngnix
-nginx/
+# script
+clean_project.sh
 
 # Logs
 logs/

@@ -18,7 +18,6 @@ COPY . /app/
 EXPOSE 8000
 
 # Команда для запуска приложения
-# CMD ["python", "manage.py", "runserver", "192.168.0.104:8000"]
-CMD ["python", "manage.py", "runserver", "192.168.0.153:8000"]
 
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 # CMD ["python", "manage.py", "runserver", "109.68.215.67:8000"]

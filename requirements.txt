@@ -12,3 +12,4 @@ whitenoise
 boto3 
 django-storages
 docker
+django-ipware

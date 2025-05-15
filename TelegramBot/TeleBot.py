@@ -32,14 +32,7 @@ class Bot():
                 self.db.create_user_with_chat_id(username=username, chat_id=chat_id)
                 self.bot.reply_to(message, f"Привет, {username}! Ваш chat ID: {chat_id}")
             except Exception as e:
-                self.bot.reply_to(message, f"Хуй тебе, а не сохранение в бд {e}")
-            # username = message.from_user.username
-            # username_db = self.db.get_data("username", username)
-            #
-            # if username == username_db:
-            #     self.db.update_data(data=message.chat.id, username=username)
-            #
-            # self.bot.reply_to(message, "Привет! Ваш chat ID: {}, username: {}".format(message.chat.id, username))
+                self.bot.reply_to(message, f"Ошибка: {e}")
 
         @self.bot.message_handler(func=lambda message: True)
         def send_code(message):

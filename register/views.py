@@ -39,7 +39,7 @@ logger_auth = logging.getLogger('django.security.Authentication')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-EXTERNAL_API_IP = "192.168.0.6"
+EXTERNAL_API_IP = "192.168.0.153"
 
 def index(request):
     templates = Template.objects.all()
@@ -190,13 +190,7 @@ def login(request):
                 )
             
             # Get IP
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-
-            # if x_forwarded_for: 
-            #     ip = x_forwarded_for.split(',')[0].strip()
-            # else: 
-            ip = request.META.get('REMOTE_ADDR')
-
+            ip = request.META["HTTP_X_REAL_IP"]
             logger_auth.warning(f"Authentication failed for {username} from {ip}")
 
             return render(request, "register/login.html", {"form": form, "error": "Неверный логин или пароль!"})

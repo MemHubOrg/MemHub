@@ -86,7 +86,7 @@ def monitor_log():
     try:
         with open(LOG_FILE, "r") as f:
             f.seek(0, 2)  # Переходим в конец файла
-            send_telegram_alert("Open file")
+            send_telegram_alert("Начало мониторинга")
 
             while True:
                 line = f.readline()
