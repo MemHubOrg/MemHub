@@ -13,3 +13,8 @@ urlpatterns = [
     path("shared/<uuid:token>/", views.shared_meme_view, name="shared_meme"),
     path("api/create-share-link/", views.create_temp_link, name="create_share_link"),
 ]
+
+handler404 = 'django.views.defaults.page_not_found'
+handler400 = 'django.views.defaults.bad_request'
+handler403 = 'django.views.defaults.permission_denied'
+handler500 = 'django.views.defaults.server_error'

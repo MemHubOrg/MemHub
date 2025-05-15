@@ -31,6 +31,7 @@ from drf_yasg import openapi
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from rest_framework_simplejwt.tokens import AccessToken
+from django.core.exceptions import PermissionDenied
 
 # For fail2ban
 logger_auth = logging.getLogger('django.security.Authentication')

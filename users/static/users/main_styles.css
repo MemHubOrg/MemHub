@@ -226,3 +226,35 @@ body {
 }
 
 
+/* Ошибка 404 */
+.error-container {
+    text-align: center;
+    padding: 60px 20px;
+}
+.error-code {
+    font-size: 100px;
+    font-weight: bold;
+    color: #ED9E1D;
+}
+.error-message {
+    font-size: 24px;
+    margin: 20px 0;
+    color: white;
+}
+.error-image {
+    max-width: 300px;
+    margin-top: 20px;
+}
+.home-link {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 24px;
+    background-color: #ED9E1D;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.home-link:hover {
+    background-color: #ED9E1D;
+}

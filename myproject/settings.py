@@ -44,7 +44,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-33oz0vhql=z2bytl=*twl^)zrg$hu!-)#=b&xxv(()4y!oh0@2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru", "109.68.215.67",
