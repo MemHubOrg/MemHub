@@ -32,6 +32,7 @@ migrations/
 # script
 clean_project.sh
 docker-compose_nohealth.yml
+threats.md
 
 # Logs
 logs/
