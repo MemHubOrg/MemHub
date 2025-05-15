@@ -19,7 +19,9 @@ from django.core.files.base import ContentFile, File
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
+
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 
 from register.forms import LoginForm, RegisterForm, TelegramCodeForm
 from register.models import User
@@ -31,7 +33,6 @@ from drf_yasg import openapi
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from rest_framework_simplejwt.tokens import AccessToken
-from django.core.exceptions import PermissionDenied
 
 # For fail2ban
 logger_auth = logging.getLogger('django.security.Authentication')
@@ -172,12 +173,6 @@ def login(request):
             if not User.objects.filter(username=username).exists():
                 request.session['register_message'] = "Пользователь с таким именем не найден! Пройдите регистрацию!"
                 return redirect("register")  # перенаправляем на путь, который обрабатывает регистрацию
-                # form = RegisterForm(initial={"username": ""})
-                # return render(
-                #     request,
-                #     "register/register.html",#"users/register.html",
-                #     {"form": form, "error": "Пользователь с таким именем не найден! Пройдите регистрацию!"}
-                # )
 
             user = authenticate(request, username=username, password=password)
 
