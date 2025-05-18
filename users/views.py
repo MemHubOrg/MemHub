@@ -10,7 +10,7 @@ from django.views.decorators.cache import never_cache
 from users.forms import CustomPasswordChangeForm
 from backend.models import Meme
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from urllib.parse import urlparse
 from django.conf import settings
@@ -42,6 +42,9 @@ def change_password_view(request):
         form = CustomPasswordChangeForm()
     return render(request, 'users/change_password.html', {'form': form})
 
+def is_valid_meme_url(url: str) -> bool:
+    return url.startswith("https://storage.yandexcloud.net/memhub.bucket/")
+
 @never_cache
 @login_required
 def my_memes_view(request):
@@ -52,9 +55,18 @@ def my_memes_view(request):
 @never_cache
 @login_required
 def selected_meme_view(request, image_id):
-    meme = get_object_or_404(Meme, id=image_id)  # Получаем мем по id
-    meme_image_url = meme.image_url  # Используем реальный URL изображения из модели
-    return render(request, 'users/selected_meme.html', {'meme': meme, 'meme_image_url': meme_image_url, 'meme_id': meme.id})
+    meme = get_object_or_404(Meme, id=image_id)
+    if not is_valid_meme_url(meme.image_url):
+        return HttpResponseBadRequest("Некорректный URL изображения")
+
+    return render(
+        request, 
+        'users/selected_meme.html', {
+            'meme': meme, 
+            'meme_image_url': meme.image_url, 
+            'meme_id': meme.id
+        }
+    )
 
 @never_cache
 @require_http_methods(["DELETE"])

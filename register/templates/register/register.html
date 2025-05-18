@@ -21,12 +21,12 @@
 
         {% if error %}
             <div class="error form-error">
-                {{ error }}
+                {{ error|escape }}
             </div>
         {% endif %}
         {% if message %}
             <div class="error form-error">
-                {{ message }}
+                {{ message|escape }}
             </div>
         {% endif %}
 
@@ -41,9 +41,6 @@
             <label>
                 {{ form.confirm_password }}
             </label>
-<!--            <label>-->
-<!--                {{ form.captcha }}-->
-<!--            </label>-->
             <div class="captcha-wrapper">
                 {{ form.captcha.image }}
                 {{ form.captcha }}
@@ -70,41 +67,6 @@
     </script>
 
     <script nonce="{{ request.csp_nonce }}">
-<!--        document.getElementById("sendCodeBtn").addEventListener("click", function() {-->
-<!--            let username = document.querySelector("input[name='username']").value;-->
-
-<!--            if (!username) {-->
-<!--                alert("Введите логин перед отправкой кода!");-->
-<!--                return;-->
-<!--            }-->
-
-<!--            fetch(`/check-telegram-user/?username=${username}`)-->
-<!--                .then(response => response.json())-->
-<!--                .then(data => {-->
-<!--                    if (data.exists) {-->
-<!--                        return fetch("/send-telegram-code/", {-->
-<!--                            method: "POST",-->
-<!--                            headers: {-->
-<!--                                "Content-Type": "application/json",-->
-<!--                                "X-CSRFToken": "{{ csrf_token }}"-->
-<!--                            },-->
-<!--                            body: JSON.stringify({ username: username })-->
-<!--                        });-->
-<!--                    } else {-->
-<!--                        throw new Error("Пользователь с таким ником не найден!");-->
-<!--                    }-->
-<!--                })-->
-<!--                .then(response => response.json())-->
-<!--                .then(data => {-->
-<!--                    if (data.success) {-->
-<!--                        document.getElementById("sendCodeBtn").style.display = "none";-->
-<!--                        document.getElementById("codeError").style.display = "block";-->
-<!--                    }-->
-<!--                })-->
-<!--                .catch(error => {-->
-<!--                    alert(error.message);-->
-<!--                });-->
-<!--        });-->
         document.getElementById("sendCodeBtn").addEventListener("click", function () {
             fetch("/send-telegram-code/", {
                 method: "POST",

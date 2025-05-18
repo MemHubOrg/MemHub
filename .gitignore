@@ -33,6 +33,7 @@ migrations/
 clean_project.sh
 docker-compose_nohealth.yml
 threats.md
+with_workers.txt
 
 # Logs
 logs/

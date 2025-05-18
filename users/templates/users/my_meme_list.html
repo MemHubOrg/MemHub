@@ -104,7 +104,6 @@
         fetch(`/users/delete_meme/${id}/`, {
             method: 'DELETE',
             headers: {
-                // 'X-CSRFToken': getCookie('csrftoken'),
                 'X-CSRFToken': '{{ csrf_token }}'
             }
         }).then(response => {
