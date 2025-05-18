@@ -55,14 +55,10 @@ def send_telegram_alert(message):
         "text": message,
         "parse_mode": "HTML"
     }
-    try:
-        requests.post(url, data=data, timeout=5)
-    except Exception as e:
-        print("Failed to send Telegram alert:", e)
+    requests.post(url, data=data, timeout=5)
 
 def monitor_containers():
     if not os.path.exists(DOCKER_SOCKET_PATH):
-        print(f"Docker socket not found at {DOCKER_SOCKET_PATH}")
         send_telegram_alert("❌ Docker socket не найден. Мониторинг не запущен.")
         return
 

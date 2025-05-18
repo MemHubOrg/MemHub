@@ -52,10 +52,6 @@ def adminpanel_index(request):
     # Иначе на страницу входа
     return redirect("admin_login")
 
-# def admin_dashboard(request):
-#     # if not request.session.get("admin_id"):
-#     #     return redirect("admin_login")
-#     return render(request, 'adminpanel/dashboard.html')
 def admin_dashboard(request):
     if not request.session.get("admin_id"):
         return redirect("admin_login")
@@ -66,49 +62,46 @@ def admin_dashboard(request):
 @csrf_exempt
 def manage_templates(request):
     if request.method == 'POST':
-        try:
-            # Удаление шаблона
-            if 'delete_id' in request.POST:
-                template = get_object_or_404(Template, id=request.POST.get('delete_id'))
+        # Удаление шаблона
+        if 'delete_id' in request.POST:
+            template = get_object_or_404(Template, id=request.POST.get('delete_id'))
 
-                # Получение относительного пути
-                parsed_url = urlparse(template.image_url)
-                file_key = parsed_url.path.lstrip('/').removeprefix('memhub.bucket/')
+            # Получение относительного пути
+            parsed_url = urlparse(template.image_url)
+            file_key = parsed_url.path.lstrip('/').removeprefix('memhub.bucket/')
 
-                # Удаление из S3
-                if s3_storage.exists(file_key):
-                    s3_storage.delete(file_key)
+            # Удаление из S3
+            if s3_storage.exists(file_key):
+                s3_storage.delete(file_key)
 
-                # Удаление из БД
-                template.delete()
+            # Удаление из БД
+            template.delete()
 
-            # Добавление нового шаблона
-            elif 'new_file' in request.FILES:
-                uploaded_file = request.FILES['new_file']
-                filename = f"templates/{uuid.uuid4().hex}.png"
+        # Добавление нового шаблона
+        elif 'new_file' in request.FILES:
+            uploaded_file = request.FILES['new_file']
+            filename = f"templates/{uuid.uuid4().hex}.png"
 
-                # Сохраняем файл в S3
-                saved_path = s3_storage.save(filename, ContentFile(uploaded_file.read()))
-                file_url = s3_storage.url(saved_path)
+            # Сохраняем файл в S3
+            saved_path = s3_storage.save(filename, ContentFile(uploaded_file.read()))
+            file_url = s3_storage.url(saved_path)
 
-                # Сохраняем в БД
-                Template.objects.create(image_url=file_url, tags=[])
+            # Сохраняем в БД
+            Template.objects.create(image_url=file_url, tags=[])
 
-            # Редактирование тегов шаблона
-            elif 'edit_id' in request.POST and 'edit_tags' in request.POST:
-                template = get_object_or_404(Template, id=request.POST['edit_id'])
-                new_tags = [tag.strip() for tag in request.POST['edit_tags'].split(',') if tag.strip()]
-                template.tags = new_tags
-                template.save()
-
-        except Exception as e:
-            print(f"Ошибка в manage_templates: {e}")
+        # Редактирование тегов шаблона
+        elif 'edit_id' in request.POST and 'edit_tags' in request.POST:
+            template = get_object_or_404(Template, id=request.POST['edit_id'])
+            new_tags = [tag.strip() for tag in request.POST['edit_tags'].split(',') if tag.strip()]
+            template.tags = new_tags
+            template.save()
 
         return redirect('manage_templates')
 
     # GET-запрос — отобразить список шаблонов
     templates = Template.objects.all().order_by('id')
     return render(request, 'adminpanel/manage_templates.html', {'templates': templates})
+
 @csrf_exempt
 @require_POST
 def toggle_ban(request):
@@ -122,6 +115,7 @@ def toggle_ban(request):
         return JsonResponse({"message": f"Пользователь {username} {status}."})
     except User.DoesNotExist:
         return JsonResponse({"message": "Пользователь не найден"}, status=404)
+    
 @csrf_exempt
 @require_POST
 def kick_sessions(request):

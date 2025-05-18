@@ -18,41 +18,26 @@
         <div class="mem-detail-container">
             <div class="mem-detail-wrapper">
                 <img id="memImage" src="{{ meme_image_url }}" alt="Мем">
-
-                <!-- Кнопка для скачивания -->
                 <div class="icon top-left">
                     <a href="#" id="downloadBtn">
                         <img src="{% static 'users/download_icon.svg' %}" alt="Загрузка">
                     </a>
                 </div>
-
-                <!-- Кнопка для отправки в ТГ -->
                 <div class="icon top-right">
                     <a href="#" id="sendToTelegramBtn">
                         <img src="{% static 'users/telegram_icon.svg' %}" alt="Телеграм">
                     </a>
                 </div>
-
-                <!-- Кнопка назад -->
                 <div class="icon bottom-left">
                     <a href="{% url 'users:my_memes' %}" class="icon bottom-left">
                         <img src="{% static 'users/back_button.svg' %}" alt="Назад">
                     </a>
                 </div>
-
-                <!-- Кнопка редактирования -->
                 <div class="icon bottom-right">
                     <a href="#" id="editBtn">
                         <img src="{% static 'users/edit_icon.svg' %}" alt="Редактирование">
                     </a>
                 </div>
-
-                <!-- Кнопка для копирования ссылки -->
-<!--                <div class="icon bottom-right share-icon">-->
-<!--                    <a href="#" id="shareLinkBtn">-->
-<!--                        <img src="{% static 'users/share_icon.svg' %}" alt="Поделиться">-->
-<!--                    </a>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
@@ -60,7 +45,6 @@
     <img src="{% static 'users/cat_lupa.png' %}" alt="" class="bottom-left">
     <img src="{% static 'users/tapaem_homyaka.png' %}" alt="" class="top-right">
 
-<!-- Редактирование мема -->
  <script>
     document.getElementById("editBtn").addEventListener("click", function (event) {
         event.preventDefault();
@@ -71,13 +55,11 @@
             return;
         }
 
-        // Cохраняем с той же логикой, что и шаблоны
         sessionStorage.setItem("selected_template", imageUrl);
         window.location.href = "/";
     });
 </script>
 
-<!-- Отправка в ТГ -->
 <script>
     document.getElementById("sendToTelegramBtn").addEventListener("click", async function (e) {
         e.preventDefault();
@@ -109,13 +91,11 @@
             }
 
         } catch (err) {
-            console.error("Ошибка при отправке в Telegram:", err);
             alert("Произошла ошибка при отправке мема в Telegram.");
         }
     });
 </script>
 
-<!-- Скачивание мема -->
 <script>
     document.getElementById("downloadBtn").addEventListener("click", async function (e) {
         e.preventDefault();
@@ -129,7 +109,7 @@
 
             const link = document.createElement("a");
             link.href = blobUrl;
-            link.download = "meme.png";  // Название файла
+            link.download = "meme.png";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -141,30 +121,5 @@
         }
     });
 </script>
-
-<!-- Поделиться -->
-<!--<script>-->
-<!--    document.getElementById("shareLinkBtn").addEventListener("click", async function (e) {-->
-<!--        e.preventDefault();-->
-
-<!--        const memeId = "{{ meme_id }}";  // Передай его в шаблон-->
-<!--        const response = await fetch("/users/api/create-share-link/", {-->
-<!--            method: "POST",-->
-<!--            headers: {-->
-<!--                "Content-Type": "application/json",-->
-<!--                "X-CSRFToken": "{{ csrf_token }}"-->
-<!--            },-->
-<!--            body: JSON.stringify({ meme_id: memeId })-->
-<!--        });-->
-
-<!--        const data = await response.json();-->
-<!--        if (data.success) {-->
-<!--            await navigator.clipboard.writeText(data.share_url);-->
-<!--            alert("Ссылка скопирована! Вы можете отправить её в Telegram или ВК.");-->
-<!--        } else {-->
-<!--            alert("Ошибка: " + data.error);-->
-<!--        }-->
-<!--    });-->
-<!--</script>-->
 </body>
 </html>

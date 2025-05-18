@@ -33,16 +33,6 @@ class TemplateViewSet(viewsets.ModelViewSet):
             ).filter(tag_match=True)
 
         return queryset
-# class TemplateViewSet(viewsets.ModelViewSet):
-#     queryset = Template.objects.all()
-#     permission_classes = [permissions.AllowAny]
-#
-#     def get_serializer_class(self):
-#         if self.action == 'create':
-#             return TemplateUploadSerializer
-#         return TemplateSerializer
-#
-#     parser_classes = [MultiPartParser, FormParser]
 
 class MemeViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]

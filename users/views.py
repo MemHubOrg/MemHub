@@ -21,9 +21,6 @@ from datetime import timedelta
 from .models import SharedMemeLink
 from backend.models import Meme
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 def index(request):
     return render(request, 'users/index.html')
 

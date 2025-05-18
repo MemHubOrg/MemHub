@@ -14,7 +14,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
 from django.core.files.storage import default_storage as s3_storage
-from django.core.files.base import ContentFile, File
+from django.core.files.base import ContentFile
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
@@ -37,15 +37,15 @@ from rest_framework_simplejwt.tokens import AccessToken
 # For fail2ban
 logger_auth = logging.getLogger('django.security.Authentication')
 
-# For debugging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 EXTERNAL_API_IP = "192.168.0.153"
 
 def index(request):
     templates = Template.objects.all()
-    return render(request, 'register/index.html', {'templates': templates})
+    return render(
+        request, 'register/index.html', 
+        {'templates': templates}, 
+        {'csp_nonce': request.csp_nonce}
+    )
 
 def health_check(request):
     return JsonResponse({"status": "ok"})
@@ -226,7 +226,6 @@ def send_meme_to_telegram(request):
             if response.status_code == 200:
                 return JsonResponse({'success': True})
             else:
-                print(f"Error: {response.json().get('message')}")
                 return JsonResponse({'success': False})
 
         except Exception as e:
@@ -291,10 +290,8 @@ def send_code_to_user(username, unique_token):
 
     try:
         response = requests.post(url, json=payload)
-        print("BOT response:", response.status_code, response.text)
         return response.status_code == 200
     except requests.exceptions.RequestException as e:
-        print(f"Request failed: {e}")
         return False
 
 class CustomTokenView(TokenObtainPairView):

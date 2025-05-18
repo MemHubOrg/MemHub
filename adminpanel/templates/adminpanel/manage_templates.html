@@ -98,8 +98,6 @@
     {% endfor %}
 </table>
 
-
-<!-- Загрузка нового шаблона и его превью -->
 <script>
     const localImageInput = document.getElementById('localImageInput');
     const localPreview = document.getElementById('localPreview');
@@ -109,7 +107,6 @@
     localImageInput.addEventListener('change', () => {
         const file = localImageInput.files[0];
         if (file && file.type.startsWith('image/')) {
-            // Отображаем превью
             const reader = new FileReader();
             reader.onload = (e) => {
                 localPreview.innerHTML = '';
@@ -123,7 +120,6 @@
             };
             reader.readAsDataURL(file);
 
-            // Подставляем файл в скрытое поле формы
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             addFileHiddenInput.files = dataTransfer.files;

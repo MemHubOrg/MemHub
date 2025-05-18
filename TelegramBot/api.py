@@ -55,7 +55,6 @@ def send_meme():
             return jsonify({'success': False, 'message': response.text}), 500
 
     except Exception as e:
-        print(f"An error occurred: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/send_code', methods=['POST'])
@@ -68,7 +67,6 @@ def send_code():
         chat_id = bot.db.get_data("chat_id", username)
 
         if not token or not chat_id:
-            print(f"[ERROR] Missing token or chat_id. username={username}, token={token}, chat_id={chat_id}")
             return jsonify({"status": "error", "message": "User not found"}), 404
 
         verification_code = bot.generate_code(token)
@@ -77,28 +75,7 @@ def send_code():
         return jsonify({"status": "success", "message": "Code sent"}), 200
 
     except Exception as e:
-        print(f"[EXCEPTION] {e}")
-        print(f"[DEBUG] username={username}, token={token}")
         return jsonify({"status": "error", "message": str(e)}), 500
-# @app.route('/send_code', methods=['POST'])
-# def send_code():
-#     try:
-#         data = request.json
-#         username = data.get('username')
-#
-#         secret = bot.db.get_data("secret", username)
-#         chat_id = bot.db.get_data("chat_id", username)
-#
-#         if not secret or not chat_id:
-#             return jsonify({"status": "error", "message": "User not found"}), 404
-#
-#         verification_code = bot.generate_code(secret)
-#         bot.send_verification_code(chat_id, verification_code)
-#
-#         return jsonify({"status": "success", "message": "Code sent"}), 200
-#     except Exception as e:
-#         print(f"An error occurred: {e}")
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8081)

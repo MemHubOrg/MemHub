@@ -10,7 +10,6 @@
 </head>
 <body>
 
-    <!-- Шапка -->
     <header class="header">
         <img src="{% static 'register/header_bg.png' %}" alt="Фон шапки" class="header-bg">
         <div class="header-content">
@@ -29,20 +28,16 @@
         {% endif %}
     </header>
 
-    <!-- Серая линия-разделитель -->
     <div class="divider"></div>
 
-    <!-- Основной контент -->
     <div class="main-content-wrapper">
         <main class="main-content">
 
-            <!-- Кнопки -->
             <div class="button-row">
                 <button id="btn-create" class="main-btn active-btn" onclick="switchSection('create')">Создание мема</button>
                 <button id="btn-templates" class="main-btn" onclick="switchSection('templates')">Шаблоны</button>
             </div>
 
-            <!-- Раздел "Как сделать мем" -->
             <div class="howto-section">
                 <p class="howto-title">Как сделать мем</p>
                 <div class="howto-gallery">
@@ -52,9 +47,7 @@
                 </div>
             </div>
 
-            <!-- Раздел: Создание мема -->
             <div id="section-create" class="section-create">
-            <!-- Зона загрузки -->
                 <div class="upload-wrapper">
                     <div class="upload-frame">
                         <div id="dropzone" class="upload-inner">
@@ -84,7 +77,6 @@
                 </div>
             </div>
 
-            <!-- Раздел: Шаблоны -->
             <div id="section-templates" class="section-templates" style="display: none;">
                 <div class="howto-section">
                     <p class="howto-title">Шаблоны</p>
@@ -112,165 +104,27 @@
         </main>
     </div>
 
-    <script>
+    <script nonce="{{ csp_nonce }}">
         const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
     </script>
 
-    <!-- Переключение разделов -->
-    <script>
-        console.log('Скрипт загружен');
+    <script nonce="{{ csp_nonce }}">
         function switchSection(section) {
-            // Скрываем оба раздела
-            console.log('Функция запущена');
-            console.log('Нажата кнопка:', section);
             document.getElementById('section-create').style.display = 'none';
             document.getElementById('section-templates').style.display = 'none';
 
-            // Показываем выбранный раздел
             if (section === 'create') {
                 document.getElementById('section-create').style.display = 'block';
             } else if (section === 'templates') {
                 document.getElementById('section-templates').style.display = 'block';
             }
 
-            // Меняем цвет кнопок
             document.getElementById('btn-create').style.backgroundColor = section === 'templates' ? '#ED9E1D' : '#999';
             document.getElementById('btn-templates').style.backgroundColor = section === 'create' ? '#ED9E1D' : '#999';
         }
     </script>
 
-    <!-- Отправка в ТГ мема и сохранение его в профиле -->
-
-    <!-- C воркерами -->
-    <!-- <script type="module">
-        import { WorkerPool } from "{% static 'js/workerPool.js' %}";
-
-        const pool = new WorkerPool("{% static 'js/image-compression-worker.js' %}", 1);
-
-        const sendToTelegram = document.getElementById('sendToTelegram');
-        if (sendToTelegram) {
-            sendToTelegram.addEventListener('click', sendToTelegramfunc);
-        }
-
-        function sendToTelegramfunc() {
-            const target = document.querySelector('.upload-inner');
-            if (!target) {
-                console.error('Элемент .upload-inner не найден');
-                return;
-            }
-
-
-            const spinner = document.getElementById('loading-spinner');
-            spinner.style.display = 'flex'; // показать спиннер
-
-            const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
-            const hiddenElements = [];
-            toHide.forEach(el => {
-                hiddenElements.push({ element: el, display: el.style.display });
-                el.style.display = 'none';
-            });
-
-            const containers = target.querySelectorAll('div[style*="position: absolute"]');
-            const containerStyles = [];
-            containers.forEach(el => {
-                containerStyles.push({
-                    element: el,
-                    border: el.style.border,
-                    boxShadow: el.style.boxShadow,
-                    transform: el.style.transform
-                });
-                el.style.border = 'none';
-                el.style.boxShadow = 'none';
-            });
-
-            // Убрать рамку у самой .upload-inner
-            const originalBorder = target.style.border;
-            target.style.border = 'none';
-
-            setTimeout(() => {
-                html2canvas(target, {
-                    useCORS: true,
-                    backgroundColor: null,
-                    scale: 1.2
-                }).then(canvas => {
-                    const worker = new Worker("{% static 'js/image-compression-worker.js' %}");
-                    canvas.toBlob(async (blob) => {
-                        try {
-                            const compressedBlob = await pool.runTask(blob);
-
-                            const formData = new FormData();
-                            formData.append('file', compressedBlob, 'meme.jpg');
-
-                            if ({{ user.is_authenticated|yesno:"true,false" }}) {
-                                Promise.all([
-                                    fetch('/save_meme_to_profile/', {
-                                        method: 'POST',
-                                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                                        body: formData
-                                    }),
-                                    fetch('/send_meme_to_telegram/', {
-                                        method: 'POST',
-                                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                                        body: formData
-                                    })
-                                ]).then(([profileRes, telegramRes]) => Promise.all([profileRes.json(), telegramRes.json()]))
-                                .then(([profileData, telegramData]) => {
-                                    spinner.style.display = 'none';
-                                    if (telegramData.success) {
-                                        alert("Мем отправлен в Telegram и сохранён в профиль!");
-                                    } else {
-                                        alert('Ошибка отправки в Telegram: ' + (telegramData.error || 'неизвестная'));
-                                    }
-                                }).catch(err => {
-                                    spinner.style.display = 'none';
-                                    console.error(err);
-                                });
-                            } else {
-                                sendToTelegramNow(formData).finally(() => {
-                                    spinner.style.display = 'none';
-                                });
-                            }
-                        } catch (err) {
-                            console.error("Ошибка при сжатии изображения:", err);
-                            alert("Ошибка при сжатии изображения: " + err.message);
-                            spinner.style.display = 'none';
-                        }
-                    }, 'image/png');
-                });
-
-                hiddenElements.forEach(({ element, display }) => {
-                    element.style.display = display;
-                });
-                containerStyles.forEach(({ element, border, boxShadow }) => {
-                    element.style.border = border;
-                    element.style.boxShadow = boxShadow;
-                });
-
-                target.style.border = originalBorder; // восстановить рамку
-
-            }, 50);
-        }
-
-        function sendToTelegramNow(formData) {
-            fetch('/send_meme_to_telegram/', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Мем отправлен в Telegram${isAuthenticated ? " и сохранён в профиль" : ""}!`);
-                } else {
-                    alert('Ошибка при отправке в Telegram: ' + (data.error || 'неизвестная'));
-                }
-            })
-            .catch(error => console.error('Ошибка:', error));
-        }
-    </script> -->
-
-    <!-- Без воркеров -->
-    <script>
+    <script nonce="{{ csp_nonce }}">
         const sendToTelegram = document.getElementById('sendToTelegram');
         if (sendToTelegram) {
             sendToTelegram.addEventListener('click', sendToTelegramfunc);
@@ -284,7 +138,7 @@
             }
 
             const spinner = document.getElementById('loading-spinner');
-            spinner.style.display = 'flex'; // показать спиннер
+            spinner.style.display = 'flex';
 
             const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
             const hiddenElements = [];
@@ -333,7 +187,7 @@
                                 })
                             ]).then(([profileRes, telegramRes]) => Promise.all([profileRes.json(), telegramRes.json()]))
                             .then(([profileData, telegramData]) => {
-                                spinner.style.display = 'none'; // спрятать спиннер
+                                spinner.style.display = 'none';
 
                                 if (telegramData.success) {
                                     alert("Мем отправлен в Telegram и сохранён в профиль!");
@@ -382,12 +236,11 @@
         }
     </script>
 
-    <!-- Cкачивание элемента как PNG -->
-    <script 
+    <script nonce="{{ csp_nonce }}">
         src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
     </script>
      
-    <script>
+    <script nonce="{{ csp_nonce }}">
         const downloadBtn = document.getElementById('downloadBtn');
         if (downloadBtn) {
             downloadBtn.addEventListener('click', downloadImage);
@@ -400,7 +253,6 @@
                 return;
             }
 
-            // Скрыть управляющие кнопки
             const toHide = target.querySelectorAll('div[style*="position: absolute"] > div');
             const hiddenElements = [];
             toHide.forEach(el => {
@@ -408,7 +260,6 @@
                 el.style.display = 'none';
             });
 
-            // Убрать рамки и тени
             const containers = target.querySelectorAll('div[style*="position: absolute"]');
             const containerStyles = [];
             containers.forEach(el => {
@@ -422,7 +273,6 @@
                 el.style.boxShadow = 'none';
             });
 
-            // Убрать рамку у самой .upload-inner
             const originalBorder = target.style.border;
             target.style.border = 'none';
 
@@ -437,7 +287,6 @@
                     link.href = canvas.toDataURL('image/png');
                     link.click();
 
-                    // Восстановить стили
                     hiddenElements.forEach(({ element, display }) => {
                         element.style.display = display;
                     });
@@ -447,14 +296,13 @@
                         element.style.transform = transform;
                     });
 
-                    target.style.border = originalBorder; // восстановить рамку
+                    target.style.border = originalBorder;
                 });
             });
         };
     </script>
 
-    <!-- Добавление текста/картинок + возможность менять размер/вращать их -->
-    <script>
+    <script nonce="{{ csp_nonce }}">
         const addImageBtn = document.getElementById('addImageBtn');
         const addTextBtn = document.getElementById('addTextBtn');
         const uploadFrame = document.querySelector('.upload-inner');
@@ -477,13 +325,12 @@
             delBtn.style.fontWeight = 'bold';
             delBtn.style.zIndex = 1001;
 
-            // Устанавливаем contentEditable = false, чтобы кнопка не выделялась
             delBtn.setAttribute('contenteditable', 'false');
             delBtn.setAttribute('unselectable', 'on');
             delBtn.style.userSelect = 'none';
 
             delBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // чтобы не мешал drag
+                e.stopPropagation();
                 el.remove();
             });
 
@@ -508,7 +355,6 @@
             rotateBtn.style.fontWeight = 'bold';
             rotateBtn.style.zIndex = 1001;
 
-            // Устанавливаем contentEditable = false, чтобы кнопка не выделялась
             rotateBtn.setAttribute('contenteditable', 'false');
             rotateBtn.setAttribute('unselectable', 'on');
             rotateBtn.style.userSelect = 'none';
@@ -572,11 +418,9 @@
                     let newLeft = e.clientX - offsetX;
                     let newTop = e.clientY - offsetY;
 
-                    // Ограничение по левому и верхнему краю
                     if (newLeft < 0) newLeft = 0;
                     if (newTop < 0) newTop = 0;
 
-                    // Ограничение по правому и нижнему краю
                     const maxLeft = parent.width - elemRect.width;
                     const maxTop = parent.height - elemRect.height;
                     if (newLeft > maxLeft) newLeft = maxLeft;
@@ -609,7 +453,7 @@
 
             resizer.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                e.stopPropagation(); // Чтобы не мешал drag
+                e.stopPropagation();
 
                 const startX = e.clientX;
                 const startY = e.clientY;
@@ -624,7 +468,6 @@
                     let newWidth = startWidth + e.clientX - startX;
                     let newHeight = startHeight + e.clientY - startY;
 
-                    // Ограничение ширины и высоты так, чтобы элемент не вышел за границы uploadFrame
                     const maxWidth = parentRect.width - startLeft;
                     const maxHeight = parentRect.height - startTop;
 
@@ -660,7 +503,6 @@
             textEl.style.left = '100px';
             textEl.style.top = '100px';
 
-            // Предотвращаем удаление контейнера, если текст пустой
             textEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace' && textEl.textContent.length == 2) {
                     e.preventDefault();
@@ -673,7 +515,6 @@
             addRotateButton(textEl);
         });
 
-        // Добавление картинки
         document.getElementById('addImageBtn').addEventListener('click', () => {
             document.getElementById('image-input').click();
         });
@@ -717,31 +558,27 @@
         });
     </script>
     
-    <script>
+    <script nonce="{{ csp_nonce }}">
         const fileInput = document.getElementById('fileInput');
         const customBtn = document.getElementById('customBtn');
         const preview = document.getElementById('preview');
         const dropzone = document.getElementById('dropzone');
     
-        // Элементы, которые нужно скрыть после загрузки
         const uploadTitle = document.querySelector('.upload-title');
         const uploadSubtitle = document.querySelector('.upload-subtitle');
         const uploadNote = document.querySelector('.upload-note');
         const uploadIcon = document.querySelector('.upload-icon');
 
-        // Кнопка вручную
         customBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             fileInput.click();
         });
 
-        // Обработка выбора файла
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             handleImageFile(file);
         });
 
-        // Drag and Drop
         dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropzone.classList.add('dragover');
@@ -776,7 +613,6 @@
                     img.style.borderRadius = '12px';
                     preview.appendChild(img);
 
-                    // Активируем кнопки
                     document.getElementById('addImageBtn').classList.remove('disabled-btn');
                     document.getElementById('addTextBtn').classList.remove('disabled-btn');
                     document.getElementById('downloadBtn').classList.remove('disabled-btn');
@@ -795,8 +631,7 @@
         }
     </script>
 
-    <!-- Перенос шаблона для создания мема -->
-     <script>
+     <script nonce="{{ csp_nonce }}">
         document.addEventListener("DOMContentLoaded", async function () {
             const imageUrl = sessionStorage.getItem("selected_template");
             if (imageUrl) {
@@ -805,20 +640,16 @@
                 switchSection('create');
 
                 try {
-                    // Загружаем картинку и создаем объект File
                     const response = await fetch(imageUrl);
                     const blob = await response.blob();
                     const file = new File([blob], "template.jpg", { type: blob.type });
 
-                    // Создаем DataTransfer и помещаем туда файл
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
 
-                    // Назначаем "виртуальный" файл в input
                     const input = document.getElementById("fileInput");
                     input.files = dataTransfer.files;
 
-                    // Вручную вызываем обработчик изменения, если он есть
                     const event = new Event("change", { bubbles: true });
                     input.dispatchEvent(event);
                 } catch (err) {
@@ -828,17 +659,14 @@
         });
     </script>
 
-    <script>
+   <script nonce="{{ csp_nonce }}">
         function selectTemplate(imageUrl) {
-            // Сохраняем путь в sessionStorage
             sessionStorage.setItem("selected_template", imageUrl);
-            // Перенаправляем на главную
             window.location.href = "/";
         }
     </script>
 
-    <!--Поиск по тегам-->
-    <script>
+    <script nonce="{{ csp_nonce }}">
     document.querySelector('.template-search-btn').addEventListener('click', () => {
         const input = document.querySelector('.template-search-input');
         const query = input.value.trim();
@@ -865,23 +693,20 @@
     });
     </script>
 
-    <!--Обработка enter-->
-    <script>
+    <script nonce="{{ csp_nonce }}">
     document.querySelector('.template-search-input').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-            event.preventDefault(); // предотвращает отправку формы, если вдруг будет
+            event.preventDefault();
             document.querySelector('.template-search-btn').click();
         }
     });
     </script>
 
-    <!--Обработчик очищения поля-->
-    <script>
+    <script nonce="{{ csp_nonce }}">
     document.querySelector('.template-clear-btn').addEventListener('click', () => {
         const input = document.querySelector('.template-search-input');
-        input.value = ''; // очищаем поле
+        input.value = '';
 
-        // Загружаем все шаблоны заново
         fetch(`/api/templates/`)
             .then(res => res.json())
             .then(data => {
@@ -904,8 +729,7 @@
     });
     </script>
 
-    <!--Обработчик кнопки мусорки-->
-    <script>
+    <script nonce="{{ csp_nonce }}">
     document.addEventListener("DOMContentLoaded", () => {
         const deleteBtn = document.getElementById('deleteBtn');
         if (deleteBtn) {
@@ -913,7 +737,6 @@
         }
 
         function resetEditor() {
-            // Очистка превью и удаление добавленных элементов
             const preview = document.getElementById('preview');
             preview.innerHTML = '';
 
@@ -929,21 +752,17 @@
             if (customBtn) customBtn.style.display = 'inline-block';
             if (uploadIcon) uploadIcon.style.display = 'block';
 
-            // Очистка вручную добавленных картинок и текста
             const elementsToRemove = document.querySelectorAll('.upload-inner > div[style*="position: absolute"]');
             elementsToRemove.forEach(el => el.remove());
 
-            // Очистка input[type=file]
             document.getElementById('fileInput').value = '';
             document.getElementById('image-input').value = '';
 
-            // Деактивация кнопок
             document.getElementById('addImageBtn').classList.add('disabled-btn');
             document.getElementById('addTextBtn').classList.add('disabled-btn');
             document.getElementById('downloadBtn').classList.add('disabled-btn');
             document.getElementById('sendToTelegram')?.classList.add('disabled-btn');
 
-            // Сброс курсора
             document.getElementById('addImageBtn').style.cursor = 'not-allowed';
             document.getElementById('addTextBtn').style.cursor = 'not-allowed';
             document.getElementById('downloadBtn').style.cursor = 'not-allowed';
@@ -951,43 +770,6 @@
         }
     });
     </script>
-<!--    <script>-->
-<!--        const deleteBtn = document.getElementById('deleteBtn');-->
-<!--        if (deleteBtn) {-->
-<!--            deleteBtn.addEventListener('click', () => {-->
-<!--                const preview = document.getElementById('preview');-->
-<!--                const uploadInner = document.querySelector('.upload-inner');-->
-
-<!--                // Очищаем загруженное изображение-->
-<!--                preview.innerHTML = '';-->
-
-<!--                // Удаляем все элементы (тексты/картинки)-->
-<!--                const customElements = uploadInner.querySelectorAll('div[style*="position: absolute"]');-->
-<!--                customElements.forEach(el => el.remove());-->
-
-<!--                // Показываем элементы, скрытые после загрузки-->
-<!--                document.querySelector('.upload-title').style.display = 'block';-->
-<!--                document.querySelector('.upload-subtitle').style.display = 'block';-->
-<!--                document.querySelector('.upload-note').style.display = 'block';-->
-<!--                document.getElementById('customBtn').style.display = 'inline-block';-->
-<!--                document.querySelector('.upload-icon').style.display = 'block';-->
-
-<!--                // Деактивируем кнопки-->
-<!--                document.getElementById('addImageBtn').classList.add('disabled-btn');-->
-<!--                document.getElementById('addTextBtn').classList.add('disabled-btn');-->
-<!--                document.getElementById('downloadBtn').classList.add('disabled-btn');-->
-<!--                document.getElementById('sendToTelegram').classList.add('disabled-btn');-->
-
-<!--                document.getElementById('addImageBtn').style.cursor = 'default';-->
-<!--                document.getElementById('addTextBtn').style.cursor = 'default';-->
-<!--                document.getElementById('downloadBtn').style.cursor = 'default';-->
-<!--                document.getElementById('sendToTelegram').style.cursor = 'default';-->
-
-<!--                // Сброс file input-->
-<!--                document.getElementById('fileInput').value = '';-->
-<!--            });-->
-<!--        }-->
-<!--    </script>-->
 
 <div id="loading-spinner" style="
     display: none;

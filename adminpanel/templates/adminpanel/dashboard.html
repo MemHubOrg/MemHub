@@ -27,7 +27,6 @@
             margin-top: 20px;
         }
 
-        /* Панель администратора */
         .admin-panel {
             display: flex;
             justify-content: space-between;
@@ -35,7 +34,6 @@
             margin-top: 20px;
         }
 
-        /* Левая колонка */
         .admin-left {
             width: 25%;
             padding: 20px;
@@ -54,7 +52,6 @@
             border-radius: 5px;
         }
 
-        /* Правая колонка с таблицей */
         .admin-right {
             width: 70%;
             padding: 20px;
@@ -62,8 +59,8 @@
         }
 
         .table-wrapper {
-            max-height: 400px; /* Ограничиваем высоту таблицы */
-            overflow-y: auto; /* Добавляем вертикальную прокрутку */
+            max-height: 400px;
+            overflow-y: auto;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
@@ -77,7 +74,7 @@
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
-            color: white; /* Белый цвет текста */
+            color: white;
         }
 
         table th {
@@ -88,18 +85,16 @@
             background-color: #222;
         }
 
-        /* Стили для кликабельной строки */
         tr {
             cursor: pointer;
         }
 
         tr:hover {
-            background-color: #333; /* Подсвечиваем строку при наведении */
+            background-color: #333;
         }
 
-        /* Выделенная строка - изменения цвета текста */
         tr.selected td {
-            color: #ED9E1D; /* Оранжевый цвет текста при выборе */
+            color: #ED9E1D;
         }
 
     </style>
@@ -123,7 +118,6 @@
             <button id="editTemplatesBtn">Изменить шаблоны</button>
         </div>
 
-        <!-- Правая колонка с таблицей пользователей -->
         <div class="admin-right">
             <div class="table-wrapper">
                 <table>
@@ -151,28 +145,12 @@
                             </tr>
                         {% endfor %}
                     </tbody>
-<!--                    <tbody>-->
-<!--                        &lt;!&ndash; Примеры строк таблицы &ndash;&gt;-->
-<!--                        <tr class="user-row">-->
-<!--                            <td>user1</td>-->
-<!--                            <td>2025-05-09 14:30</td>-->
-<!--                        </tr>-->
-<!--                        <tr class="user-row">-->
-<!--                            <td>user2</td>-->
-<!--                            <td>2025-05-08 09:00</td>-->
-<!--                        </tr>-->
-<!--                        <tr class="user-row">-->
-<!--                            <td>user3</td>-->
-<!--                            <td>2025-05-07 18:45</td>-->
-<!--                        </tr>-->
-<!--                    </tbody>-->
                 </table>
             </div>
         </div>
 
     </div>
     <script>
-        // Глобальная переменная
         window.selectedUsername = null;
 
         const rows = document.querySelectorAll('tr.user-row');
@@ -186,15 +164,11 @@
     </script>
 
     <script>
-        // Получаем все строки таблицы
         const rows = document.querySelectorAll('tr.user-row');
 
-        // Добавляем обработчик событий для каждой строки
         rows.forEach(row => {
             row.addEventListener('click', () => {
-                // Убираем выделение у всех строк
                 rows.forEach(r => r.classList.remove('selected'));
-                // Добавляем класс 'selected' для выделенной строки
                 row.classList.add('selected');
             });
         });

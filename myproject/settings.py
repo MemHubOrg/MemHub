@@ -127,6 +127,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'myproject.middleware.NoCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    # 'django.middleware.security.ContentSecurityPolicyMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
