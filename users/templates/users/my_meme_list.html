@@ -8,9 +8,9 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'users/styles.css' %}">
 </head>
-<script>
+<script nonce="{{ request.csp_nonce }}">
     const IMAGES_PER_PAGE = 8;
-    const memes = {{ memes_json|safe }};
+    const memes = JSON.parse('{{ memes_json|escapejs }}');
     const TOTAL_IMAGES = memes.length;
     let currentPage = 0;
 
@@ -19,7 +19,7 @@
 
         // Если мемов нет, показываем сообщение и выходим
         if (TOTAL_IMAGES === 0) {
-            container.innerHTML = '<p>Вы ещё не сохранили ни одного мема</p>';
+            container.innerHTML = '<p class="empty-message">Вы ещё не сохранили ни одного мема</p>';
             document.querySelector('.nav-icon.left').classList.add('disabled');
             document.querySelector('.nav-icon.right').classList.add('disabled');
             return;
@@ -30,6 +30,9 @@
         const end = Math.min(start + IMAGES_PER_PAGE, TOTAL_IMAGES);
 
         for (let i = start; i < end; i++) {
+            const meme = memes[i];
+            if (!meme || !meme.id || !meme.image_url) continue;
+
             const link = document.createElement('a');
             link.href = `/users/selected_meme/${memes[i].id}/`;
             link.className = 'mem-item';

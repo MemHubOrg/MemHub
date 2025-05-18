@@ -6,98 +6,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
     <title>Панель администратора</title>
     {% load static %}
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-        }
+    <link rel="stylesheet" href="{% static 'adminpanel/styles.css' %}">
 
-        .logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 100px;
-        }
-
-        h2 {
-            color: #fff;
-            text-align: center;
-            font-size: 28px;
-            margin-top: 20px;
-        }
-
-        .admin-panel {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .admin-left {
-            width: 25%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .admin-left button {
-            padding: 15px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #ED9E1D;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-
-        .admin-right {
-            width: 70%;
-            padding: 20px;
-            border-left: 2px solid #ccc;
-        }
-
-        .table-wrapper {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th, table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            color: white;
-        }
-
-        table th {
-            background-color: #333;
-        }
-
-        table td {
-            background-color: #222;
-        }
-
-        tr {
-            cursor: pointer;
-        }
-
-        tr:hover {
-            background-color: #333;
-        }
-
-        tr.selected td {
-            color: #ED9E1D;
-        }
-
-    </style>
 </head>
 <body>
     {% csrf_token %}
@@ -150,7 +60,7 @@
         </div>
 
     </div>
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         window.selectedUsername = null;
 
         const rows = document.querySelectorAll('tr.user-row');
@@ -163,8 +73,8 @@
         });
     </script>
 
-    <script>
-        const rows = document.querySelectorAll('tr.user-row');
+    <script nonce="{{ request.csp_nonce }}">
+<!--        const rows = document.querySelectorAll('tr.user-row');-->
 
         rows.forEach(row => {
             row.addEventListener('click', () => {
@@ -174,13 +84,13 @@
         });
     </script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         document.getElementById('editTemplatesBtn').addEventListener('click', () => {
             window.location.href = '/adminpanel/templates/';
         });
     </script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         document.getElementById('button1').addEventListener('click', () => {
 
             if (!window.selectedUsername) {
@@ -202,7 +112,7 @@
         });
     </script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         document.getElementById('button2').addEventListener('click', () => {
             if (!window.selectedUsername) {
                 alert("Выберите пользователя");
@@ -223,7 +133,7 @@
         });
     </script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -240,7 +150,7 @@
     }
     </script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
     document.getElementById('button3').addEventListener('click', () => {
         if (!window.selectedUsername) {
             alert("Выберите пользователя");
@@ -261,7 +171,7 @@
     });
     </script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         document.getElementById('button4').addEventListener('click', () => {
             window.location.href = 'http://109.68.215.67:3000';
         });

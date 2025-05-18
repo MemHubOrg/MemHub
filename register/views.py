@@ -37,14 +37,13 @@ from rest_framework_simplejwt.tokens import AccessToken
 # For fail2ban
 logger_auth = logging.getLogger('django.security.Authentication')
 
-EXTERNAL_API_IP = "192.168.0.153"
+EXTERNAL_API_IP = "192.168.0.6"
 
 def index(request):
     templates = Template.objects.all()
     return render(
         request, 'register/index.html', 
-        {'templates': templates}, 
-        {'csp_nonce': request.csp_nonce}
+        {'templates': templates}
     )
 
 def health_check(request):

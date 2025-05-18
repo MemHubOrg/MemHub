@@ -26,22 +26,15 @@
                 
                 <button type="button" id="sendCodeBtn" class="action-btn send-code-btn">Отправить код повторно</button>
                 <button type="button" id="verifyCodeBtn" class="action-btn verify-code-btn">Войти</button>
-                <p id="codeError" style="
-                    color: grey; 
-                    font-size: 16px;
-                    padding: 0px; 
-                    text-align: center;">
-                    Если вам не приходит код, проверьте, инициализирован ли диалог с ботом 
-                    <a href="https://t.me/LFS_Auth_Bot" 
-                        target="_blank" 
-                        style="color: blue; text-decoration: underline;">здесь
-                    </a>.
+                <p id="codeError" class="code-error">
+                    Если вам не приходит код, проверьте, инициализирован ли диалог с ботом
+                    <a href="https://t.me/LFS_Auth_Bot" target="_blank" class="code-error-link">здесь</a>.
                 </p>
             </div>
-            <p id="statusMessage" style="text-align: center; font-size: 16px; color: red;"></p>
+            <p id="statusMessage" class="status-message"></p>
         </form>
     </div>
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         {% if username %}
             sessionStorage.setItem("username", "{{ username }}");
         {% endif %}
@@ -122,7 +115,7 @@
         });
     </script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         document.querySelector("input[name='telegram_code']").addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();

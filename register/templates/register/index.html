@@ -34,8 +34,8 @@
         <main class="main-content">
 
             <div class="button-row">
-                <button id="btn-create" class="main-btn active-btn" onclick="switchSection('create')">Создание мема</button>
-                <button id="btn-templates" class="main-btn" onclick="switchSection('templates')">Шаблоны</button>
+                <button id="btn-create" class="main-btn active-btn">Создание мема</button>
+                <button id="btn-templates" class="main-btn">Шаблоны</button>
             </div>
 
             <div class="howto-section">
@@ -53,7 +53,7 @@
                         <div id="dropzone" class="upload-inner">
                             <p class="upload-title">Перетащите изображение сюда</p>
                             <p class="upload-subtitle">Или нажмите, чтобы выбрать изображение</p>
-                            <input type="file" id="fileInput" accept="image/*" style="display:none">
+                            <input type="file" id="fileInput" accept="image/*" class="hidden-input">
                             <div id="preview"></div>
                             <button type="button" class="upload-btn" id="customBtn">Выбрать файл</button>
                             <p class="upload-note">Максимальный размер файла 100 MB</p>
@@ -63,7 +63,7 @@
                             <div class="upload-icons-left">
                                 <img src="{% static 'register/add_pic_icon.svg' %}" alt="" id="addImageBtn" class="disabled-btn">
                                 <img src="{% static 'register/add_text_icon.svg' %}" alt="" id="addTextBtn" class="disabled-btn">
-                                <input type="file" id="image-input" accept="image/*" style="display: none;" />
+                                <input type="file" id="image-input" accept="image/*" class="hidden-input">
                             </div>
                             <div class="upload-icons-right">
                                 {% if user.is_authenticated %}
@@ -77,7 +77,7 @@
                 </div>
             </div>
 
-            <div id="section-templates" class="section-templates" style="display: none;">
+            <div id="section-templates" class="section-templates hidden-input">
                 <div class="howto-section">
                     <p class="howto-title">Шаблоны</p>
 
@@ -92,7 +92,7 @@
                             <div class="template-item">
                                 <img src="{{ template.image_url }}" alt="">
                                 <button class="template-action-btn"
-                                        onclick="selectTemplate('{{ template.image_url }}')">
+                                        data-image-url="{{ template.image_url }}">
                                     Сделать мем
                                 </button>
                             </div>
@@ -104,11 +104,11 @@
         </main>
     </div>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
     </script>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         function switchSection(section) {
             document.getElementById('section-create').style.display = 'none';
             document.getElementById('section-templates').style.display = 'none';
@@ -122,9 +122,11 @@
             document.getElementById('btn-create').style.backgroundColor = section === 'templates' ? '#ED9E1D' : '#999';
             document.getElementById('btn-templates').style.backgroundColor = section === 'create' ? '#ED9E1D' : '#999';
         }
+        document.getElementById("btn-create").addEventListener("click", () => switchSection("create"));
+        document.getElementById("btn-templates").addEventListener("click", () => switchSection("templates"));
     </script>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         const sendToTelegram = document.getElementById('sendToTelegram');
         if (sendToTelegram) {
             sendToTelegram.addEventListener('click', sendToTelegramfunc);
@@ -236,11 +238,9 @@
         }
     </script>
 
-    <script nonce="{{ csp_nonce }}">
-        src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
      
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         const downloadBtn = document.getElementById('downloadBtn');
         if (downloadBtn) {
             downloadBtn.addEventListener('click', downloadImage);
@@ -302,7 +302,7 @@
         };
     </script>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         const addImageBtn = document.getElementById('addImageBtn');
         const addTextBtn = document.getElementById('addTextBtn');
         const uploadFrame = document.querySelector('.upload-inner');
@@ -558,7 +558,7 @@
         });
     </script>
     
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         const fileInput = document.getElementById('fileInput');
         const customBtn = document.getElementById('customBtn');
         const preview = document.getElementById('preview');
@@ -631,7 +631,7 @@
         }
     </script>
 
-     <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         document.addEventListener("DOMContentLoaded", async function () {
             const imageUrl = sessionStorage.getItem("selected_template");
             if (imageUrl) {
@@ -659,14 +659,14 @@
         });
     </script>
 
-   <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
         function selectTemplate(imageUrl) {
             sessionStorage.setItem("selected_template", imageUrl);
             window.location.href = "/";
         }
     </script>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
     document.querySelector('.template-search-btn').addEventListener('click', () => {
         const input = document.querySelector('.template-search-input');
         const query = input.value.trim();
@@ -678,22 +678,33 @@
                 grid.innerHTML = "";
 
                 data.forEach(template => {
-                    const item = document.createElement('div');
-                    item.classList.add('template-item');
+<!--                    const item = document.createElement('div');-->
+<!--                    item.classList.add('template-item');-->
 
-                    item.innerHTML = `
-                        <img src="${template.imageUrl}" alt="">
-                        <button class="template-action-btn" onclick="selectTemplate('${template.imageUrl}')">
-                            Сделать мем
-                        </button>
-                    `;
+<!--                    item.innerHTML = `-->
+<!--                        <img src="${template.imageUrl}" alt="">-->
+<!--                        <button class="template-action-btn" onclick="selectTemplate('${template.imageUrl}')">-->
+<!--                            Сделать мем-->
+<!--                        </button>-->
+<!--                    `;-->
+                    const img = document.createElement("img");
+                    img.src = template.imageUrl;
+
+                    const button = document.createElement("button");
+                    button.className = "template-action-btn";
+                    button.textContent = "Сделать мем";
+                    button.dataset.imageUrl = template.imageUrl;
+                    button.addEventListener("click", () => selectTemplate(template.imageUrl));
+
+                    item.appendChild(img);
+                    item.appendChild(button);
                     grid.appendChild(item);
                 });
             });
     });
     </script>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
     document.querySelector('.template-search-input').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -702,7 +713,7 @@
     });
     </script>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
     document.querySelector('.template-clear-btn').addEventListener('click', () => {
         const input = document.querySelector('.template-search-input');
         input.value = '';
@@ -714,22 +725,33 @@
                 grid.innerHTML = "";
 
                 data.forEach(template => {
-                    const item = document.createElement('div');
-                    item.classList.add('template-item');
+<!--                    const item = document.createElement('div');-->
+<!--                    item.classList.add('template-item');-->
 
-                    item.innerHTML = `
-                        <img src="${template.imageUrl}" alt="">
-                        <button class="template-action-btn" onclick="selectTemplate('${template.imageUrl}')">
-                            Сделать мем
-                        </button>
-                    `;
-                    grid.appendChild(item);
+<!--                    item.innerHTML = `-->
+<!--                        <img src="${template.imageUrl}" alt="">-->
+<!--                        <button class="template-action-btn" onclick="selectTemplate('${template.imageUrl}')">-->
+<!--                            Сделать мем-->
+<!--                        </button>-->
+<!--                    `;-->
+<!--                    grid.appendChild(item);-->
+                    const img = document.createElement("img");
+                    img.src = template.imageUrl;
+
+                    const button = document.createElement("button");
+                    button.className = "template-action-btn";
+                    button.textContent = "Сделать мем";
+                    button.dataset.imageUrl = template.imageUrl;
+                    button.addEventListener("click", () => selectTemplate(template.imageUrl));
+
+                    item.appendChild(img);
+                    item.appendChild(button);
                 });
             });
     });
     </script>
 
-    <script nonce="{{ csp_nonce }}">
+    <script nonce="{{ request.csp_nonce }}">
     document.addEventListener("DOMContentLoaded", () => {
         const deleteBtn = document.getElementById('deleteBtn');
         if (deleteBtn) {
@@ -771,31 +793,24 @@
     });
     </script>
 
-<div id="loading-spinner" style="
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.4);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-">
-    <div style="
-            width: 60px;
-            height: 60px;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-    "></div>
+    <script nonce="{{ request.csp_nonce }}">
+    document.querySelectorAll('.template-action-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const imageUrl = button.dataset.imageUrl;
+            selectTemplate(imageUrl);
+        });
+    });
+    </script>
+
+<div id="loading-spinner">
+    <div></div>
 </div>
 
-<style>
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-</style>
+<!--<style>-->
+<!--@keyframes spin {-->
+<!--    0% { transform: rotate(0deg); }-->
+<!--    100% { transform: rotate(360deg); }-->
+<!--}-->
+<!--</style>-->
 </body>
 </html>

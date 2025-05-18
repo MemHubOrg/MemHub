@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from csp.constants import NONCE
 
 # Для блокировки MIME-спуфинга.
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -114,9 +115,11 @@ INSTALLED_APPS = [
     'captcha',
     'adminpanel',
     'storages',
+    'csp'
 ]
 
 MIDDLEWARE = [
+    'csp.middleware.CSPMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -127,7 +130,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'myproject.middleware.NoCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    # 'django.middleware.security.ContentSecurityPolicyMiddleware',
+    # 'myproject.middleware.ContentSecurityPolicyMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -238,3 +241,34 @@ SWAGGER_SETTINGS = {
 }
 
 CSRF_COOKIE_HTTPONLY = True
+
+# CONTENT_SECURITY_POLICY = {
+#     "DIRECTIVES": {
+#         "default-src": ["'self'"],
+#         "script-src": ["'self'", "https://cdn.jsdelivr.net", "'nonce-%nonce%'"],
+#         "style-src": ["'self'", "https://fonts.googleapis.com", "'nonce-%nonce%'"],
+#         "img-src": ["'self'", "https://storage.yandexcloud.net"],
+#         "font-src": ["https://fonts.gstatic.com"],
+#     }
+# }
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ["'self'"],
+        "script-src": ["'self'", "https://cdn.jsdelivr.net", NONCE],
+        "style-src": [
+            "'self'",
+            "https://fonts.googleapis.com",
+            NONCE,
+            "'unsafe-hashes'",
+            # "sha256-UP0QZg7irvSMvOBz9mH2PIIE28+57UiavRfeVea0l3g=",
+            # "sha256-nGS6+RzPP7HYLJTNbJVek21iB/evton+WVBYX0Nvq/I=",
+        ],
+        "img-src": ["'self'", "https://storage.yandexcloud.net", "data:"],
+        "font-src": ["https://fonts.gstatic.com"],
+        "connect-src": ["'self'", "https://storage.yandexcloud.net"],
+    }
+}
+
+SECURE_HSTS_SECONDS = 31536000  # 1 год
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True

@@ -468,3 +468,10 @@ button.register {
 .mem-item:hover .share-btn {
     opacity: 1;
 }
+
+.empty-message {
+    color: white;
+    font-size: 18px;
+    opacity: 1;
+    margin: 20px 0;
+}

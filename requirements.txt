@@ -13,3 +13,4 @@ boto3
 django-storages
 docker
 django-ipware
+django-csp
