@@ -313,8 +313,6 @@ class CustomTokenView(TokenObtainPairView):
      )
      def post(self, request, *args, **kwargs):
          return super().post(request, *args, **kwargs)
-<<<<<<< HEAD
-=======
 
 @csrf_exempt
 def check_password_reset_flag(request):
@@ -336,4 +334,3 @@ def check_password_reset_flag(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
->>>>>>> develop

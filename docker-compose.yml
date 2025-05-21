@@ -124,7 +124,7 @@ services:
         loki-url: "http://109.68.215.67:3100/loki/api/v1/push"
         loki-external-labels: "container=telegram_bot"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health"]
+      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health/"]
       # test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
