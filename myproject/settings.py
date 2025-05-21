@@ -18,13 +18,13 @@ from csp.constants import NONCE
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Server
-# USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_HOST = True
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'http')
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# USE_X_FORWARDED_PORT = True
-# SECURE_SSL_REDIRECT = True  # Перенаправлять HTTP → HTTPS (если Nginx не сделал)
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_PORT = True
+SECURE_SSL_REDIRECT = True  # Перенаправлять HTTP → HTTPS (если Nginx не сделал)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Yandex storage
 AWS_ACCESS_KEY_ID = "YCAJEViHoPprYN0Cq-b91mg3y"
@@ -115,7 +115,8 @@ INSTALLED_APPS = [
     'captcha',
     'adminpanel',
     'storages',
-    'csp'
+    'csp',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'myproject.middleware.NoCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
     # 'myproject.middleware.ContentSecurityPolicyMiddleware',
 ]
 
@@ -245,30 +247,44 @@ CSRF_COOKIE_HTTPONLY = True
 # CONTENT_SECURITY_POLICY = {
 #     "DIRECTIVES": {
 #         "default-src": ["'self'"],
-#         "script-src": ["'self'", "https://cdn.jsdelivr.net", "'nonce-%nonce%'"],
-#         "style-src": ["'self'", "https://fonts.googleapis.com", "'nonce-%nonce%'"],
-#         "img-src": ["'self'", "https://storage.yandexcloud.net"],
+#         "script-src": ["'self'", "https://cdn.jsdelivr.net", NONCE],
+#         "style-src": [
+#             "'self'",
+#             "https://fonts.googleapis.com",
+#             NONCE,
+#             "'unsafe-hashes'",
+#             # "sha256-UP0QZg7irvSMvOBz9mH2PIIE28+57UiavRfeVea0l3g=",
+#             # "sha256-nGS6+RzPP7HYLJTNbJVek21iB/evton+WVBYX0Nvq/I=",
+#         ],
+#         "img-src": ["'self'", "https://storage.yandexcloud.net", "data:"],
 #         "font-src": ["https://fonts.gstatic.com"],
+#         "connect-src": ["'self'", "https://storage.yandexcloud.net"],
 #     }
 # }
+
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ["'self'"],
-        "script-src": ["'self'", "https://cdn.jsdelivr.net", NONCE],
+        # "script-src": ["'self'", "https://cdn.jsdelivr.net", NONCE],
+        "script-src": ["'strict-dynamic'", NONCE, "'unsafe-inline'"],
         "style-src": [
             "'self'",
             "https://fonts.googleapis.com",
-            NONCE,
-            "'unsafe-hashes'",
-            # "sha256-UP0QZg7irvSMvOBz9mH2PIIE28+57UiavRfeVea0l3g=",
-            # "sha256-nGS6+RzPP7HYLJTNbJVek21iB/evton+WVBYX0Nvq/I=",
+            NONCE,  # безопасно, если вы его используете в шаблоне
         ],
         "img-src": ["'self'", "https://storage.yandexcloud.net", "data:"],
         "font-src": ["https://fonts.gstatic.com"],
         "connect-src": ["'self'", "https://storage.yandexcloud.net"],
+        "form-action": ["'self'"],
+        "frame-ancestors": ["'none'"],
+        "base-uri": ["'self'"],
     }
 }
-
 SECURE_HSTS_SECONDS = 31536000  # 1 год
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "https://memhubpoly.ru",
+]

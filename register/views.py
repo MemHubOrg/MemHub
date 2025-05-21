@@ -37,7 +37,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 # For fail2ban
 logger_auth = logging.getLogger('django.security.Authentication')
 
-EXTERNAL_API_IP = "192.168.0.6"
+EXTERNAL_API_IP = "109.68.215.67"
 
 def index(request):
     templates = Template.objects.all()

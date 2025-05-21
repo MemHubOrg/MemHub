@@ -8,10 +8,6 @@ def create_initial_templates(sender, **kwargs):
         return
     urls = [
         'https://storage.yandexcloud.net/memhub.bucket/templates/placeholder_pic.png',
-        'https://storage.yandexcloud.net/memhub.bucket/templates/placeholder_pic2.png',
-        'https://storage.yandexcloud.net/memhub.bucket/templates/placeholder_pic3.png',
-        'https://storage.yandexcloud.net/memhub.bucket/templates/placeholder_pic4.png',
-        'https://storage.yandexcloud.net/memhub.bucket/templates/placeholder_pic5.png',
     ]
 
     for url in urls:

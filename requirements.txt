@@ -14,3 +14,4 @@ django-storages
 docker
 django-ipware
 django-csp
+django-cors-headers

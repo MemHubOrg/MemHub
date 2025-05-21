@@ -11,8 +11,8 @@ services:
       POSTGRES_USER: django_user
       POSTGRES_PASSWORD: django_password
       POSTGRES_DB: django_db
-      POSTGRES_HOST: "localhost"
-      # POSTGRES_HOST: "109.68.215.67"
+      # POSTGRES_HOST: "localhost"
+      POSTGRES_HOST: "109.68.215.67"
     ports:
       - "5431:5432"
     healthcheck:
@@ -50,8 +50,8 @@ services:
       - POSTGRES_USER=django_user
       - POSTGRES_PASSWORD=django_password
     healthcheck:
-      # test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health/"]
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health/"]
+      # test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -76,8 +76,8 @@ services:
       - db
       - web
     healthcheck:
-      # test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health/"]
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health/"]
+      # test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -101,8 +101,8 @@ services:
       - web
       - api
     healthcheck:
-      # test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health"]
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health"]
+      # test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3

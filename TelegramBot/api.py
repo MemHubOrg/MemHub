@@ -7,12 +7,13 @@ from flask import Flask, request, jsonify
 from TeleBot import Bot
 
 app = Flask(__name__)
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Инициализация бота
-TOKEN = '7912191924:AAFX18u5GXj0vP1HWc0yk1Keoqx4O6XgeJ0'
-# TOKEN = '7728653033:AAGLTd8eFy8XR8CNEHaHiR0O0ZJU4o-hMfI'
+# TOKEN = '7912191924:AAFX18u5GXj0vP1HWc0yk1Keoqx4O6XgeJ0'
+TOKEN = '7728653033:AAGLTd8eFy8XR8CNEHaHiR0O0ZJU4o-hMfI'
 # TOKEN = '7958894633:AAGtpGxa9CSIyGLOeobjdEwWhOcCQS7V0Qs'
 
 bot = Bot(token=TOKEN)
@@ -41,13 +42,6 @@ def send_meme():
 
         # Отправка в Telegram
         response = bot.send_sticker(chat_id, buffer)
-
-        # url = f'https://api.telegram.org/bot{TOKEN}/sendPhoto'
-        # response = requests.post(url, data={
-        #     'chat_id': chat_id,
-        #     'photo': image_url,
-        #     'caption': 'Вот твой мем!'
-        # })
 
         if response:
             return jsonify({'success': True}), 200
