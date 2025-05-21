@@ -11,6 +11,7 @@ services:
       POSTGRES_USER: django_user
       POSTGRES_PASSWORD: django_password
       POSTGRES_DB: django_db
+      # POSTGRES_HOST: "localhost"
       POSTGRES_HOST: "109.68.215.67"
     ports:
       - "5431:5432"
@@ -32,6 +33,8 @@ services:
               python manage.py collectstatic --no-input &&
               python manage.py makemigrations &&
               python manage.py makemigrations backend &&
+              python manage.py makemigrations adminpanel &&
+              python manage.py makemigrations users &&
               python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"
     volumes:
@@ -39,6 +42,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      # - db
       db:
         condition: service_healthy
     environment:
@@ -54,6 +58,12 @@ services:
       options:
         loki-url: "http://109.68.215.67:3100/loki/api/v1/push"
         loki-external-labels: "container=django_app"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health/"]
+      # test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   api:
     build: .
@@ -81,6 +91,12 @@ services:
       options:
         loki-url: "http://109.68.215.67:3100/loki/api/v1/push"
         loki-external-labels: "container=telegram_bot_api"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health/"]
+      # test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   bot:
     build: .
@@ -107,6 +123,41 @@ services:
       options:
         loki-url: "http://109.68.215.67:3100/loki/api/v1/push"
         loki-external-labels: "container=telegram_bot"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://109.68.215.67:8000/health"]
+      # test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  monitor:
+    build: 
+      context: .
+      dockerfile: monitor/Dockerfile
+    container_name: monitor
+    restart: always
+    depends_on:
+      bot:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    environment:
+      - TELEGRAM_BOT_TOKEN=7912191924:AAFX18u5GXj0vP1HWc0yk1Keoqx4O6XgeJ0
+      - TELEGRAM_CHAT_ID=1225145626
+      - S3_HEALTH_URL=https://storage.yandexcloud.net/memhub.bucket/healthcheck.txt
+      - DB_HOST=db
+      - DB_PORT=5432
+      - POSTGRES_DB=django_db
+      - POSTGRES_USER=django_user
+      - POSTGRES_PASSWORD=django_password
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+  
 volumes:
   postgres_data:

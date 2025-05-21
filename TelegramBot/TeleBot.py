@@ -1,13 +1,8 @@
 import pyotp
 import telebot
 import os
-from telebot import types
-import logging
 
 from DataBase import DB
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class Bot():
@@ -27,12 +22,17 @@ class Bot():
         @self.bot.message_handler(commands=['start'])
         def send_welcome(message):
             username = message.from_user.username
-            username_db = self.db.get_data("username", username)
+            chat_id = str(message.chat.id)
 
-            if username == username_db:
-                self.db.update_data(data=message.chat.id, username=username)
+            if not username:
+                self.bot.reply_to(message, "У вас не установлен username в Telegram.")
+                return
 
-            self.bot.reply_to(message, "Привет! Ваш chat ID: {}, username: {}".format(message.chat.id, username))
+            try:
+                self.db.create_user_with_chat_id(username=username, chat_id=chat_id)
+                self.bot.reply_to(message, f"Привет, {username}! Ваш chat ID: {chat_id}")
+            except Exception as e:
+                self.bot.reply_to(message, f"Ошибка: {e}")
 
         @self.bot.message_handler(func=lambda message: True)
         def send_code(message):
@@ -49,6 +49,9 @@ class Bot():
 
     def send_verification_code(self, chat_id: str, code: str) -> None:
         self.bot.send_message(chat_id, f"Ваш код верификации: {code}")
+    
+    def send_sticker(self, chat_id: str, sticker):
+        return self.bot.send_sticker(chat_id=chat_id, sticker=sticker)
 
     def generate_code(self, secret: str) -> str:
         totp = pyotp.TOTP(secret, interval=300)

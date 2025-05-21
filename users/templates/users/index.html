@@ -9,8 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <!-- Шапка -->
     <header class="header">
         <img src="{% static 'register/header_bg.png' %}" alt="Фон шапки" class="header-bg">
         <div class="header-content">
@@ -29,20 +27,16 @@
         {% endif %}
     </header>
 
-    <!-- Серая линия-разделитель -->
     <div class="divider"></div>
 
-    <!-- Основной контент -->
     <div class="main-content-wrapper">
         <main class="main-content">
 
-            <!-- Кнопки -->
             <div class="button-row">
                 <button class="main-btn">Создание мема ЁУ АКА ВОТ ВАМ ДВА КОЛПАКА ТЕСТИРУЕМ CI/CD</button>
                 <button class="main-btn">Шаблоны А КАК НАСЧЁТ КОТИКОВ? ТЕСТИРУЕМ CI/CD</button>
             </div>
 
-            <!-- Раздел "Как сделать мем" -->
             <div class="howto-section">
                 <p class="howto-title">Как сделать мем А ЕЩЁ ТЕСТИРУЕМ CI/CD</p>
                 <div class="howto-gallery">
@@ -52,7 +46,6 @@
                 </div>
             </div>
 
-            <!-- Зона загрузки -->
             <div class="upload-wrapper">
                 <div class="upload-frame">
                     <div class="upload-inner">
@@ -68,9 +61,7 @@
                             <img src="{% static 'users/add_text_icon.svg' %}" alt="">
                         </div>
                         <div class="upload-icons-right">
-                            {% if user.is_authenticated %}
-                                <img src="{% static 'users/telegram_icon.svg' %}" alt="">
-                            {% endif %}
+                            <img src="{% static 'users/telegram_icon.svg' %}" alt="">
                             <img src="{% static 'users/download_icon.svg' %}" alt="">
                         </div>
                     </div>

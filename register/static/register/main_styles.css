@@ -16,6 +16,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: brightness(0.5);
 }
 
 .header-content {
@@ -116,6 +117,7 @@ body {
 .upload-wrapper {
     width: 100%;
     margin-bottom: 60px;
+    position: relative;
 }
 
 .upload-frame {
@@ -141,11 +143,20 @@ body {
 }
 
 .upload-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* вот это даст вертикальный центр */
     border: 3px dashed #ED9E1D;
     border-radius: 15px;
-    text-align: center;
     padding: 40px 20px;
     margin-top: 40px;
+    text-align: center;
+}
+
+.upload-inner.dragover {
+    border-color: #333;
+    background-color: #2e2e2e;
 }
 
 .upload-title {
@@ -187,6 +198,15 @@ body {
     background-color: transparent;
 }
 
+.trash-icon {
+    position: absolute;
+    bottom: -20px; /* Сдвигаем вниз за рамку */
+    right: 10px; /* В правый угол */
+    width: 30px; /* Размер иконки */
+    height: 30px; /* Размер иконки */
+}
+
+
 .hide-ui .rotate-btn,
 .hide-ui .remove-btn {
     display: none !important;
@@ -212,11 +232,12 @@ body {
 }
 
 .howto-item {
-    flex: 1;
-    aspect-ratio: 1/1;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    display: block;
     border: 2px dashed #ED9E1D;
     border-radius: 10px;
-    overflow: hidden;
 }
 
 .howto-item img {
@@ -225,4 +246,138 @@ body {
     object-fit: cover;
 }
 
+.section-create,
+.section-templates {
+    width: 100%;
+    margin: 0 auto;
+}
 
+/* Активная кнопка */
+.active-btn {
+    background-color: #444;
+    color: white;
+    cursor: default;
+}
+
+/* Cтиль для неактивных кнопок */
+.disabled-btn {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Поиск шаблонов */
+.template-search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.template-search-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+}
+
+.template-search-btn,
+.template-clear-btn {
+    background-color: #ED9E1D;
+    color: #121212;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Сетка шаблонов */
+.template-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.template-item {
+    max-width: 200px;
+    max-height: 200px;
+    background-color: #2e2e2e;
+    border: 2px dashed #ED9E1D;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.template-item img {
+    flex-grow: 1;
+    max-width: 100%;
+    max-height: calc(200px - 50px); /* оставляем место под кнопку */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+.template-action-btn {
+    height: 30px;
+    background-color: #ED9E1D;
+    color: #121212;
+    border: none;
+    width: 100%;
+    font-size: 14px;
+    cursor: pointer;
+    border-top: 1px solid #444;
+}
+
+@media {
+    .header-logo {
+        height: 30px;
+    }
+
+    .header-title {
+        font-size: 18px;  /* Уменьшаем размер текста */
+    }
+
+    .profile-icon img {
+        width: 40px;  /* Уменьшаем размер иконки профиля */
+        height: 40px;  /* Уменьшаем размер иконки профиля */
+    }
+
+    .header-login-btn {
+        font-size: 14px;  /* Уменьшаем шрифт кнопки "Вход" */
+    }
+}
+
+.trash-icon {
+    cursor: pointer;
+}
+
+#loading-spinner {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+#loading-spinner > div {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hidden-input {
+    display: none;
+}

@@ -12,11 +12,31 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from csp.constants import NONCE
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Для определения HTTPS
+# Для блокировки MIME-спуфинга.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Server
+USE_X_FORWARDED_HOST = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'http')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_PORT = True
 SECURE_SSL_REDIRECT = True  # Перенаправлять HTTP → HTTPS (если Nginx не сделал)
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+# Yandex storage
+AWS_ACCESS_KEY_ID = "YCAJEViHoPprYN0Cq-b91mg3y"
+AWS_SECRET_ACCESS_KEY = "YCMXK2KDXlqsC94VelxbzzqdoXnQ5TK4BWfAsJaH"
+AWS_STORAGE_BUCKET_NAME = 'memhub.bucket'
+AWS_S3_ENDPOINT_URL = 'https://storage.yandexcloud.net'
+
+# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.storage.yandexcloud.net'
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_ADDRESSING_STYLE = "path"
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,14 +51,33 @@ SECRET_KEY = 'django-insecure-33oz0vhql=z2bytl=*twl^)zrg$hu!-)#=b&xxv(()4y!oh0@2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru","109.68.215.67", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "www.memhubpoly.ru", "memhubpoly.ru", "login.memhubpoly.ru", "109.68.215.67",
+    "localhost", "127.0.0.1", "172.20.10.4", "192.168.0.104", "192.168.0.6", "192.168.0.153",
+    "nginx"
+]
+
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOG_DIR, exist_ok=True)
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {asctime} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+        },
+        'auth_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'auth.log'),
+            'formatter': 'simple',
         },
     },
     'loggers': {
@@ -50,6 +89,11 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
+        },
+        'django.security.Authentication': {
+            'handlers': ['auth_file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }
@@ -69,9 +113,14 @@ INSTALLED_APPS = [
     'backend',
     'drf_yasg',
     'captcha',
+    'adminpanel',
+    'storages',
+    'csp',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'csp.middleware.CSPMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,6 +129,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'myproject.middleware.NoCacheMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
+    # 'myproject.middleware.ContentSecurityPolicyMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -95,6 +148,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static'
             ],
         },
     },
@@ -112,7 +166,8 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', 'django_db'),
         'USER': os.getenv('POSTGRES_USER', 'django_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'django_password'),
-        'HOST': os.getenv('DB_HOST', 'db'), 
+        # 'HOST': os.getenv('DB_HOST', 'db'), 
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
@@ -165,13 +220,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'register.User'
 
-MEDIA_ROOT = 'media/'
-
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # Другие классы аутентификации, если нужно
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     ),
 }
  
@@ -185,3 +241,50 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+CSRF_COOKIE_HTTPONLY = True
+
+# CONTENT_SECURITY_POLICY = {
+#     "DIRECTIVES": {
+#         "default-src": ["'self'"],
+#         "script-src": ["'self'", "https://cdn.jsdelivr.net", NONCE],
+#         "style-src": [
+#             "'self'",
+#             "https://fonts.googleapis.com",
+#             NONCE,
+#             "'unsafe-hashes'",
+#             # "sha256-UP0QZg7irvSMvOBz9mH2PIIE28+57UiavRfeVea0l3g=",
+#             # "sha256-nGS6+RzPP7HYLJTNbJVek21iB/evton+WVBYX0Nvq/I=",
+#         ],
+#         "img-src": ["'self'", "https://storage.yandexcloud.net", "data:"],
+#         "font-src": ["https://fonts.gstatic.com"],
+#         "connect-src": ["'self'", "https://storage.yandexcloud.net"],
+#     }
+# }
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ["'self'"],
+        # "script-src": ["'self'", "https://cdn.jsdelivr.net", NONCE],
+        "script-src": ["'strict-dynamic'", NONCE, "'unsafe-inline'"],
+        "style-src": [
+            "'self'",
+            "https://fonts.googleapis.com",
+            NONCE,  # безопасно, если вы его используете в шаблоне
+        ],
+        "img-src": ["'self'", "https://storage.yandexcloud.net", "data:"],
+        "font-src": ["https://fonts.gstatic.com"],
+        "connect-src": ["'self'", "https://storage.yandexcloud.net"],
+        "form-action": ["'self'"],
+        "frame-ancestors": ["'none'"],
+        "base-uri": ["'self'"],
+    }
+}
+SECURE_HSTS_SECONDS = 31536000  # 1 год
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "https://memhubpoly.ru",
+]

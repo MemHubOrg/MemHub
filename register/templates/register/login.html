@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{% static 'register/styles.css' %}">
 </head>
 <body>
+    <img src="../../static/register/cat_lupa.png" alt="" class="bottom-left">
+    <img src="../../static/register/tapaem_homyaka.png" alt="" class="top-right">
+
     <a href="{% url 'index' %}" class="logo">
         <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип">
     </a>
@@ -20,19 +23,19 @@
             {% csrf_token %}
 
             <label>
-                {{ form.username }}  <!-- Django будет рендерить поле с классом и другими аттрибутами -->
+                {{ form.username }}
             </label>
             <label>
                 {{ form.password }}
             </label>
+            <div class="captcha-wrapper">
+                {{ form.captcha.image }}
+                {{ form.captcha }}
+            </div>
             <button type="submit">Войти</button>
             <button class="register" onclick="window.location.href='/register/'">Зарегистрироваться</button>
             {% if form.errors %}
-                <div class="error" style="color: red;
-                     font-size: 16px;
-                     padding: 0px;
-                     text-align: center;
-                     border: 1px solid black;">
+                <div class="error error-box">
                     {% for field in form %}
                         {% for error in field.errors %}
                             <p>{{ error }}</p>
@@ -42,8 +45,5 @@
             {% endif %}
         </form>
     </div>
-
-    <img src="../../static/register/cat_lupa.png" alt="" class="bottom-left">
-    <img src="../../static/register/tapaem_homyaka.png" alt="" class="top-right">
 </body>
 </html>

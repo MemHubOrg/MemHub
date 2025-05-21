@@ -4,14 +4,17 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    # path('register/', views.register, name='register'),
-    # path('login/', views.login, name='login'),
-    # path('verify-telegram-code/', views.verify_telegram_code, name="verify_telegram_code"),
-    # #path("check-telegram-user/", views.check_telegram_user, name="check_telegram_user"),
-    # path("send-telegram-code/", views.send_telegram_code, name="send_telegram_code"),
     path('profile/', views.profile, name='profile'),
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     path('change-password/', views.change_password_view, name='change_password'),
     path('my_memes/', views.my_memes_view, name='my_memes'),
-    path('selected_meme/<int:image_id>/', views.selected_meme_view, name='selected_meme')
+    path('selected_meme/<int:image_id>/', views.selected_meme_view, name='selected_meme'),
+    path('delete_meme/<int:meme_id>/', views.delete_meme, name='delete_meme'),
+    path("shared/<uuid:token>/", views.shared_meme_view, name="shared_meme"),
+    path("api/create-share-link/", views.create_temp_link, name="create_share_link"),
 ]
+
+handler404 = 'django.views.defaults.page_not_found'
+handler400 = 'django.views.defaults.bad_request'
+handler403 = 'django.views.defaults.permission_denied'
+handler500 = 'django.views.defaults.server_error'

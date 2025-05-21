@@ -1,39 +1,54 @@
+import requests
+import logging
+
+from PIL import Image
+from io import BytesIO
 from flask import Flask, request, jsonify
 from TeleBot import Bot
-import requests
 
 app = Flask(__name__)
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Инициализация бота
+# TOKEN = '7912191924:AAFX18u5GXj0vP1HWc0yk1Keoqx4O6XgeJ0'
 TOKEN = '7728653033:AAGLTd8eFy8XR8CNEHaHiR0O0ZJU4o-hMfI'
-#TOKEN = '7958894633:AAGtpGxa9CSIyGLOeobjdEwWhOcCQS7V0Qs'
+# TOKEN = '7958894633:AAGtpGxa9CSIyGLOeobjdEwWhOcCQS7V0Qs'
+
 bot = Bot(token=TOKEN)
 
 @app.route('/send_meme', methods=['POST'])
 def send_meme():
     try:
         chat_id = request.form.get('chat_id')
-        photo_file = request.files.get('file')
+        image_url = request.form.get('image_url')
 
-        if not chat_id or not photo_file:
-            return jsonify({'success': False, 'message': 'chat_id и файл обязательны'}), 400
+        if not chat_id or not image_url:
+            return jsonify({'success': False, 'message': 'chat_id и image_url обязательны'}), 400
+
+        # Скачиваем из S3
+        response = requests.get(image_url)
+        img = Image.open(BytesIO(response.content))
+
+        # Обрезаем и сжимаем до 512x512
+        img = img.convert("RGBA")
+        img.thumbnail((512, 512))
+
+        # Сохраняем во временный буфер в webp
+        buffer = BytesIO()
+        img.save(buffer, format="WEBP")
+        buffer.seek(0)
 
         # Отправка в Telegram
-        url = f'https://api.telegram.org/bot{TOKEN}/sendPhoto'
-        response = requests.post(url, data={
-            'chat_id': chat_id,
-            'caption': 'Вот твой мем!'
-        }, files={
-            'photo': (photo_file.filename, photo_file.stream, photo_file.mimetype)
-        })
+        response = bot.send_sticker(chat_id, buffer)
 
-        if response.status_code == 200:
+        if response:
             return jsonify({'success': True}), 200
         else:
             return jsonify({'success': False, 'message': response.text}), 500
 
     except Exception as e:
-        print(f"An error occurred: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/send_code', methods=['POST'])
@@ -41,20 +56,20 @@ def send_code():
     try:
         data = request.json
         username = data.get('username')
+        token = data.get('token')
 
-        secret = bot.db.get_data("secret", username)
         chat_id = bot.db.get_data("chat_id", username)
 
-        if not secret or not chat_id:
+        if not token or not chat_id:
             return jsonify({"status": "error", "message": "User not found"}), 404
 
-        verification_code = bot.generate_code(secret)
+        verification_code = bot.generate_code(token)
         bot.send_verification_code(chat_id, verification_code)
 
         return jsonify({"status": "success", "message": "Code sent"}), 200
-    except Exception as e:
-        print(f"An error occurred: {e}")
 
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8081)

@@ -25,3 +25,15 @@ Thumbs.db
 
 # Staticfiles
 staticfiles/
+
+# Migrations
+migrations/
+
+# script
+clean_project.sh
+docker-compose_nohealth.yml
+threats.md
+with_workers.txt
+
+# Logs
+logs/

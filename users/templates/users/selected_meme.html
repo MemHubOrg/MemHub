@@ -14,34 +14,112 @@
     </a>
 
     <div class="mem-block">
-        <h2>Личный кабинет</h2>
-        <h3 class="mem-section-title">Сохранённые мемы</h3>
 
         <div class="mem-detail-container">
             <div class="mem-detail-wrapper">
-                <img id="memImage" src="{% static meme_image_url %}" alt="Мем">
-
+                <img id="memImage" src="{{ meme_image_url }}" alt="Мем">
                 <div class="icon top-left">
-                    <img src="{% static 'users/download_icon.svg' %}" alt="Загрузка">
+                    <a href="#" id="downloadBtn">
+                        <img src="{% static 'users/download_icon.svg' %}" alt="Загрузка">
+                    </a>
                 </div>
                 <div class="icon top-right">
-                    <img src="{% static 'users/telegram_icon.svg' %}" alt="Телеграм">
+                    <a href="#" id="sendToTelegramBtn">
+                        <img src="{% static 'users/telegram_icon.svg' %}" alt="Телеграм">
+                    </a>
                 </div>
                 <div class="icon bottom-left">
-                    <a href="{% url 'my_memes' %}" class="icon bottom-left">
+                    <a href="{% url 'users:my_memes' %}" class="icon bottom-left">
                         <img src="{% static 'users/back_button.svg' %}" alt="Назад">
                     </a>
                 </div>
                 <div class="icon bottom-right">
-                    <img src="{% static 'users/edit_icon.svg' %}" alt="Редактирование">
+                    <a href="#" id="editBtn">
+                        <img src="{% static 'users/edit_icon.svg' %}" alt="Редактирование">
+                    </a>
                 </div>
             </div>
         </div>
-
     </div>
 
     <img src="{% static 'users/cat_lupa.png' %}" alt="" class="bottom-left">
     <img src="{% static 'users/tapaem_homyaka.png' %}" alt="" class="top-right">
 
+<script nonce="{{ request.csp_nonce }}">
+    document.getElementById("editBtn").addEventListener("click", function (event) {
+        event.preventDefault();
+
+        const imageUrl = "{{ meme_image_url|escapejs }}";
+        if (!imageUrl) {
+            console.error("URL изображения не задан");
+            return;
+        }
+
+        sessionStorage.setItem("selected_template", imageUrl);
+        window.location.href = "/";
+    });
+</script>
+
+<script nonce="{{ request.csp_nonce }}">
+    document.getElementById("sendToTelegramBtn").addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        const imageUrl = document.getElementById("memImage").src;
+
+        try {
+            const response = await fetch(imageUrl, { mode: 'cors' });
+            if (!response.ok) throw new Error("Не удалось загрузить изображение");
+
+            const blob = await response.blob();
+
+            const formData = new FormData();
+            formData.append("file", blob, "meme.png");
+
+            const tgResponse = await fetch("/send_meme_to_telegram/", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: formData
+            });
+
+            const data = await tgResponse.json();
+            if (data.success) {
+                alert("Мем успешно отправлен в Telegram!");
+            } else {
+                alert("Ошибка при отправке: " + (data.error || "неизвестная"));
+            }
+
+        } catch (err) {
+            alert("Произошла ошибка при отправке мема в Telegram.");
+        }
+    });
+</script>
+
+<script nonce="{{ request.csp_nonce }}">
+    document.getElementById("downloadBtn").addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        const imageUrl = document.getElementById("memImage").src;
+
+        try {
+            const response = await fetch(imageUrl, { mode: 'cors' });
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = "meme.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error("Ошибка при скачивании изображения:", error);
+            alert("Не удалось скачать изображение.");
+        }
+    });
+</script>
 </body>
 </html>

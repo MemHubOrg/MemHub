@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{% static 'register/styles.css' %}">
 </head>
 <body>
+    <img src="../../static/register/cat_lupa.png" alt="" class="bottom-left">
+    <img src="../../static/register/tapaem_homyaka.png" alt="" class="top-right">
+
     <a href="{% url 'index' %}" class="logo">
         <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип">
     </a>
@@ -16,16 +19,32 @@
     <div class="login-box">
         <h2>Личный кабинет</h2>
 
-        <button onclick="window.location.href='{% url 'users:change_password' %}'">Изменить пароль</button>
-        <button class="register" onclick="window.location.href='{% url 'users:my_memes' %}'">Мои сохранённые мемы</button>
+        <button id="changePasswordBtn">Изменить пароль</button>
+        <button class="register" id="myMemesBtn">Мои сохранённые мемы</button>
         
-        <form method="post" action="{% url 'logout' %}">
+        <form method="post" action="{% url 'logout' %}" onsubmit="removeTokens()">
             {% csrf_token %}
             <button type="submit" class="exit">Выход</button>
         </form>
     </div>
 
-    <img src="{% static 'register/cat_lupa.png' %}" alt="" class="bottom-left">
-    <img src="{% static 'register/tapaem_homyaka.png' %}" alt="" class="top-right">
+    <script nonce="{{ request.csp_nonce }}">
+        function removeTokens() {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+        }
+    </script>
+
+    <script nonce="{{ request.csp_nonce }}">
+        document.getElementById("myMemesBtn").addEventListener("click", function () {
+            window.location.href = "/users/my_memes/";
+        });
+    </script>
+
+    <script nonce="{{ request.csp_nonce }}">
+        document.getElementById("changePasswordBtn").addEventListener("click", function () {
+            window.location.href = "/users/change-password/";
+        });
+    </script>
 </body>
 </html>

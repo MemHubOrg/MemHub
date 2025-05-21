@@ -8,64 +8,61 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'users/styles.css' %}">
 </head>
-<script>
-    const TOTAL_IMAGES = 21;
+<script nonce="{{ request.csp_nonce }}">
     const IMAGES_PER_PAGE = 8;
+    const memes = JSON.parse('{{ memes_json|escapejs }}');
+    const TOTAL_IMAGES = memes.length;
     let currentPage = 0;
 
     function renderImages() {
-<<<<<<< HEAD
-    const container = document.getElementById('memGrid');
-    container.innerHTML = '';
-    const start = currentPage * IMAGES_PER_PAGE;
-    const end = Math.min(start + IMAGES_PER_PAGE, TOTAL_IMAGES);
-
-    for (let i = start; i < end; i++) {
-        const link = document.createElement('a');
-        link.href = `/selected_meme/${i + 1}/`;
-        link.className = 'mem-item';
-
-        const img = document.createElement('img');
-        img.src = "{% static 'users/placeholder_pic.png' %}";
-        img.alt = `Мем ${i + 1}`;
-
-        link.appendChild(img);
-        container.appendChild(link);
-    }
-
-    const leftArrow = document.querySelector('.nav-icon.left');
-    const rightArrow = document.querySelector('.nav-icon.right');
-
-    if (currentPage > 0) {
-        leftArrow.classList.remove('disabled');
-    } else {
-        leftArrow.classList.add('disabled');
-    }
-
-    if (end < TOTAL_IMAGES) {
-        rightArrow.classList.remove('disabled');
-    } else {
-        rightArrow.classList.add('disabled');
-    }
-}
-
-
-
-=======
         const container = document.getElementById('memGrid');
+
+        // Если мемов нет, показываем сообщение и выходим
+        if (TOTAL_IMAGES === 0) {
+            container.innerHTML = '<p class="empty-message">Вы ещё не сохранили ни одного мема</p>';
+            document.querySelector('.nav-icon.left').classList.add('disabled');
+            document.querySelector('.nav-icon.right').classList.add('disabled');
+            return;
+        }
+
         container.innerHTML = '';
         const start = currentPage * IMAGES_PER_PAGE;
         const end = Math.min(start + IMAGES_PER_PAGE, TOTAL_IMAGES);
 
         for (let i = start; i < end; i++) {
+            const meme = memes[i];
+            if (!meme || !meme.id || !meme.image_url) continue;
+
             const link = document.createElement('a');
-            link.href = `/selected_meme/${i + 1}/`;
+            link.href = `/users/selected_meme/${memes[i].id}/`;
             link.className = 'mem-item';
 
+            // картинка мема
             const img = document.createElement('img');
-            img.src = "{% static 'users/placeholder_pic.png' %}";
+            img.src = memes[i]['image_url'];
             img.alt = `Мем ${i + 1}`;
 
+            // крестик
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'delete-btn';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.addEventListener('click', function(event) {
+                event.preventDefault(); // чтобы не сработал переход по ссылке
+                deleteMeme(memes[i].id);
+            });
+
+            const shareBtn = document.createElement('span');
+            shareBtn.className = 'share-btn';
+            shareBtn.innerHTML = '🔗'; // или <img src="...">, если иконка
+            shareBtn.title = 'Поделиться';
+            shareBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                shareMeme(memes[i].id);
+            });
+
+            // добавляем крестик и картинку в блок
+            link.appendChild(shareBtn);
+            link.appendChild(closeBtn);
             link.appendChild(img);
             container.appendChild(link);
         }
@@ -86,7 +83,6 @@
         }
     }
 
->>>>>>> Vadim
     function nextPage() {
         const maxPage = Math.floor((TOTAL_IMAGES - 1) / IMAGES_PER_PAGE);
         if (currentPage < maxPage) {
@@ -102,31 +98,55 @@
         }
     }
 
+    function deleteMeme(id) {
+        if (!confirm("Удалить мем?")) return;
+
+        fetch(`/users/delete_meme/${id}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Удаляем из массива и перерисовываем
+                const index = memes.findIndex(m => m.id === id);
+                if (index !== -1) {
+                    memes.splice(index, 1);
+                    renderImages();
+                }
+            } else {
+                alert('Ошибка при удалении мема');
+            }
+        });
+    }
+    
+    async function shareMeme(id) {
+        try {
+            const response = await fetch("/users/api/create-share-link/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ meme_id: id })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                await navigator.clipboard.writeText(data.share_url);
+                alert("Ссылка скопирована!");
+            } else {
+                alert("Ошибка: " + (data.error || "неизвестная"));
+            }
+        } catch (err) {
+            console.error("Ошибка при создании ссылки:", err);
+            alert("Ошибка при создании ссылки");
+        }
+    }
+
     window.addEventListener('load', renderImages);
 </script>
 
-<<<<<<< HEAD
-    <body>
-        <a href="{% url 'index' %}" class="logo">
-            <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип">
-        </a>
-
-        <div class="mem-block">
-            <h2>Личный кабинет</h2>
-            <h3 class="mem-section-title">Сохранённые мемы</h3>
-
-            <div class="mem-container">
-                <div class="nav-icon left" onclick="prevPage()">&#10094;</div>
-
-                <div class="mem-grid" id="memGrid">
-                    <!-- Картинки-заглушки вставляются через JS -->
-                </div>
-
-                <div class="nav-icon right" onclick="nextPage()">&#10095;</div>
-            </div>
-        </div>
-
-=======
 <body>
     <a href="{% url 'index' %}" class="logo">
         <img src="{% static 'users/memhub_logo.svg' %}" alt="Логотип">
@@ -138,17 +158,14 @@
 
         <div class="mem-container">
             <div class="nav-icon left" onclick="prevPage()">&#10094;</div>
-
-            <div class="mem-grid" id="memGrid">
-                <!-- Картинки-заглушки вставляются через JS -->
-            </div>
-
+            <div class="mem-grid" id="memGrid"> </div>
             <div class="nav-icon right" onclick="nextPage()">&#10095;</div>
         </div>
     </div>
->>>>>>> Vadim
 
     <img src="{% static 'users/cat_lupa.png' %}" alt="" class="bottom-left">
     <img src="{% static 'users/tapaem_homyaka.png' %}" alt="" class="top-right">
 </body>
 </html>
+
+

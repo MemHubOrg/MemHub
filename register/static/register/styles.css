@@ -81,6 +81,7 @@ button.register {
 }
 
 .bottom-left, .top-right {
+    pointer-events: none;
     position: absolute;
     width: 350px;
 }
@@ -270,3 +271,76 @@ button.register {
     }
 }
 
+
+.captcha-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.captcha-wrapper img {
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    max-width: 100%;
+}
+
+.captcha-wrapper input {
+    width: 100%;
+    max-width: 280px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #999;
+}
+
+.error-box {
+    color: red;
+    font-size: 16px;
+    padding: 0;
+    text-align: center;
+    border: 1px solid black;
+}
+
+.code-error {
+    color: white;
+    font-size: 16px;
+    padding: 0;
+    text-align: center;
+}
+
+.code-error-link {
+    color: blue;
+    text-decoration: underline;
+}
+
+.status-message {
+    text-align: center;
+    font-size: 16px;
+    color: red;
+}
+
+.form-error {
+    color: red;
+    font-size: 16px;
+    padding: 0;
+    text-align: center;
+    border: 1px solid black;
+    margin-bottom: 10px;
+}
+
+.page-single-meme {
+    background-color: #121212;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    padding: 40px;
+}
+
+.page-single-meme img {
+    max-width: 90%;
+    border-radius: 15px;
+    border: 4px dashed #ED9E1D;
+    background: white;
+}

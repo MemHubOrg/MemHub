@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <title>Memhub – Вход</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'register/styles.css' %}">
+</head>
+<body>
+    <a href="{% url 'index' %}" class="logo">
+        <img src="{% static 'register/memhub_logo.svg' %}" alt="Логотип">
+    </a>
+
+    <div class="login-box">
+        <h2>Вход</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>
+                {{ form.login }}
+            </label>
+            <label>
+                {{ form.password }}
+            </label>
+            <button type="submit">Войти</button>
+            <button class="register" onclick="window.location.href='/register/'">Зарегистрироваться</button>
+            {% if form.errors %}
+                <div class="error" style="color: red;
+                     font-size: 16px;
+                     padding: 0px;
+                     text-align: center;
+                     border: 1px solid black;">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <img src="../../static/register/cat_lupa.png" alt="" class="bottom-left">
+    <img src="../../static/register/tapaem_homyaka.png" alt="" class="top-right">
+</body>
+</html>

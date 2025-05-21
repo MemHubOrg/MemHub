@@ -1,0 +1,131 @@
+body {
+    font-family: sans-serif;
+    background: #121212;
+    color: white;
+    padding: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #555;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #333;
+}
+
+img {
+    max-height: 100px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 4px;
+}
+
+button {
+    padding: 6px 12px;
+    margin-top: 4px;
+}
+
+.simple-upload-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ED9E1D;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.simple-upload-btn:hover {
+    background-color: #d18719;
+}
+
+.submit-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #45a045;
+}
+
+#localPreview img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.danger-btn {
+    background: red;
+    color: white;
+}
+
+.simple-upload-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ED9E1D;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.simple-upload-btn:hover {
+    background-color: #d18719;
+}
+
+.submit-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #45a045;
+}
+
+#localPreview img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.left-align {
+    text-align: left;
+}
+
+.local-preview {
+    margin-top: 15px;
+}
+
+.local-image-form{
+    margin-top: 10px;
+}
+
+.display-btn{
+    display: none;
+}

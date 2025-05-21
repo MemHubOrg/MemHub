@@ -256,6 +256,8 @@ button.register {
     user-select: none;
     padding: 0 10px;
     transition: transform 0.2s ease;
+    z-index: 10; /* ← поднимаем стрелку над котом */
+    position: relative; /* ← чтобы z-index сработал */
 }
 
 .nav-icon:hover {
@@ -264,6 +266,8 @@ button.register {
 
 .nav-icon.left {
     margin-right: 10px;
+    z-index: 10; /* ← поднимаем стрелку над котом */
+    position: relative; /* ← чтобы z-index сработал */
 }
 
 .nav-icon.right {
@@ -283,7 +287,9 @@ button.register {
 
 .mem-detail-wrapper {
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
     border: 1px solid #999;
     background-color: #f1f1f1;
@@ -324,10 +330,6 @@ button.register {
     height: 100%;
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> Vadim
 /* Адаптация под мобильные устройства */
 
 @media (max-width: 768px) {
@@ -402,3 +404,74 @@ button.register {
     }
 }
 
+.mem-item {
+    position: relative;
+    display: inline-block;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: red;
+    color: white;
+    font-size: 14px; /* меньше шрифт */
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px; /* по центру по вертикали */
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    pointer-events: auto;
+    box-shadow: 0 0 0 2px white; /* как обводка */
+}
+
+.mem-item:hover .delete-btn {
+    opacity: 1;
+}
+
+.share-icon {
+    position: absolute;
+    bottom: 10px;     /* выравнивание по низу — такое же, как у .bottom-right */
+    right: 60px;      /* сдвиг левее от редактирования (которая обычно стоит на right: 10px или 20px) */
+    width: 40px;
+    height: 40px;
+}
+
+.share-btn {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: #5cb85c; /* зелёный */
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    pointer-events: auto;
+    box-shadow: 0 0 0 2px white;
+}
+
+.mem-item:hover .share-btn {
+    opacity: 1;
+}
+
+.empty-message {
+    color: white;
+    font-size: 18px;
+    opacity: 1;
+    margin: 20px 0;
+}

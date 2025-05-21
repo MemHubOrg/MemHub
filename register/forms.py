@@ -22,11 +22,14 @@ class LoginForm(forms.Form):
         required=True,
         label='Пароль'
     )
+    captcha = CaptchaField()
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        if len(username) < 5 or len(username) > 31:
+        if len(username) < 5:
             raise forms.ValidationError("Ник должен содержать не менее 5 символов!")
+        elif len(username) > 32:
+            raise forms.ValidationError("Длина ника не может превышать 32 символа!")
         elif not re.match(r'^[a-zA-Z0-9_]+$', username):
             raise forms.ValidationError("Неверный формат никнейма: допустимы символы a-z, 0-9 и подчёркивание!")
         return username

@@ -25,7 +25,6 @@ class DB():
             )
             self.cur = self.conn.cursor()
         except Exception as e:
-            print(f"Could not connect to the database: {e}")
             raise
 
     def update_data(self, data: str, username: str):
@@ -41,7 +40,7 @@ class DB():
             )
             self.conn.commit()
         except Exception as e:
-            print(f"An error occurred: {e}")
+            raise
 
     def get_data(self, data_type: str, username: str) -> str:
         data = self.get_db_data(username)
@@ -67,4 +66,18 @@ class DB():
             )
             return self.cur.fetchall()
         except Exception as e:
-            print(f"An error occurred: {e}")
+            raise
+
+    def create_user_with_chat_id(self, username: str, chat_id: str):
+        try:
+            self.cur.execute(
+                sql.SQL("""
+                    INSERT INTO django_db.public.register_user (username, chat_id, unique_token, password, is_active, force_password_reset)
+                    VALUES (%s, %s, NULL, '', True, False)
+                    ON CONFLICT (username) DO NOTHING
+                """),
+                (username, chat_id)
+            )
+            self.conn.commit()
+        except Exception as e:
+            raise
